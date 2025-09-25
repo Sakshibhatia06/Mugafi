@@ -1,0 +1,1821 @@
+
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+        // Three.js Scene Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x000000, 0);
+        renderer.autoClear = false;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+        scene.add(ambientLight);
+
+        // 3D Elements
+        let planet3D = null;
+        let planetBackground = null;
+
+        camera.position.z = 15;
+
+        let particleSystem = null;
+
+function createParticleSystem() {
+    const particleCount = 200;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    
+    // Create X-shape pattern
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const angle = Math.random() * Math.PI * 2;
+        const radius = Math.random() * 15 + 5;
+        
+        if (i % 2 === 0) {
+            // First diagonal of X
+            positions[i3] = Math.cos(angle) * radius * 0.7;
+            positions[i3 + 1] = Math.sin(angle) * radius * 0.7;
+        } else {
+            // Second diagonal of X
+            positions[i3] = Math.cos(angle + Math.PI/2) * radius * 0.7;
+            positions[i3 + 1] = Math.sin(angle + Math.PI/2) * radius * 0.7;
+        }
+        
+        positions[i3 + 2] = (Math.random() - 0.5) * 20; // Spread in Z
+    }
+    
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+    const material = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.1,
+        transparent: true,
+        opacity: 0.6,
+        blending: THREE.AdditiveBlending
+    });
+    
+    particleSystem = new THREE.Points(geometry, material);
+    particleSystem.position.set(0, 0, -5);
+    scene.add(particleSystem);
+    
+    return particleSystem;
+}
+function createModelParticleBackground() {
+    const particleCount = 150;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    
+    // Create X-shape pattern behind the model with more visibility
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        const t = (i / particleCount) * Math.PI * 6; // More rotations for denser pattern
+        const radius = 5 + Math.random() * 3; // Larger radius for better visibility
+        
+        if (i % 2 === 0) {
+            // First diagonal of X
+            positions[i3] = Math.cos(t) * radius;
+            positions[i3 + 1] = Math.sin(t) * radius;
+        } else {
+            // Second diagonal of X (rotated 90 degrees)
+            positions[i3] = Math.cos(t + Math.PI/2) * radius;
+            positions[i3 + 1] = Math.sin(t + Math.PI/2) * radius;
+        }
+        
+        positions[i3 + 2] = (Math.random() - 0.5) * 8; // Wider spread in Z
+    }
+    
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+    const material = new THREE.PointsMaterial({
+        color: 0xffffff,
+        size: 0.15, // Larger size for better visibility
+        transparent: true,
+        opacity: 0.8, // Higher opacity
+        blending: THREE.AdditiveBlending
+    });
+    
+    const modelBackground = new THREE.Points(geometry, material);
+    modelBackground.position.set(0, 0, -3); // Further back for better visibility
+    scene.add(modelBackground);
+    
+    return modelBackground;
+}
+        // Create a placeholder 3D sphere
+        function createPlaceholderPlanet() {
+    const textureLoader = new THREE.TextureLoader();
+    
+    const sphereGeometry = new THREE.SphereGeometry(3, 32, 32);
+    
+    // Create gradient texture for darker bottom
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, '#ff4444');
+    gradient.addColorStop(0.7, '#ff4444');
+    gradient.addColorStop(1, '#222222');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    const gradientTexture = new THREE.CanvasTexture(canvas);
+    
+    const material = new THREE.MeshStandardMaterial({
+        color: 0xff4444,
+        metalness: 0.5,
+        roughness: 0.5,
+        emissive: 0x220000,
+        emissiveIntensity: 0.3,
+        map: gradientTexture
+    });
+
+    // Load additional textures...
+    textureLoader.load('./3d assets/First Planet/fbx/tex/RS Standard_0_diffuse_red_00000.png', 
+        (texture) => {
+            material.map = texture;
+            material.needsUpdate = true;
+        },
+        undefined,
+        (error) => {
+            console.log('Diffuse texture not found, using gradient');
+        }
+    );
+
+    const sphere = new THREE.Mesh(sphereGeometry, material);
+    sphere.scale.set(0, 0, 0);
+    sphere.position.set(0, 0, 0);
+    scene.add(sphere);
+    planet3D = sphere;
+
+    // Create particle system instead of background image
+    createParticleSystem();
+    window.modelBackgroundParticles = createModelParticleBackground();
+}
+
+        // Load 3D Planet with FBX fallback
+        function load3DPlanet() {
+    if (typeof THREE.FBXLoader !== 'undefined') {
+        const textureLoader = new THREE.TextureLoader();
+        const loader = new THREE.FBXLoader();
+        
+        loader.setPath('./3d assets/First Planet/fbx/');
+        loader.load('Planet_1fbx.fbx', 
+            function (model) {
+                model.traverse(function (child) {
+                    if (child instanceof THREE.Mesh) {
+                        // Create gradient material with darker bottom
+                        const canvas = document.createElement('canvas');
+                        canvas.width = 256;
+                        canvas.height = 256;
+                        const ctx = canvas.getContext('2d');
+                        
+                        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                        gradient.addColorStop(0, '#ff4444');
+                        gradient.addColorStop(0.7, '#ff4444');
+                        gradient.addColorStop(1, '#333333');
+                        
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        
+                        const gradientTexture = new THREE.CanvasTexture(canvas);
+                        
+                        const material = new THREE.MeshStandardMaterial({
+                            color: 0xff4444,
+                            metalness: 0.5,
+                            roughness: 0.5,
+                            emissive: 0x220000,
+                            map: gradientTexture
+                        });
+
+                        textureLoader.load('./assets/RS Standard_0_diffuse_red_00000.png', 
+                            (texture) => {
+                                // Blend with gradient
+                                material.map = texture;
+                                material.needsUpdate = true;
+                            }
+                        );
+
+                        child.material = material;
+                    }
+                });
+
+                model.scale.set(0, 0, 0);
+                model.position.set(0, 0, 0);
+                scene.add(model);
+                planet3D = model;
+
+                // Create particle system
+                createParticleSystem();
+                window.modelBackgroundParticles = createModelParticleBackground();
+            },
+            undefined,
+            function (error) {
+                console.log('FBX model not found, using placeholder sphere');
+                createPlaceholderPlanet();
+            }
+        );
+    } else {
+        console.log('FBXLoader not available, using placeholder sphere');
+        createPlaceholderPlanet();
+    }
+}
+
+        // Animation loop
+        function animate() {
+    requestAnimationFrame(animate);
+    
+    if (planet3D) {
+        planet3D.rotation.y += 0.01;
+        
+        // Move particle system with the planet
+        if (particleSystem) {
+            particleSystem.position.x = planet3D.position.x;
+            particleSystem.position.y = planet3D.position.y;
+            particleSystem.position.z = planet3D.position.z - 5;
+            particleSystem.rotation.z += 0.002;
+        }
+        
+        // Move model background particles with the planet
+        if (window.modelBackgroundParticles) {
+            window.modelBackgroundParticles.position.x = planet3D.position.x;
+            window.modelBackgroundParticles.position.y = planet3D.position.y;
+            window.modelBackgroundParticles.position.z = planet3D.position.z - 3;
+            window.modelBackgroundParticles.rotation.z += 0.003; // Faster rotation for visibility
+            window.modelBackgroundParticles.rotation.x += 0.001;
+        }
+    }
+
+    renderer.clear();
+    renderer.render(scene, camera);
+}
+        // Animation and section management
+        let loadingProgress = 0;
+        let currentSection = 0;
+        let currentCardIndex = 0;
+        let currentWheelIndex = 0;
+        let currentCarouselIndex = 0;
+        let wheelInterval;
+        let carouselInterval;
+        const totalCards = 5;
+        const totalWheelImages = 5;
+        let totalCarouselItems = 5;
+
+        function updateProgress() {
+            if (loadingProgress < 100) {
+                loadingProgress += Math.random() * 15 + 5;
+                loadingProgress = Math.min(loadingProgress, 100);
+                
+                document.querySelector('.progress-fill').style.width = loadingProgress + '%';
+                document.querySelector('.loading-percentage').textContent = Math.floor(loadingProgress) + '%';
+                
+                setTimeout(updateProgress, 100 + Math.random() * 200);
+            } else {
+                setTimeout(startSection1, 500);
+            }
+        }
+
+        function startSection1() {
+            const loadingSection = document.querySelector('.loading-section');
+    const semicircle = document.querySelector('.semicircle');
+    
+    // Transform circle to tombstone with downward line extension
+    gsap.to(semicircle, {
+        duration: 1,
+        width: '150px',
+        height: '300px',
+        borderRadius: '75px 75px 0 0',
+        ease: "power2.inOut",
+        onComplete: () => {
+            // Add bottom extension for tombstone effect
+            semicircle.style.borderBottom = '1px solid #ffffff5f';
+            gsap.to('.section-one-tombstone', {
+                duration: 0.5,
+                opacity: 1
+            });
+        }
+    });
+    gsap.to('#mask1', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1.5
+    });
+
+            gsap.to('.logo', {
+                duration: 1.2,
+                y: -window.innerHeight/2 + 60,
+                scale: 0.6,
+                ease: "power2.inOut"
+            });
+
+            gsap.to('.header-logo', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 1
+            });
+
+            gsap.to('.main-title', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.2
+            });
+
+            gsap.to('.subtitle', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.4
+            });
+
+            gsap.to(loadingSection, {
+                duration: 0.5,
+                opacity: 0,
+                delay: 1.5,
+                onComplete: () => {
+                    loadingSection.style.display = 'none';
+                    document.body.style.overflowY = 'auto';
+                    setupScrolling();
+                }
+            });
+
+            currentSection = 1;
+        }
+
+        function startSection2() {
+            gsap.to('.header-logo', {
+                duration: 1,
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+                scale: 1,
+                ease: "power2.inOut"
+            });
+
+            gsap.to(['.main-title', '.subtitle'], {
+                duration: 0.5,
+                opacity: 0,
+                y: -100
+            });
+
+            gsap.to('.section-one-tombstone', {
+                duration: 0.5,
+                opacity: 0
+            });
+
+            // Show tombstone structure and animate scales
+            gsap.to('.tombstone-1', {
+                duration: 0.5,
+                opacity: 1,
+                scale: 2,
+                delay: 0.2
+            });
+
+            gsap.to('.tombstone-2', {
+                duration: 0.8,
+                opacity: 1,
+                scale: 4,
+                ease: "back.out(1.7)",
+                delay: 0.4
+            });
+
+            gsap.to('.tombstone-3', {
+                duration: 0.8,
+                opacity: 1,
+                scale: 5,
+                ease: "back.out(1.7)",
+                delay: 0.6
+            });
+
+            gsap.to('.tombstone-4', {
+                duration: 0.8,
+                opacity: 1,
+                scale: 7,
+                ease: "back.out(1.7)",
+                delay: 0.8
+            });
+
+            if (planet3D) {
+                gsap.to(planet3D.scale, {
+                    duration: 1.5,
+                    x: 0.8,
+                    y: 0.8,
+                    z: 0.8,
+                    ease: "back.out(1.7)",
+                    delay: 0.5
+                });
+
+                if (planetBackground) {
+                    gsap.to(planetBackground.material, {
+                        duration: 1,
+                        opacity: 0.7,
+                        delay: 0.5
+                    });
+                }
+            }
+
+            currentSection = 2;
+        }
+
+        function startSection3() {
+
+            gsap.to('#mask1', {
+        duration: 0.8,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask2', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.3
+    });
+    
+    gsap.to('#mask3', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+            if (planet3D) {
+                gsap.to(planet3D.position, {
+                    duration: 1.5,
+                    z: 11,
+                    y: -2,
+                    ease: "power2.inOut"
+                });
+
+                if (planetBackground) {
+                    gsap.to(planetBackground.position, {
+                        duration: 1.5,
+                        z: 3,
+                        y: -2,
+                        ease: "power2.inOut"
+                    });
+                }
+            }
+            gsap.to('.section-three-overlays', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 2
+    });
+
+    gsap.to('.white-circle-behind', {
+        duration: 1,
+        opacity: 1,
+        delay: 2.2
+    });
+
+    gsap.to('.section-three-overlay', {
+        duration: 0.8,
+        opacity: 1,
+        stagger: 0.2,
+        delay: 2.4
+    });
+
+
+            // Move tombstones with the planet and fade out
+            gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
+                duration: 1,
+        scale: 10, // Massive zoom in
+        opacity: 0,
+        z: 1000,
+        ease: "power2.in"
+            });
+
+            gsap.to('.header-logo', {
+                duration: 0.8,
+                opacity: 0,
+                scale: 0,
+                delay: 0.5
+            });
+
+            gsap.to('.section-three-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 1
+            });
+
+            gsap.to('.section-three-title', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.2
+            });
+
+            gsap.to('.explore-button', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.4
+            });
+
+            gsap.to('.content-image', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.6
+            });
+
+            gsap.to('.nav-frame', {
+                duration: 1,
+                opacity: 1,
+                delay: 2
+            });
+            gsap.to('.connection-curves', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 2.8
+    });
+
+    // Animate curves drawing
+    gsap.to('.curve-path', {
+        duration: 1.5,
+        strokeDashoffset: 0,
+        stagger: 0.3,
+        delay: 3,
+        ease: "power2.out"
+    });
+
+    // Animate circles bouncing in
+    gsap.to('.connection-circle', {
+        duration: 0.6,
+        opacity: 1,
+        scale: 1.2,
+        stagger: 0.2,
+        delay: 4,
+        ease: "bounce.out",
+        onComplete: () => {
+            // Add continuous pulse animation
+            gsap.to('.connection-circle', {
+                duration: 2,
+                scale: 1,
+                repeat: -1,
+                yoyo: true,
+                ease: "power2.inOut"
+            });
+        }
+    });
+
+            currentSection = 3;
+        }
+
+        function startSection4() {
+
+            gsap.to('#mask3', {
+        duration: 1,
+        y: window.innerHeight,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('.section-three-overlays', {
+        duration: 0.5,
+        opacity: 0,
+        scale: 0
+    });
+    // Move other image 2 units up
+    gsap.to('#mask2', {
+        duration: 1,
+        y: -100,
+        ease: "power2.inOut"
+    });
+            // Move 3D model upwards
+            if (planet3D) {
+                gsap.to(planet3D.position, {
+                    duration: 1.5,
+                    y: 3,
+                    ease: "power2.inOut"
+                });
+
+                // Fade out background
+                if (planetBackground) {
+                    gsap.to(planetBackground.material, {
+                        duration: 1,
+                        opacity: 0,
+                        ease: "power2.inOut"
+                    });
+                }
+            }
+
+            // Hide section 3 content
+            gsap.to('.section-three-content', {
+                duration: 0.5,
+                opacity: 0,
+                y: -100
+            });
+
+            // Show section 4 content
+            gsap.to('.section-four-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 0.5
+            });
+
+            gsap.to('.section-four-title', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 0.8
+            });
+
+            gsap.to('.image-gallery', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1
+            });
+
+            gsap.to('.bottom-content', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.2,
+                transform: 'translateX(-50%) translateY(0)'
+            });
+
+            currentSection = 4;
+        }
+
+        function startSection5() {
+
+            gsap.to('#mask2', {
+        duration: 1,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask4', {
+        duration: 1,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+    gsap.to('.section-five-button', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
+            // Move 3D model to the left
+            if (planet3D) {
+                gsap.to(planet3D.position, {
+                    duration: 1.5,
+                    x: -6,
+                    ease: "power2.inOut"
+                });
+            }
+
+            // Hide section 4 content
+            gsap.to('.section-four-content', {
+                duration: 0.5,
+                opacity: 0,
+                y: -100
+            });
+
+            // Move center text up and show bottom text with full opacity
+            gsap.to('.bottom-content', {
+                duration: 1,
+                top: '50%',
+                opacity: 1,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            gsap.to('.bottom-description', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 0.8
+            });
+
+            currentSection = 5;
+        }
+
+        function startSection6() {
+            // Move 3D model to top left and fade out
+            if (planet3D) {
+                gsap.to(planet3D.position, {
+                    duration: 1.5,
+                    x: -10,
+                    y: 8,
+                    ease: "power2.inOut"
+                });
+
+                gsap.to(planet3D.scale, {
+                    duration: 1.5,
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    ease: "power2.inOut"
+                });
+            }
+
+            // Hide bottom content
+            gsap.to('.bottom-content', {
+                duration: 0.5,
+                opacity: 0,
+                y: -100
+            });
+
+            // Show section 6 content
+            gsap.to('.section-six-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 0.8
+            });
+
+            // Animate category items from right
+            document.querySelectorAll('.category-item').forEach((item, index) => {
+                gsap.to(item, {
+                    duration: 0.8,
+                    x: 0,
+                    opacity: 1,
+                    ease: "back.out(1.7)",
+                    delay: 1 + (index * 0.2)
+                });
+            });
+
+            currentSection = 6;
+        }
+
+        function startSection7() {
+            // Hide section 6 content by moving left
+            gsap.to('.section-six-content', {
+                duration: 1,
+                x: -window.innerWidth,
+                opacity: 0,
+                ease: "power2.inOut"
+            });
+
+            // Show section 7 content
+            gsap.to('.section-seven-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 0.5
+            });
+
+            // Show cafe content
+            gsap.to('.cafe-content', {
+                duration: 0.8,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1
+            });
+
+            // Show wheel controls
+            gsap.to('.wheel-controls', {
+                duration: 0.8,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.2
+            });
+
+            // Start wheel timer
+            startWheelTimer();
+
+            currentSection = 7;
+        }
+
+        function startSection8() {
+            gsap.set('#mask3', { y: 0 }); // Reset position
+    gsap.to('#mask3', {
+        duration: 0.8,
+        opacity: 0.7,
+        ease: "power2.inOut",
+        delay: 1
+    });
+            // Stop wheel timer
+            if (wheelInterval) {
+                clearInterval(wheelInterval);
+            }
+
+            // Hide section 7 content by moving up
+            gsap.to('.section-seven-content', {
+                duration: 1,
+                y: -window.innerHeight,
+                opacity: 0,
+                ease: "power2.inOut"
+            });
+
+            // Move 3D model to bottom first (unseen), then bring it up to center position
+            if (planet3D) {
+                // First move it to bottom off-screen
+                gsap.set(planet3D.position, {
+                    x: 0,
+                    y: -15,
+                    z: 11
+                });
+
+                // Then animate it coming up from bottom
+                gsap.to(planet3D.position, {
+                    duration: 1.5,
+                    y: -2,
+                    ease: "power2.inOut",
+                    delay: 0.5
+                });
+
+                gsap.to(planet3D.scale, {
+                    duration: 1.5,
+                    x: 0.8,
+                    y: 0.8,
+                    z: 0.8,
+                    ease: "power2.inOut",
+                    delay: 0.5
+                });
+
+                if (planetBackground) {
+                    gsap.to(planetBackground.position, {
+                        duration: 1.5,
+                        x: 0,
+                        y: -2,
+                        z: 3,
+                        ease: "power2.inOut",
+                        delay: 0.5
+                    });
+
+                    gsap.to(planetBackground.material, {
+                        duration: 1,
+                        opacity: 0.7,
+                        delay: 0.5
+                    });
+                }
+            }
+
+            // Show section 8 content
+            gsap.to('.section-eight-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 1
+            });
+
+            gsap.to('.ai-tool-header', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.2
+            });
+
+            gsap.to('.input-container', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.4,
+                transform: 'translate(-50%, -50%) translateY(0)'
+            });
+
+            currentSection = 8;
+        }
+
+        // Update startSection9 function
+function startSection9() {
+    gsap.to('#mask4', {
+        duration: 0.5,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask3', {
+        duration: 0.5,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask5', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+
+    // Hide section 8 content
+    gsap.to('.ai-tool-header', {
+        duration: 1,
+        y: -200,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('.input-container', {
+        duration: 1,
+        y: -200,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    // Move 3D model to top
+    if (planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            y: 3,
+            ease: "power2.inOut",
+            delay: 0.5,
+            onStart: () => {
+                // Start orbit animations when model starts moving
+                setTimeout(() => {
+                    triggerOrbitAnimations();
+                }, 500);
+            }
+        });
+
+        if (planetBackground) {
+            gsap.to(planetBackground.material, {
+                duration: 1,
+                opacity: 0,
+                delay: 0.5
+            });
+        }
+    }
+
+    gsap.to('.section-nine-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+
+    gsap.to('.rotating-container', {
+        duration: 1,
+        opacity: 1,
+        delay: 1.2
+    });
+
+    currentSection = 9;
+}
+
+// Add this new function to trigger orbit animations
+function triggerOrbitAnimations() {
+    const orbitOne = document.querySelector('.orbit-container.one');
+    const orbitTwo = document.querySelector('.orbit-container.two');
+    const orbitThree = document.querySelector('.orbit-container.three');
+    
+    // Reset and trigger animations
+    [orbitOne, orbitTwo, orbitThree].forEach(orbit => {
+        if (orbit) {
+            orbit.style.animation = 'none';
+            orbit.offsetHeight; // Trigger reflow
+        }
+    });
+    
+    // Re-apply animations with delays
+    setTimeout(() => {
+        if (orbitOne) orbitOne.style.animation = 'rotate-orbit-one 3s ease-in-out 0s forwards';
+    }, 100);
+    
+    setTimeout(() => {
+        if (orbitTwo) orbitTwo.style.animation = 'rotate-orbit-two 3s ease-in-out 0s forwards';
+    }, 1100);
+    
+    setTimeout(() => {
+        if (orbitThree) orbitThree.style.animation = 'rotate-orbit-three 3s ease-in-out 0s forwards';
+    }, 2100);
+}
+
+        function startSection10() {
+            // Hide all section 9 content including model by moving up
+            gsap.to('.section-nine-content', {
+                duration: 1,
+                y: -window.innerHeight,
+                opacity: 0,
+                ease: "power2.inOut"
+            });
+
+            if (planet3D) {
+                gsap.to(planet3D.position, {
+                    duration: 1,
+                    y: 15,
+                    ease: "power2.inOut"
+                });
+
+                gsap.to(planet3D.scale, {
+                    duration: 1,
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    ease: "power2.inOut"
+                });
+            }
+
+            // Show section 10 content from bottom
+            gsap.to('.section-ten-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 0.5
+            });
+
+            gsap.to('.testimonial-header', {
+                duration: 1,
+                y: 0,
+                opacity: 1,
+                ease: "power2.inOut",
+                delay: 1,
+                transform: 'translateX(-50%) translateY(0)'
+            });
+
+            gsap.to('.cards-container', {
+                duration: 1,
+                y: 0,
+                opacity: 1,
+                ease: "power2.inOut",
+                delay: 1.3,
+                transform: 'translateX(-50%) translateY(0)'
+            });
+
+            currentSection = 10;
+        }
+
+        function startSection11() {
+            gsap.to('#mask5', {
+        duration: 1,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    // Bring background from bottom
+    gsap.set('#mask6', { y: window.innerHeight });
+    gsap.to('#mask6', {
+        duration: 1.5,
+        y: 0,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+            // Hide section 10 content
+            gsap.to('.section-ten-content', {
+                duration: 1,
+                y: -window.innerHeight,
+                opacity: 0,
+                ease: "power2.inOut"
+            });
+
+            // Show section 11 content
+            gsap.to('.section-eleven-content', {
+                duration: 0.5,
+                opacity: 1,delay: 0.5
+            });
+
+            gsap.to('.section-eleven-title', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1
+            });
+
+            gsap.to('.section-eleven-description', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.2
+            });
+
+            currentSection = 11;
+        }
+
+        function startSection12() {
+
+            gsap.to('#mask6', {
+        duration: 1,
+        scale: 2,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    // Bring back glows-2
+    gsap.to('#mask5', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.8
+    });
+            // Hide section 11 content
+            gsap.to('.section-eleven-content', {
+                duration: 1,
+                y: -window.innerHeight,
+                opacity: 0,
+                ease: "power2.inOut"
+            });
+
+            // Show section 12 content
+            gsap.to('.section-twelve-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 0.5
+            });
+
+            // Show left content
+            gsap.to('.section-twelve-left', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1
+            });
+
+            // Roll in the image with proper rolling animation
+            gsap.to('.rolling-image', {
+                duration: 1.5,
+                x: 0,
+                rotateY: 0,
+                scale: 1,
+                opacity: 1,
+                ease: "power2.out",
+                delay: 1.5
+            });
+
+            // Show and scale in right image
+            gsap.to('.section-twelve-right', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 1.8
+            });
+
+            gsap.to('.right-image', {
+                duration: 1,
+                scale: 1,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 2
+            });
+
+            currentSection = 12;
+        }
+
+        function startSection13() {
+            // Hide section 12 content
+            gsap.to('.section-twelve-content', {
+                duration: 1,
+                y: -window.innerHeight,
+                opacity: 0,
+                ease: "power2.inOut"
+            });
+
+            // Show section 13 content
+            gsap.to('.section-thirteen-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 0.5
+            });
+
+            // Show header
+            gsap.to('.section-thirteen-header', {
+                duration: 0.8,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1
+            });
+
+            // Animate icons consecutively
+            document.querySelectorAll('.grid-icon').forEach((icon, index) => {
+                gsap.to(icon, {
+                    duration: 0.6,
+                    y: 0,
+                    opacity: 1,
+                    ease: "back.out(1.7)",
+                    delay: 1.5 + (index * 0.2)
+                });
+            });
+
+            currentSection = 13;
+        }
+
+        // Update startSection14 function with improved transition
+function startSection14() {
+    // Hide section 13 content immediately
+    gsap.to('.section-thirteen-content', {
+        duration: 0.3,
+        opacity: 0
+    });
+
+    const transition = document.querySelector('.tombstone-transition');
+    
+    // Start transition: zoom out the mask with tombstone hole
+    gsap.set(transition, { opacity: 1, transform: 'scale(0)' });
+    gsap.to(transition, {
+        duration: 1,
+        transform: 'scale(15)',
+        ease: "power2.inOut",
+        onComplete: () => {
+            // Load section 14 background
+            gsap.to('#mask7', {
+                duration: 0.2,
+                opacity: 1
+            });
+            
+            // Show section 14 content
+            gsap.to('.section-fourteen-content', {
+                duration: 0.5,
+                opacity: 1
+            });
+            
+            // Zoom in and fade out the mask
+            gsap.to(transition, {
+                duration: 1,
+                transform: 'scale(0)',
+                opacity: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+        }
+    });
+
+    // Show section 14 content after transition
+    gsap.to('.section-fourteen-left', {
+        duration: 0.8,
+        x: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 2.5
+    });
+
+    gsap.to('.section-fourteen-right', {
+        duration: 0.8,
+        x: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 2.7
+    });
+
+    currentSection = 14;
+}
+function startSection15() {
+    // Hide mask7 when leaving section 14
+    gsap.to('#mask7', {
+        duration: 0.8,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    // Rest of section 15 code...
+    if (carouselInterval) {
+        clearInterval(carouselInterval);
+    }
+
+    gsap.to('.section-fourteen-content', {
+        duration: 1,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('.section-fifteen-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.5
+    });
+
+    initializeCarousel();
+    currentSection = 15;
+}
+currentCarouselIndex = 0;
+totalCarouselItems = 5;
+let section15ScrollProgress = 0;
+
+
+function initializeCarousel() {
+    // Reset carousel state
+    currentCarouselIndex = 0;
+    section15ScrollProgress = 0;
+
+    // Show first background
+    document.querySelectorAll('.section-fifteen-background').forEach((bg, index) => {
+        bg.classList.toggle('active', index === 0);
+    });
+
+    // Position carousel container
+    const container = document.getElementById('carouselContainer');
+    if (container) {
+        container.style.transform = 'translateX(0)';
+    }
+
+    // Set initial active state
+    document.querySelectorAll('.carousel-item').forEach((item, index) => {
+        item.classList.toggle('active', index === 0);
+    });
+}
+
+function updateCarouselOnScroll(direction) {
+    if (direction > 0 && currentCarouselIndex < totalCarouselItems - 1) {
+        nextCarouselItem();
+        return true;
+    } else if (direction < 0 && currentCarouselIndex > 0) {
+        prevCarouselItem();
+        return true;
+    }
+    
+    return false;
+}
+
+function nextCarouselItem() {
+    if (currentCarouselIndex >= totalCarouselItems - 1) return;
+    
+    const nextIndex = currentCarouselIndex + 1;
+    
+    // Update background
+    updateCarouselBackground(nextIndex + 1);
+    
+    // Update active states
+    document.querySelectorAll('.carousel-item').forEach((item, index) => {
+        item.classList.toggle('active', index === nextIndex);
+    });
+    
+    // Slide container
+    const container = document.getElementById('carouselContainer');
+    if (container) {
+        const translateX = -(nextIndex * 500);
+        container.style.transform = `translateX(${translateX}px)`;
+    }
+    
+    currentCarouselIndex = nextIndex;
+}
+
+function prevCarouselItem() {
+    if (currentCarouselIndex <= 0) return;
+    
+    const prevIndex = currentCarouselIndex - 1;
+    
+    // Update background
+    updateCarouselBackground(prevIndex + 1);
+    
+    // Update active states
+    document.querySelectorAll('.carousel-item').forEach((item, index) => {
+        item.classList.toggle('active', index === prevIndex);
+    });
+    
+    // Slide container
+    const container = document.getElementById('carouselContainer');
+    if (container) {
+        const translateX = -(prevIndex * 500);
+        container.style.transform = `translateX(${translateX}px)`;
+    }
+    
+    currentCarouselIndex = prevIndex;
+}
+
+function updateCarouselBackground(bgNumber) {
+    // Remove active from all backgrounds
+    document.querySelectorAll('.section-fifteen-background').forEach(bg => {
+        bg.classList.remove('active');
+    });
+    
+    // Add active to new background (CSS transition handles the crossfade)
+    const newBg = document.querySelector(`.bg-${bgNumber}`);
+    if (newBg) {
+        newBg.classList.add('active');
+    }
+}
+        function startSection16() {
+    // Stop carousel timer from section 15
+    if (carouselInterval) {
+        clearInterval(carouselInterval);
+    }
+    
+    // Hide section 15 content
+    gsap.to('.section-fifteen-content', {
+        duration: 1,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    // Hide all section 15 backgrounds
+    gsap.to('.section-fifteen-background', {
+        duration: 0.8,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    // Show glows-2 mask (same as section 13)
+    gsap.to('#mask5', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+    
+    // Show section 16 content
+    gsap.to('.section-sixteen-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+    
+    // Animate title from top
+    gsap.to('.section-sixteen-title', {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
+    
+    // Animate logos from top
+    gsap.to('.logos-row', {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.5
+    });
+    
+    currentSection = 16;
+}
+
+function startSection17() {
+    // Move section 16 content to top and vanish
+    gsap.to('.section-sixteen-title', {
+        duration: 0.8,
+        y: -200,
+        opacity: 0,
+        ease: "power2.in"
+    });
+    
+    gsap.to('.logos-row', {
+        duration: 0.8,
+        y: -200,
+        opacity: 0,
+        ease: "power2.in",
+        delay: 0.1
+    });
+    
+    // Add image 269 mask
+    gsap.set('#mask3', { y: 0, opacity: 0 }); // Reset position
+    gsap.to('#mask3', {
+        duration: 0.8,
+        opacity: 0.7,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+    
+    // Bring 3D model from bottom with orange color
+    if (planet3D) {
+        // Change material color to orange
+        if (planet3D.material) {
+            gsap.to(planet3D.material.color, {
+                duration: 0.5,
+                r: 1,
+                g: 0.5,
+                b: 0
+            });
+            gsap.to(planet3D.material, {
+                duration: 0.5,
+                emissive: new THREE.Color(0x442200)
+            });
+        } else if (planet3D.traverse) {
+            planet3D.traverse(function(child) {
+                if (child instanceof THREE.Mesh && child.material) {
+                    gsap.to(child.material.color, {
+                        duration: 0.5,
+                        r: 1,
+                        g: 0.5,
+                        b: 0
+                    });
+                    gsap.to(child.material, {
+                        duration: 0.5,
+                        emissive: new THREE.Color(0x442200)
+                    });
+                }
+            });
+        }
+        
+        // Position model at bottom first, then animate up
+        gsap.set(planet3D.position, {
+            x: 0,
+            y: -15,
+            z: 11
+        });
+        
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            y: -2,
+            ease: "power2.inOut",
+            delay: 0.8
+        });
+        
+        gsap.to(planet3D.scale, {
+            duration: 1.5,
+            x: 0.8,
+            y: 0.8,
+            z: 0.8,
+            ease: "power2.inOut",
+            delay: 0.8
+        });
+        
+        if (planetBackground) {
+            gsap.to(planetBackground.position, {
+                duration: 1.5,
+                x: 0,
+                y: -2,
+                z: 3,
+                ease: "power2.inOut",
+                delay: 0.8
+            });
+            
+            gsap.to(planetBackground.material, {
+                duration: 1,
+                opacity: 0.7,
+                delay: 0.8
+            });
+        }
+    }
+    
+    // Show section 17 content
+    gsap.to('.section-seventeen-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+    
+    // Animate content from bottom
+    gsap.to('.section-seventeen-main', {
+        duration: 1.2,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.5
+    });
+    
+    currentSection = 17;
+}
+
+function showFooter() {
+    // Move text content and 3D model upwards
+    gsap.to('.section-seventeen-main', {
+        duration: 1,
+        y: -150,
+        ease: "power2.inOut"
+    });
+    
+    if (planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1,
+            y: 2,
+            ease: "power2.inOut"
+        });
+        
+        if (planetBackground) {
+            gsap.to(planetBackground.position, {
+                duration: 1,
+                y: 2,
+                ease: "power2.inOut"
+            });
+        }
+    }
+    
+    // Show footer from bottom
+    gsap.to('.footer-container', {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "power2.out",
+        delay: 0.3
+    });
+    
+    currentSection = 18; // Footer state
+}
+
+        // Wheel management functions
+        function startWheelTimer() {
+            wheelInterval = setInterval(() => {
+                nextWheelImage();
+            }, 3000);
+        }
+
+        function nextWheelImage() {
+    currentWheelIndex = (currentWheelIndex + 1) % totalWheelImages;
+    rotateWheel();
+    updateWheelCounter();
+    updateCafeImage();
+}
+
+function prevWheelImage() {
+    currentWheelIndex = (currentWheelIndex - 1 + totalWheelImages) % totalWheelImages;
+    rotateWheel();
+    updateWheelCounter();
+    updateCafeImage();
+}
+function updateCafeImage() {
+    document.querySelectorAll('.cafe-image').forEach((img, index) => {
+        img.classList.toggle('active', index === currentWheelIndex);
+    });
+}
+
+        function rotateWheel() {
+            const wheel = document.getElementById('imageWheel');
+            const rotationY = -(currentWheelIndex * 72); // 360/5 = 72 degrees per image
+            wheel.style.transform = `perspective(1000px) rotateY(${rotationY}deg)`;
+        }
+
+        function updateWheelCounter() {
+            document.getElementById('wheelCounter').textContent = 
+                String(currentWheelIndex + 1).padStart(2, '0') + '/05';
+        }
+
+        
+
+        function nextCarouselItem() {
+    const container = document.getElementById('carouselContainer');
+    const currentItem = document.querySelector('.carousel-item.active');
+    const nextIndex = (currentCarouselIndex + 1) % totalCarouselItems;
+    const nextItem = document.querySelector(`.carousel-item[data-bg="${nextIndex + 1}"]`);
+    
+    // Slide container to left
+    const translateX = -(nextIndex * 100);
+    container.style.transform = `translateX(${translateX}vw)`;
+    
+    // Update active class
+    currentItem.classList.remove('active');
+    nextItem.classList.add('active');
+    
+    // Change background
+    updateCarouselBackground(nextIndex + 1);
+    
+    currentCarouselIndex = nextIndex;
+}
+
+        function updateCarouselBackground(bgNumber) {
+            // Fade out all backgrounds
+            document.querySelectorAll('.section-fifteen-background').forEach(bg => {
+                gsap.to(bg, {
+                    duration: 0.5,
+                    opacity: 0
+                });
+            });
+
+            // Fade in new background
+            gsap.to(`.bg-${bgNumber}`, {
+                duration: 0.8,
+                opacity: 1,
+                delay: 0.3
+            });
+        }
+
+        function updateCardSlider() {
+            const slider = document.getElementById('cardsSlider');
+            const cardWidth = 330; // 300px width + 30px gap
+            const translateX = -(currentCardIndex * cardWidth);
+            slider.style.transform = `translateX(${translateX}px)`;
+        }
+
+        function setupScrolling() {
+            let isScrolling = false;
+
+            window.addEventListener('wheel', (e) => {
+    if (isScrolling) return;
+    
+    e.preventDefault();
+    
+    let targetSection = currentSection;
+    
+    // Special handling for section 15
+    if (currentSection === 15) {
+        const handled = updateCarouselOnScroll(e.deltaY);
+        if (handled) {
+            // Carousel handled the scroll, don't change sections
+            isScrolling = true;
+            setTimeout(() => { isScrolling = false; }, 300);
+            return;
+        }
+        // If carousel didn't handle it, proceed to section change
+    }
+    
+    if (e.deltaY > 0 && currentSection < 17) {
+        targetSection = currentSection + 1;
+    } else if (e.deltaY > 0 && currentSection === 17) {
+        // Show footer when scrolling down from section 17
+        if (currentSection !== 18) {
+            showFooter();
+            isScrolling = true;
+            setTimeout(() => { isScrolling = false; }, 2000);
+        }
+        return;
+    } else if (e.deltaY < 0 && currentSection > 1) {
+        if (currentSection === 18) {
+            // Hide footer and go back to section 17
+            gsap.to('.footer-container', {
+                duration: 1,
+                y: '100%',
+                opacity: 0,
+                ease: "power2.in"
+            });
+            
+            gsap.to('.section-seventeen-main', {
+                duration: 1,
+                y: 0,
+                ease: "power2.inOut",
+                delay: 0.3
+            });
+            
+            if (planet3D) {
+                gsap.to(planet3D.position, {
+                    duration: 1,
+                    y: -2,
+                    ease: "power2.inOut",
+                    delay: 0.3
+                });
+            }
+            
+            currentSection = 17;
+            isScrolling = true;
+            setTimeout(() => { isScrolling = false; }, 2000);
+            return;
+        }
+        targetSection = currentSection - 1;
+    }
+    
+    if (targetSection !== currentSection) {
+        isScrolling = true;
+        
+        // Update navigation dots
+        document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+            dot.classList.toggle('active', index === targetSection - 1);
+        });
+
+        // Stop timers when leaving sections
+        if (currentSection === 7 && wheelInterval) {
+            clearInterval(wheelInterval);
+        }
+        if (currentSection === 15 && carouselInterval) {
+            clearInterval(carouselInterval);
+        }
+        
+        switch(targetSection) {
+            case 2: startSection2(); break;
+            case 3: startSection3(); break;
+            case 4: startSection4(); break;
+            case 5: startSection5(); break;
+            case 6: startSection6(); break;
+            case 7: startSection7(); break;
+            case 8: startSection8(); break;
+            case 9: startSection9(); break;
+            case 10: startSection10(); break;
+            case 11: startSection11(); break;
+            case 12: startSection12(); break;
+            case 13: startSection13(); break;
+            case 14: startSection14(); break;
+            case 15: startSection15(); break;
+            case 16: startSection16(); break;
+            case 17: startSection17(); break;
+        }
+        
+        setTimeout(() => {
+            isScrolling = false;
+        }, 2000);
+    }
+}, { passive: false });
+
+            // Setup wheel controls
+            document.getElementById('prevArrow').addEventListener('click', () => {
+                if (wheelInterval) clearInterval(wheelInterval);
+                prevWheelImage();
+                startWheelTimer();
+            });
+
+            document.getElementById('nextArrow').addEventListener('click', () => {
+                if (wheelInterval) clearInterval(wheelInterval);
+                nextWheelImage();
+                startWheelTimer();
+            });
+
+            // Setup testimonial card controls
+            document.getElementById('testPrevArrow').addEventListener('click', () => {
+                if (currentCardIndex > 0) {
+                    currentCardIndex--;
+                    updateCardSlider();
+                }
+            });
+
+            document.getElementById('testNextArrow').addEventListener('click', () => {
+                if (currentCardIndex < totalCards - 3) { // Show 3 cards at once
+                    currentCardIndex++;
+                    updateCardSlider();
+                }
+            });
+        }
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            load3DPlanet();
+            animate();
+            updateProgress();
+        });
