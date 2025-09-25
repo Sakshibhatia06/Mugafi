@@ -24,6 +24,191 @@
 
         let particleSystem = null;
 
+        class AssetLoader {
+    constructor() {
+        this.imageSources = [];
+        this.loadedCount = 0;
+        this.totalCount = 0;
+        this.onProgress = null;
+        this.onComplete = null;
+    }
+
+    // Extract all image sources from the HTML
+    extractImageSources() {
+        const images = document.querySelectorAll('img');
+        const backgroundImages = document.querySelectorAll('[style*="background-image"]');
+        const cssBackgroundMasks = document.querySelectorAll('.background-mask');
+        
+        // Get all img src attributes
+        images.forEach(img => {
+            if (img.src && !img.src.includes('data:')) {
+                this.imageSources.push(img.src);
+            }
+        });
+
+        // Get inline background images
+        backgroundImages.forEach(element => {
+            const style = element.getAttribute('style');
+            const matches = style.match(/background-image:\s*url\(['"]?(.*?)['"]?\)/);
+            if (matches && matches[1]) {
+                this.imageSources.push(matches[1]);
+            }
+        });
+
+        // Get CSS background mask images
+        const maskSources = [
+            './assets/Mask group-2.png',
+            './assets/Group 1171275138.png',
+            './assets/image 269.png',
+            './assets/glows.png',
+            './assets/glows-2.png',
+            './assets/koncepted.ai_red_rose_color_pallete_detailed_smooth_mountains_i_81b88cf3-c6dd-4118-9c38-94b63a67f4d2-2 1.png',
+            './assets/image 376.png',
+            './assets/creator ownership.png',
+            './assets/koncepted.ai_A_surreal_scene_with_a_circle_of_human_silhouettes_c0d5e498-c93a-4922-b101-5c5ed5a9b2eb 1.png',
+            './assets/transparent funding.png',
+            './assets/global reach.png',
+            './assets/global reach-1.png',
+            './assets/Rectangle 8305.png'
+        ];
+
+        // Add mask sources
+        maskSources.forEach(src => {
+            if (!this.imageSources.includes(src)) {
+                this.imageSources.push(src);
+            }
+        });
+
+        // Remove duplicates
+        this.imageSources = [...new Set(this.imageSources)];
+        this.totalCount = this.imageSources.length;
+
+        console.log(`Found ${this.totalCount} images to load:`, this.imageSources);
+    }
+
+    // Load a single image and return a promise
+    loadImage(src) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            
+            img.onload = () => {
+                this.loadedCount++;
+                const progress = (this.loadedCount / this.totalCount) * 100;
+                
+                if (this.onProgress) {
+                    this.onProgress(progress, this.loadedCount, this.totalCount);
+                }
+                
+                console.log(`Loaded: ${src} (${this.loadedCount}/${this.totalCount})`);
+                resolve(img);
+            };
+            
+            img.onerror = () => {
+                console.warn(`Failed to load: ${src}`);
+                this.loadedCount++; // Count failed loads too to prevent hanging
+                const progress = (this.loadedCount / this.totalCount) * 100;
+                
+                if (this.onProgress) {
+                    this.onProgress(progress, this.loadedCount, this.totalCount);
+                }
+                
+                resolve(null); // Resolve with null instead of rejecting
+            };
+            
+            img.src = src;
+        });
+    }
+
+    // Load all images
+    async loadAll() {
+        this.extractImageSources();
+        
+        if (this.totalCount === 0) {
+            if (this.onComplete) {
+                this.onComplete();
+            }
+            return;
+        }
+
+        const loadPromises = this.imageSources.map(src => this.loadImage(src));
+        
+        try {
+            await Promise.all(loadPromises);
+            console.log('All images loaded successfully!');
+            if (this.onComplete) {
+                this.onComplete();
+            }
+        } catch (error) {
+            console.error('Error loading some images:', error);
+            if (this.onComplete) {
+                this.onComplete();
+            }
+        }
+    }
+}
+
+// Update the loading progress system
+let assetLoader;
+let assetsLoaded = false;
+
+function initializeAssetLoading() {
+    assetLoader = new AssetLoader();
+    
+    assetLoader.onProgress = (progress, loaded, total) => {
+        loadingProgress = progress;
+        updateLoadingDisplay(progress, loaded, total);
+    };
+    
+    assetLoader.onComplete = () => {
+        assetsLoaded = true;
+        loadingProgress = 100;
+        updateLoadingDisplay(100, assetLoader.totalCount, assetLoader.totalCount);
+        
+        // Wait a moment before starting the experience
+        setTimeout(() => {
+            startSection1();
+        }, 500);
+    };
+    
+    // Start loading assets
+    assetLoader.loadAll();
+}
+
+function updateLoadingDisplay(progress, loaded, total) {
+    const progressFill = document.querySelector('.progress-fill');
+    const loadingPercentage = document.querySelector('.loading-percentage');
+    const loadingText = document.querySelector('.loading-text');
+    
+    if (progressFill) {
+        progressFill.style.width = progress + '%';
+    }
+    
+    if (loadingPercentage) {
+        loadingPercentage.textContent = Math.floor(progress) + '%';
+    }
+    
+    if (loadingText) {
+        if (total > 0) {
+            loadingText.textContent = `loading assets ... (${loaded}/${total})`;
+        } else {
+            loadingText.textContent = `loading multiverse ...`;
+        }
+    }
+}
+
+// Remove the old updateProgress function and replace with this
+function updateProgress() {
+    // This function is now only used as a fallback
+    if (!assetsLoaded && loadingProgress < 100) {
+        // Add some artificial progress if assets are taking too long
+        loadingProgress += Math.random() * 2 + 1;
+        loadingProgress = Math.min(loadingProgress, 95); // Cap at 95% until assets are done
+        
+        updateLoadingDisplay(loadingProgress, 0, 0);
+        setTimeout(updateProgress, 100 + Math.random() * 200);
+    }
+}
+
 function createParticleSystem() {
     const particleCount = 200;
     const geometry = new THREE.BufferGeometry();
@@ -984,58 +1169,81 @@ function triggerOrbitAnimations() {
     }, 2100);
 }
 
-        function startSection10() {
-            // Hide all section 9 content including model by moving up
-            gsap.to('.section-nine-content', {
-                duration: 1,
-                y: -window.innerHeight,
-                opacity: 0,
-                ease: "power2.inOut"
-            });
-
-            if (planet3D) {
-                gsap.to(planet3D.position, {
-                    duration: 1,
-                    y: 15,
-                    ease: "power2.inOut"
-                });
-
-                gsap.to(planet3D.scale, {
-                    duration: 1,
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    ease: "power2.inOut"
-                });
-            }
-
-            // Show section 10 content from bottom
-            gsap.to('.section-ten-content', {
+        function startSection1() {
+    if (!assetsLoaded && loadingProgress < 100) {
+        // If assets aren't fully loaded yet, wait a bit more
+        setTimeout(startSection1, 100);
+        return;
+    }
+    
+    const loadingSection = document.querySelector('.loading-section');
+    const semicircle = document.querySelector('.semicircle');
+    
+    // Transform circle to tombstone with downward line extension
+    gsap.to(semicircle, {
+        duration: 1,
+        width: '150px',
+        height: '300px',
+        borderRadius: '75px 75px 0 0',
+        ease: "power2.inOut",
+        onComplete: () => {
+            // Add bottom extension for tombstone effect
+            semicircle.style.borderBottom = '1px solid #ffffff5f';
+            gsap.to('.section-one-tombstone', {
                 duration: 0.5,
-                opacity: 1,
-                delay: 0.5
+                opacity: 1
             });
-
-            gsap.to('.testimonial-header', {
-                duration: 1,
-                y: 0,
-                opacity: 1,
-                ease: "power2.inOut",
-                delay: 1,
-                transform: 'translateX(-50%) translateY(0)'
-            });
-
-            gsap.to('.cards-container', {
-                duration: 1,
-                y: 0,
-                opacity: 1,
-                ease: "power2.inOut",
-                delay: 1.3,
-                transform: 'translateX(-50%) translateY(0)'
-            });
-
-            currentSection = 10;
         }
+    });
+    
+    gsap.to('#mask1', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1.5
+    });
+
+    gsap.to('.logo', {
+        duration: 1.2,
+        y: -window.innerHeight/2 + 60,
+        scale: 0.6,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('.header-logo', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+
+    gsap.to('.main-title', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
+
+    gsap.to('.subtitle', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.4
+    });
+
+    gsap.to(loadingSection, {
+        duration: 0.5,
+        opacity: 0,
+        delay: 1.5,
+        onComplete: () => {
+            loadingSection.style.display = 'none';
+            document.body.style.overflowY = 'auto';
+            setupScrolling();
+        }
+    });
+
+    currentSection = 1;
+}
 
         function startSection11() {
             gsap.to('#mask5', {
@@ -1817,5 +2025,6 @@ function updateCafeImage() {
         document.addEventListener('DOMContentLoaded', () => {
             load3DPlanet();
             animate();
+            initializeAssetLoading();
             updateProgress();
         });
