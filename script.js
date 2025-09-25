@@ -491,21 +491,14 @@ function createModelParticleBackground() {
         const totalWheelImages = 5;
         let totalCarouselItems = 5;
 
-        function updateProgress() {
-            if (loadingProgress < 100) {
-                loadingProgress += Math.random() * 15 + 5;
-                loadingProgress = Math.min(loadingProgress, 100);
-                
-                document.querySelector('.progress-fill').style.width = loadingProgress + '%';
-                document.querySelector('.loading-percentage').textContent = Math.floor(loadingProgress) + '%';
-                
-                setTimeout(updateProgress, 100 + Math.random() * 200);
-            } else {
-                setTimeout(startSection1, 500);
-            }
-        }
+        
 
         function startSection1() {
+            if (!assetsLoaded && loadingProgress < 1001) {
+        // If assets aren't fully loaded yet, wait a bit more
+        setTimeout(startSection1, 1001);
+        return;
+    }
             const loadingSection = document.querySelector('.loading-section');
     const semicircle = document.querySelector('.semicircle');
     
@@ -2066,5 +2059,4 @@ function updateCafeImage() {
             load3DPlanet();
             animate();
             initializeAssetLoading();
-            // updateProgress();
         });
