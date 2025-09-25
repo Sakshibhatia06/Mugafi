@@ -1277,6 +1277,58 @@ function triggerOrbitAnimations() {
 
     currentSection = 1;
 }
+function startSection10() {
+            // Hide all section 9 content including model by moving up
+            gsap.to('.section-nine-content', {
+                duration: 1,
+                y: -window.innerHeight,
+                opacity: 0,
+                ease: "power2.inOut"
+            });
+
+            if (planet3D) {
+                gsap.to(planet3D.position, {
+                    duration: 1,
+                    y: 15,
+                    ease: "power2.inOut"
+                });
+
+                gsap.to(planet3D.scale, {
+                    duration: 1,
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    ease: "power2.inOut"
+                });
+            }
+
+            // Show section 10 content from bottom
+            gsap.to('.section-ten-content', {
+                duration: 0.5,
+                opacity: 1,
+                delay: 0.5
+            });
+
+            gsap.to('.testimonial-header', {
+                duration: 1,
+                y: 0,
+                opacity: 1,
+                ease: "power2.inOut",
+                delay: 1,
+                transform: 'translateX(-50%) translateY(0)'
+            });
+
+            gsap.to('.cards-container', {
+                duration: 1,
+                y: 0,
+                opacity: 1,
+                ease: "power2.inOut",
+                delay: 1.3,
+                transform: 'translateX(-50%) translateY(0)'
+            });
+
+            currentSection = 10;
+        }
 
         function startSection11() {
             gsap.to('#mask5', {
