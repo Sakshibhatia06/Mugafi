@@ -24,7 +24,8 @@
 
         let particleSystem = null;
 
-        class AssetLoader {
+        // Image preloader system - Updated
+class AssetLoader {
     constructor() {
         this.imageSources = [];
         this.loadedCount = 0;
@@ -37,11 +38,10 @@
     extractImageSources() {
         const images = document.querySelectorAll('img');
         const backgroundImages = document.querySelectorAll('[style*="background-image"]');
-        const cssBackgroundMasks = document.querySelectorAll('.background-mask');
         
         // Get all img src attributes
         images.forEach(img => {
-            if (img.src && !img.src.includes('data:')) {
+            if (img.src && !img.src.includes('data:') && !img.src.includes('blob:')) {
                 this.imageSources.push(img.src);
             }
         });
@@ -55,8 +55,32 @@
             }
         });
 
-        // Get CSS background mask images
-        const maskSources = [
+        // Add all the mask background images and other assets
+        const allAssets = [
+            './assets/Group 1171275088.png',
+            './assets/Rectangle 8311-3.png',
+            './assets/Group 1171275097-1.png',
+            './assets/Frame 2147224148-8.png',
+            './assets/Frame 2147224148-6.png',
+            './assets/Frame 2147224148.png',
+            './assets/Vector 61.png',
+            './assets/Vector 61-1.png',
+            './assets/Vector 61-2.png',
+            './assets/Vector 61-3.png',
+            './assets/Vector 61-5.png',
+            './assets/Frame 2147224336.png',
+            './assets/Frame 2147224180-5.png',
+            './assets/Group 1171275118.png',
+            './assets/Frame 2147224338.png',
+            './assets/Frame 2147224338-1.png',
+            './assets/Frame 2147224339.png',
+            './assets/Frame 2147224339-2.png',
+            './assets/Frame 2147224340.png',
+            './assets/Frame 2147224341.png',
+            './assets/Mask group-8.png',
+            './assets/Frame 2147224148-4.png',
+            './assets/Frame 2147224339-1.png',
+            // Background masks
             './assets/Mask group-2.png',
             './assets/Group 1171275138.png',
             './assets/image 269.png',
@@ -64,16 +88,18 @@
             './assets/glows-2.png',
             './assets/koncepted.ai_red_rose_color_pallete_detailed_smooth_mountains_i_81b88cf3-c6dd-4118-9c38-94b63a67f4d2-2 1.png',
             './assets/image 376.png',
+            // Section 15 backgrounds
             './assets/creator ownership.png',
             './assets/koncepted.ai_A_surreal_scene_with_a_circle_of_human_silhouettes_c0d5e498-c93a-4922-b101-5c5ed5a9b2eb 1.png',
             './assets/transparent funding.png',
             './assets/global reach.png',
             './assets/global reach-1.png',
+            // Navigation
             './assets/Rectangle 8305.png'
         ];
 
-        // Add mask sources
-        maskSources.forEach(src => {
+        // Add all assets to sources
+        allAssets.forEach(src => {
             if (!this.imageSources.includes(src)) {
                 this.imageSources.push(src);
             }
@@ -88,7 +114,7 @@
 
     // Load a single image and return a promise
     loadImage(src) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const img = new Image();
             
             img.onload = () => {
@@ -96,24 +122,40 @@
                 const progress = (this.loadedCount / this.totalCount) * 100;
                 
                 if (this.onProgress) {
-                    this.onProgress(progress, this.loadedCount, this.totalCount);
+                    this.onProgress(progress, this.loadedCount, this.totalCount, src);
                 }
                 
-                console.log(`Loaded: ${src} (${this.loadedCount}/${this.totalCount})`);
-                resolve(img);
+                console.log(`✓ Loaded: ${src} (${this.loadedCount}/${this.totalCount})`);
+                resolve({ success: true, src, img });
             };
             
             img.onerror = () => {
-                console.warn(`Failed to load: ${src}`);
-                this.loadedCount++; // Count failed loads too to prevent hanging
+                console.warn(`✗ Failed to load: ${src}`);
+                this.loadedCount++; // Count failed loads to prevent hanging
                 const progress = (this.loadedCount / this.totalCount) * 100;
                 
                 if (this.onProgress) {
-                    this.onProgress(progress, this.loadedCount, this.totalCount);
+                    this.onProgress(progress, this.loadedCount, this.totalCount, src);
                 }
                 
-                resolve(null); // Resolve with null instead of rejecting
+                resolve({ success: false, src, img: null });
             };
+            
+            // Set a timeout to prevent hanging on slow/missing images
+            setTimeout(() => {
+                if (!img.complete) {
+                    console.warn(`⏰ Timeout loading: ${src}`);
+                    img.src = ''; // Cancel the request
+                    this.loadedCount++;
+                    const progress = (this.loadedCount / this.totalCount) * 100;
+                    
+                    if (this.onProgress) {
+                        this.onProgress(progress, this.loadedCount, this.totalCount, src);
+                    }
+                    
+                    resolve({ success: false, src, img: null });
+                }
+            }, 10000); // 10 second timeout per image
             
             img.src = src;
         });
@@ -124,22 +166,29 @@
         this.extractImageSources();
         
         if (this.totalCount === 0) {
+            console.log('No images to load');
             if (this.onComplete) {
                 this.onComplete();
             }
             return;
         }
 
+        console.log(`🚀 Starting to load ${this.totalCount} assets...`);
+        
         const loadPromises = this.imageSources.map(src => this.loadImage(src));
         
         try {
-            await Promise.all(loadPromises);
-            console.log('All images loaded successfully!');
+            const results = await Promise.all(loadPromises);
+            const successCount = results.filter(r => r.success).length;
+            const failCount = results.filter(r => !r.success).length;
+            
+            console.log(`🎉 Asset loading complete! Success: ${successCount}, Failed: ${failCount}`);
+            
             if (this.onComplete) {
                 this.onComplete();
             }
         } catch (error) {
-            console.error('Error loading some images:', error);
+            console.error('❌ Unexpected error during asset loading:', error);
             if (this.onComplete) {
                 this.onComplete();
             }
@@ -147,34 +196,32 @@
     }
 }
 
-// Update the loading progress system
+// Updated loading system - ONLY progresses with real asset loading
 let assetLoader;
 let assetsLoaded = false;
 
 function initializeAssetLoading() {
     assetLoader = new AssetLoader();
     
-    assetLoader.onProgress = (progress, loaded, total) => {
-        loadingProgress = progress;
-        updateLoadingDisplay(progress, loaded, total);
+    assetLoader.onProgress = (progress, loaded, total, currentSrc) => {
+        updateLoadingDisplay(progress, loaded, total, currentSrc);
     };
     
     assetLoader.onComplete = () => {
         assetsLoaded = true;
-        loadingProgress = 100;
-        updateLoadingDisplay(100, assetLoader.totalCount, assetLoader.totalCount);
+        console.log('🏁 All assets loaded! Starting experience...');
         
-        // Wait a moment before starting the experience
+        // Small delay to show 100% completion
         setTimeout(() => {
             startSection1();
-        }, 500);
+        }, 800);
     };
     
     // Start loading assets
     assetLoader.loadAll();
 }
 
-function updateLoadingDisplay(progress, loaded, total) {
+function updateLoadingDisplay(progress, loaded, total, currentSrc = '') {
     const progressFill = document.querySelector('.progress-fill');
     const loadingPercentage = document.querySelector('.loading-percentage');
     const loadingText = document.querySelector('.loading-text');
@@ -189,23 +236,16 @@ function updateLoadingDisplay(progress, loaded, total) {
     
     if (loadingText) {
         if (total > 0) {
+            const fileName = currentSrc ? currentSrc.split('/').pop() : '';
             loadingText.textContent = `loading assets ... (${loaded}/${total})`;
+            
+            // Optionally show current file being loaded
+            if (fileName && loaded < total) {
+                loadingText.textContent += ` • ${fileName}`;
+            }
         } else {
-            loadingText.textContent = `loading multiverse ...`;
+            loadingText.textContent = `scanning assets ...`;
         }
-    }
-}
-
-// Remove the old updateProgress function and replace with this
-function updateProgress() {
-    // This function is now only used as a fallback
-    if (!assetsLoaded && loadingProgress < 100) {
-        // Add some artificial progress if assets are taking too long
-        loadingProgress += Math.random() * 2 + 1;
-        loadingProgress = Math.min(loadingProgress, 95); // Cap at 95% until assets are done
-        
-        updateLoadingDisplay(loadingProgress, 0, 0);
-        setTimeout(updateProgress, 100 + Math.random() * 200);
     }
 }
 
@@ -2026,5 +2066,5 @@ function updateCafeImage() {
             load3DPlanet();
             animate();
             initializeAssetLoading();
-            updateProgress();
+            // updateProgress();
         });
