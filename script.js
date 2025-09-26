@@ -1,30 +1,29 @@
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-        // Register GSAP plugins
-        gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+// Three.js Scene Setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-        // Three.js Scene Setup
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setClearColor(0x000000, 0);
-        renderer.autoClear = false;
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setClearColor(0x000000, 0);
+renderer.autoClear = false;
+document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 2);
-        scene.add(ambientLight);
+// Lighting
+const ambientLight = new THREE.AmbientLight(0xffffff, 2);
+scene.add(ambientLight);
 
-        // 3D Elements
-        let planet3D = null;
-        let planetBackground = null;
+// 3D Elements
+let planet3D = null;
+let planetBackground = null;
 
-        camera.position.z = 15;
+camera.position.z = 15;
 
-        let particleSystem = null;
+let particleSystem = null;
 
-        // Image preloader system - Updated
+// Image preloader system - Updated
 class AssetLoader {
     constructor() {
         this.imageSources = [];
@@ -289,6 +288,7 @@ function createParticleSystem() {
     
     return particleSystem;
 }
+
 function createModelParticleBackground() {
     const particleCount = 150;
     const geometry = new THREE.BufferGeometry();
@@ -329,8 +329,9 @@ function createModelParticleBackground() {
     
     return modelBackground;
 }
-        // Create a placeholder 3D sphere
-        function createPlaceholderPlanet() {
+
+// Create a placeholder 3D sphere
+function createPlaceholderPlanet() {
     const textureLoader = new THREE.TextureLoader();
     
     const sphereGeometry = new THREE.SphereGeometry(3, 32, 32);
@@ -383,8 +384,8 @@ function createModelParticleBackground() {
     window.modelBackgroundParticles = createModelParticleBackground();
 }
 
-        // Load 3D Planet with FBX fallback
-        function load3DPlanet() {
+// Load 3D Planet with FBX fallback
+function load3DPlanet() {
     if (typeof THREE.FBXLoader !== 'undefined') {
         const textureLoader = new THREE.TextureLoader();
         const loader = new THREE.FBXLoader();
@@ -451,8 +452,8 @@ function createModelParticleBackground() {
     }
 }
 
-        // Animation loop
-        function animate() {
+// Animation loop
+function animate() {
     requestAnimationFrame(animate);
     
     if (planet3D) {
@@ -479,1373 +480,1775 @@ function createModelParticleBackground() {
     renderer.clear();
     renderer.render(scene, camera);
 }
-        // Animation and section management
-        let loadingProgress = 0;
-        let currentSection = 0;
-        let currentCardIndex = 0;
-        let currentWheelIndex = 0;
-        let currentCarouselIndex = 0;
-        let wheelInterval;
-        let carouselInterval;
-        const totalCards = 5;
-        const totalWheelImages = 5;
-        let totalCarouselItems = 5;
 
+// Animation and section management
+let loadingProgress = 0;
+let currentSection = 0;
+let currentCardIndex = 0;
+let currentWheelIndex = 0;
+let currentCarouselIndex = 0;
+let wheelInterval;
+let carouselInterval;
+const totalCards = 5;
+const totalWheelImages = 5;
+let totalCarouselItems = 5;
+
+// Section transition functions with reverse capability
+function startSection1(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        if (!assetsLoaded) {
+            setTimeout(() => startSection1(reverse), 100);
+            return;
+        }
         
+        const loadingSection = document.querySelector('.loading-section');
+        const semicircle = document.querySelector('.semicircle');
+        
+        gsap.to(semicircle, {
+            duration: 1,
+            width: '150px',
+            height: '300px',
+            borderRadius: '75px 75px 0 0',
+            ease: "power2.inOut",
+            onComplete: () => {
+                semicircle.style.borderBottom = '1px solid #ffffff5f';
+                gsap.to('.section-one-tombstone', {
+                    duration: 0.5,
+                    opacity: 1
+                });
+            }
+        });
+        
+        gsap.to('#mask1', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 1.5
+        });
 
-        function startSection1() {
-            if (!assetsLoaded && loadingProgress < 1001) {
-        // If assets aren't fully loaded yet, wait a bit more
-        setTimeout(startSection1, 1001);
-        return;
+        gsap.to('.logo', {
+            duration: 1.2,
+            y: -window.innerHeight/2 + 60,
+            scale: 0.6,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.header-logo', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 1
+        });
+
+        gsap.to('.main-title', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.2
+        });
+
+        gsap.to('.subtitle', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.4
+        });
+
+        gsap.to(loadingSection, {
+            duration: 0.5,
+            opacity: 0,
+            delay: 1.5,
+            onComplete: () => {
+                loadingSection.style.display = 'none';
+                document.body.style.overflowY = 'auto';
+                setupScrolling();
+            }
+        });
+    } else {
+        // Reverse animation (coming back from section 2)
+        gsap.to('.header-logo', {
+            duration: 1,
+            top: '30px',
+            transform: 'translateX(-50%)',
+            scale: 0.6,
+            ease: "power2.inOut"
+        });
+
+        gsap.to(['.main-title', '.subtitle'], {
+            duration: 0.5,
+            opacity: 1,
+            y: 0
+        });
+
+        gsap.to('.section-one-tombstone', {
+            duration: 0.5,
+            opacity: 1
+        });
+
+        // Reset tombstone structures
+        gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
+            duration: 0.5,
+            opacity: 0,
+            scale: 1
+        });
+
+        if (planet3D) {
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut"
+            });
+        }
     }
-            const loadingSection = document.querySelector('.loading-section');
-    const semicircle = document.querySelector('.semicircle');
-    
-    // Transform circle to tombstone with downward line extension
-    gsap.to(semicircle, {
-        duration: 1,
-        width: '150px',
-        height: '300px',
-        borderRadius: '75px 75px 0 0',
-        ease: "power2.inOut",
-        onComplete: () => {
-            // Add bottom extension for tombstone effect
-            semicircle.style.borderBottom = '1px solid #ffffff5f';
-            gsap.to('.section-one-tombstone', {
-                duration: 0.5,
-                opacity: 1
-            });
-        }
-    });
-    gsap.to('#mask1', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 1.5
-    });
 
-            gsap.to('.logo', {
-                duration: 1.2,
-                y: -window.innerHeight/2 + 60,
-                scale: 0.6,
-                ease: "power2.inOut"
-            });
+    currentSection = 1;
+}
 
-            gsap.to('.header-logo', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 1
-            });
+function startSection2(reverse = false) {
+    if (!reverse) {
+        // Forward animation
+        gsap.to('.header-logo', {
+            duration: 1,
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            scale: 1,
+            ease: "power2.inOut"
+        });
 
-            gsap.to('.main-title', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
+        gsap.to(['.main-title', '.subtitle'], {
+            duration: 0.5,
+            opacity: 0,
+            y: -100
+        });
+
+        gsap.to('.section-one-tombstone', {
+            duration: 0.5,
+            opacity: 0
+        });
+
+        // Show tombstone structure and animate scales
+        gsap.to('.tombstone-1', {
+            duration: 0.5,
+            opacity: 1,
+            scale: 2,
+            delay: 0.2
+        });
+
+        gsap.to('.tombstone-2', {
+            duration: 0.8,
+            opacity: 1,
+            scale: 4,
+            ease: "back.out(1.7)",
+            delay: 0.4
+        });
+
+        gsap.to('.tombstone-3', {
+            duration: 0.8,
+            opacity: 1,
+            scale: 5,
+            ease: "back.out(1.7)",
+            delay: 0.6
+        });
+
+        gsap.to('.tombstone-4', {
+            duration: 0.8,
+            opacity: 1,
+            scale: 7,
+            ease: "back.out(1.7)",
+            delay: 0.8
+        });
+
+        if (planet3D) {
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
                 ease: "back.out(1.7)",
-                delay: 1.2
+                delay: 0.5
             });
 
-            gsap.to('.subtitle', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.4
-            });
-
-            gsap.to(loadingSection, {
-                duration: 0.5,
-                opacity: 0,
-                delay: 1.5,
-                onComplete: () => {
-                    loadingSection.style.display = 'none';
-                    document.body.style.overflowY = 'auto';
-                    setupScrolling();
-                }
-            });
-
-            currentSection = 1;
-        }
-
-        function startSection2() {
-            gsap.to('.header-logo', {
-                duration: 1,
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                scale: 1,
-                ease: "power2.inOut"
-            });
-
-            gsap.to(['.main-title', '.subtitle'], {
-                duration: 0.5,
-                opacity: 0,
-                y: -100
-            });
-
-            gsap.to('.section-one-tombstone', {
-                duration: 0.5,
-                opacity: 0
-            });
-
-            // Show tombstone structure and animate scales
-            gsap.to('.tombstone-1', {
-                duration: 0.5,
-                opacity: 1,
-                scale: 2,
-                delay: 0.2
-            });
-
-            gsap.to('.tombstone-2', {
-                duration: 0.8,
-                opacity: 1,
-                scale: 4,
-                ease: "back.out(1.7)",
-                delay: 0.4
-            });
-
-            gsap.to('.tombstone-3', {
-                duration: 0.8,
-                opacity: 1,
-                scale: 5,
-                ease: "back.out(1.7)",
-                delay: 0.6
-            });
-
-            gsap.to('.tombstone-4', {
-                duration: 0.8,
-                opacity: 1,
-                scale: 7,
-                ease: "back.out(1.7)",
-                delay: 0.8
-            });
-
-            if (planet3D) {
-                gsap.to(planet3D.scale, {
-                    duration: 1.5,
-                    x: 0.8,
-                    y: 0.8,
-                    z: 0.8,
-                    ease: "back.out(1.7)",
+            if (planetBackground) {
+                gsap.to(planetBackground.material, {
+                    duration: 1,
+                    opacity: 0.7,
                     delay: 0.5
                 });
-
-                if (planetBackground) {
-                    gsap.to(planetBackground.material, {
-                        duration: 1,
-                        opacity: 0.7,
-                        delay: 0.5
-                    });
-                }
             }
+        }
+    } else {
+        // Reverse animation (coming back from section 3)
+        gsap.to('#mask1', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask2', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask3', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
 
-            currentSection = 2;
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                z: 0,
+                y: 0,
+                ease: "power2.inOut"
+            });
         }
 
-        function startSection3() {
+        // Hide section 3 content
+        gsap.to('.section-three-content', {
+            duration: 0.5,
+            opacity: 0
+        });
 
-            gsap.to('#mask1', {
-        duration: 0.8,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    gsap.to('#mask2', {
-        duration: 0.8,
-        opacity: 1,
-        ease: "power2.inOut",
-        delay: 0.3
-    });
-    
-    gsap.to('#mask3', {
-        duration: 0.8,
-        opacity: 1,
-        ease: "power2.inOut",
-        delay: 0.5
-    });
-            if (planet3D) {
-                gsap.to(planet3D.position, {
+        gsap.to('.section-three-overlays', {
+            duration: 0.5,
+            opacity: 0
+        });
+
+        gsap.to('.nav-frame', {
+            duration: 1,
+            opacity: 0
+        });
+
+        // Show tombstones again
+        gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
+            duration: 1,
+            scale: [2, 4, 5, 7],
+            opacity: 1,
+            ease: "power2.out"
+        });
+
+        gsap.to('.header-logo', {
+            duration: 0.8,
+            opacity: 1,
+            scale: 1
+        });
+    }
+
+    currentSection = 2;
+}
+
+function startSection3(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        gsap.to('#mask1', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask2', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.3
+        });
+        
+        gsap.to('#mask3', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+        
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                z: 11,
+                y: -2,
+                ease: "power2.inOut"
+            });
+
+            if (planetBackground) {
+                gsap.to(planetBackground.position, {
                     duration: 1.5,
-                    z: 11,
+                    z: 3,
                     y: -2,
                     ease: "power2.inOut"
                 });
-
-                if (planetBackground) {
-                    gsap.to(planetBackground.position, {
-                        duration: 1.5,
-                        z: 3,
-                        y: -2,
-                        ease: "power2.inOut"
-                    });
-                }
             }
-            gsap.to('.section-three-overlays', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 2
-    });
+        }
+        
+        gsap.to('.section-three-overlays', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 2
+        });
 
-    gsap.to('.white-circle-behind', {
-        duration: 1,
-        opacity: 1,
-        delay: 2.2
-    });
+        gsap.to('.white-circle-behind', {
+            duration: 1,
+            opacity: 1,
+            delay: 2.2
+        });
 
-    gsap.to('.section-three-overlay', {
-        duration: 0.8,
-        opacity: 1,
-        stagger: 0.2,
-        delay: 2.4
-    });
+        gsap.to('.section-three-overlay', {
+            duration: 0.8,
+            opacity: 1,
+            stagger: 0.2,
+            delay: 2.4
+        });
 
+        // Move tombstones with the planet and fade out
+        gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
+            duration: 1,
+            scale: 10,
+            opacity: 0,
+            z: 1000,
+            ease: "power2.in"
+        });
 
-            // Move tombstones with the planet and fade out
-            gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
-                duration: 1,
-        scale: 10, // Massive zoom in
-        opacity: 0,
-        z: 1000,
-        ease: "power2.in"
+        gsap.to('.header-logo', {
+            duration: 0.8,
+            opacity: 0,
+            scale: 0,
+            delay: 0.5
+        });
+
+        gsap.to('.section-three-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 1
+        });
+
+        gsap.to('.section-three-title', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.2
+        });
+
+        gsap.to('.explore-button', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.4
+        });
+
+        gsap.to('.content-image', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.6
+        });
+
+        gsap.to('.nav-frame', {
+            duration: 1,
+            opacity: 1,
+            delay: 2
+        });
+        
+        gsap.to('.connection-curves', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 2.8
+        });
+
+        // Animate curves drawing
+        gsap.to('.curve-path', {
+            duration: 1.5,
+            strokeDashoffset: 0,
+            stagger: 0.3,
+            delay: 3,
+            ease: "power2.out"
+        });
+
+        // Animate circles bouncing in
+        gsap.to('.connection-circle', {
+            duration: 0.6,
+            opacity: 1,
+            scale: 1.2,
+            stagger: 0.2,
+            delay: 4,
+            ease: "bounce.out",
+            onComplete: () => {
+                // Add continuous pulse animation
+                gsap.to('.connection-circle', {
+                    duration: 2,
+                    scale: 1,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "power2.inOut"
+                });
+            }
+        });
+    } else {
+        // Reverse animation (coming back from section 4)
+        gsap.to('#mask3', {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('.section-three-overlays', {
+            duration: 0.5,
+            opacity: 1,
+            scale: 1
+        });
+        
+        gsap.to('#mask2', {
+            duration: 1,
+            y: 0,
+            ease: "power2.inOut"
+        });
+
+        // Hide section 4 content
+        gsap.to('.section-four-content', {
+            duration: 0.5,
+            opacity: 0
+        });
+
+        // Show section 3 content
+        gsap.to('.section-three-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                y: -2,
+                ease: "power2.inOut"
             });
 
-            gsap.to('.header-logo', {
-                duration: 0.8,
-                opacity: 0,
-                scale: 0,
-                delay: 0.5
+            if (planetBackground) {
+                gsap.to(planetBackground.material, {
+                    duration: 1,
+                    opacity: 0.7,
+                    ease: "power2.inOut"
+                });
+            }
+        }
+    }
+
+    currentSection = 3;
+}
+
+function startSection4(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        gsap.to('#mask3', {
+            duration: 1,
+            y: window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('.section-three-overlays', {
+            duration: 0.5,
+            opacity: 0,
+            scale: 0
+        });
+        
+        gsap.to('#mask2', {
+            duration: 1,
+            y: -100,
+            ease: "power2.inOut"
+        });
+        
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                y: 3,
+                ease: "power2.inOut"
             });
 
-            gsap.to('.section-three-content', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 1
-            });
+            if (planetBackground) {
+                gsap.to(planetBackground.material, {
+                    duration: 1,
+                    opacity: 0,
+                    ease: "power2.inOut"
+                });
+            }
+        }
 
-            gsap.to('.section-three-title', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.2
-            });
+        gsap.to('.section-three-content', {
+            duration: 0.5,
+            opacity: 0,
+            y: -100
+        });
 
-            gsap.to('.explore-button', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.4
-            });
+        gsap.to('.section-four-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.5
+        });
 
-            gsap.to('.content-image', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.6
-            });
+        gsap.to('.section-four-title', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 0.8
+        });
 
-            gsap.to('.nav-frame', {
-                duration: 1,
-                opacity: 1,
-                delay: 2
-            });
-            gsap.to('.connection-curves', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 2.8
-    });
+        gsap.to('.image-gallery', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1
+        });
 
-    // Animate curves drawing
-    gsap.to('.curve-path', {
-        duration: 1.5,
-        strokeDashoffset: 0,
-        stagger: 0.3,
-        delay: 3,
-        ease: "power2.out"
-    });
+        gsap.to('.bottom-content', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.2,
+            transform: 'translateX(-50%) translateY(0)'
+        });
+    } else {
+        // Reverse animation (coming back from section 5)
+        gsap.to('#mask2', {
+            duration: 1,
+            opacity: 1,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask4', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
 
-    // Animate circles bouncing in
-    gsap.to('.connection-circle', {
-        duration: 0.6,
-        opacity: 1,
-        scale: 1.2,
-        stagger: 0.2,
-        delay: 4,
-        ease: "bounce.out",
-        onComplete: () => {
-            // Add continuous pulse animation
-            gsap.to('.connection-circle', {
-                duration: 2,
-                scale: 1,
-                repeat: -1,
-                yoyo: true,
+        gsap.to('.section-five-button', {
+            duration: 0.8,
+            opacity: 0
+        });
+
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                x: 0,
                 ease: "power2.inOut"
             });
         }
-    });
 
-            currentSection = 3;
+        gsap.to('.section-four-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+
+        gsap.to('.bottom-content', {
+            duration: 1,
+            top: '5%',
+            opacity: 0.3,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.bottom-description', {
+            duration: 0.5,
+            opacity: 0.3
+        });
+    }
+
+    currentSection = 4;
+}
+
+function startSection5(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        gsap.to('#mask2', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask4', {
+            duration: 1,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+        
+        gsap.to('.section-five-button', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.2
+        });
+        
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                x: -6,
+                ease: "power2.inOut"
+            });
         }
 
-        function startSection4() {
+        gsap.to('.section-four-content', {
+            duration: 0.5,
+            opacity: 0,
+            y: -100
+        });
 
-            gsap.to('#mask3', {
-        duration: 1,
-        y: window.innerHeight,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    gsap.to('.section-three-overlays', {
-        duration: 0.5,
-        opacity: 0,
-        scale: 0
-    });
-    // Move other image 2 units up
-    gsap.to('#mask2', {
-        duration: 1,
-        y: -100,
-        ease: "power2.inOut"
-    });
-            // Move 3D model upwards
-            if (planet3D) {
-                gsap.to(planet3D.position, {
-                    duration: 1.5,
-                    y: 3,
-                    ease: "power2.inOut"
-                });
+        gsap.to('.bottom-content', {
+            duration: 1,
+            top: '50%',
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
 
-                // Fade out background
-                if (planetBackground) {
-                    gsap.to(planetBackground.material, {
-                        duration: 1,
-                        opacity: 0,
-                        ease: "power2.inOut"
-                    });
-                }
-            }
-
-            // Hide section 3 content
-            gsap.to('.section-three-content', {
-                duration: 0.5,
-                opacity: 0,
-                y: -100
+        gsap.to('.bottom-description', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.8
+        });
+    } else {
+        // Reverse animation (coming back from section 6)
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                x: -6,
+                y: 3,
+                ease: "power2.inOut"
             });
 
-            // Show section 4 content
-            gsap.to('.section-four-content', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 0.5
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                ease: "power2.inOut"
             });
-
-            gsap.to('.section-four-title', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 0.8
-            });
-
-            gsap.to('.image-gallery', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1
-            });
-
-            gsap.to('.bottom-content', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.2,
-                transform: 'translateX(-50%) translateY(0)'
-            });
-
-            currentSection = 4;
         }
 
-        function startSection5() {
+        gsap.to('.section-six-content', {
+            duration: 0.5,
+            opacity: 0
+        });
 
-            gsap.to('#mask2', {
-        duration: 1,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    gsap.to('#mask4', {
-        duration: 1,
-        opacity: 1,
-        ease: "power2.inOut",
-        delay: 0.5
-    });
-    gsap.to('.section-five-button', {
-        duration: 0.8,
-        opacity: 1,
-        ease: "back.out(1.7)",
-        delay: 1.2
-    });
-            // Move 3D model to the left
-            if (planet3D) {
-                gsap.to(planet3D.position, {
-                    duration: 1.5,
-                    x: -6,
-                    ease: "power2.inOut"
-                });
-            }
+        gsap.to('.bottom-content', {
+            duration: 0.5,
+            opacity: 1
+        });
 
-            // Hide section 4 content
-            gsap.to('.section-four-content', {
+        document.querySelectorAll('.category-item').forEach((item) => {
+            gsap.to(item, {
                 duration: 0.5,
-                opacity: 0,
-                y: -100
+                x: 100,
+                opacity: 0
+            });
+        });
+    }
+
+    currentSection = 5;
+}
+
+function startSection6(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                x: -10,
+                y: 8,
+                ease: "power2.inOut"
             });
 
-            // Move center text up and show bottom text with full opacity
-            gsap.to('.bottom-content', {
-                duration: 1,
-                top: '50%',
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut"
+            });
+        }
+
+        gsap.to('.bottom-content', {
+            duration: 0.5,
+            opacity: 0,
+            y: -100
+        });
+
+        gsap.to('.section-six-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.8
+        });
+
+        document.querySelectorAll('.category-item').forEach((item, index) => {
+            gsap.to(item, {
+                duration: 0.8,
+                x: 0,
                 opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1 + (index * 0.2)
+            });
+        });
+    } else {
+        // Reverse animation (coming back from section 7)
+        if (wheelInterval) {
+            clearInterval(wheelInterval);
+        }
+
+        gsap.to('.section-seven-content', {
+            duration: 1,
+            x: window.innerWidth,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-six-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+
+        if (planet3D) {
+            gsap.set(planet3D.position, {
+                x: -10,
+                y: 8
+            });
+
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut"
+            });
+        }
+    }
+
+    currentSection = 6;
+}
+
+function startSection7(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        gsap.to('.section-six-content', {
+            duration: 1,
+            x: -window.innerWidth,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-seven-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.5
+        });
+
+        gsap.to('.cafe-content', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1
+        });
+
+        gsap.to('.wheel-controls', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.2
+        });
+
+        startWheelTimer();
+    } else {
+        // Reverse animation (coming back from section 8)
+        if (wheelInterval) {
+            clearInterval(wheelInterval);
+        }
+
+        gsap.set('#mask3', { y: 0 });
+        gsap.to('#mask3', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-eight-content', {
+            duration: 1,
+            y: window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-seven-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                y: 15,
+                ease: "power2.inOut"
+            });
+
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut"
+            });
+        }
+
+        startWheelTimer();
+    }
+
+    currentSection = 7;
+}
+
+function startSection8(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        gsap.set('#mask3', { y: 0 });
+        gsap.to('#mask3', {
+            duration: 0.8,
+            opacity: 0.7,
+            ease: "power2.inOut",
+            delay: 1
+        });
+        
+        if (wheelInterval) {
+            clearInterval(wheelInterval);
+        }
+
+        gsap.to('.section-seven-content', {
+            duration: 1,
+            y: -window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        if (planet3D) {
+            gsap.set(planet3D.position, {
+                x: 0,
+                y: -15,
+                z: 11
+            });
+
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                y: -2,
                 ease: "power2.inOut",
                 delay: 0.5
             });
 
-            gsap.to('.bottom-description', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 0.8
-            });
-
-            currentSection = 5;
-        }
-
-        function startSection6() {
-            // Move 3D model to top left and fade out
-            if (planet3D) {
-                gsap.to(planet3D.position, {
-                    duration: 1.5,
-                    x: -10,
-                    y: 8,
-                    ease: "power2.inOut"
-                });
-
-                gsap.to(planet3D.scale, {
-                    duration: 1.5,
-                    x: 0,
-                    y: 0,
-                    z: 0,
-                    ease: "power2.inOut"
-                });
-            }
-
-            // Hide bottom content
-            gsap.to('.bottom-content', {
-                duration: 0.5,
-                opacity: 0,
-                y: -100
-            });
-
-            // Show section 6 content
-            gsap.to('.section-six-content', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 0.8
-            });
-
-            // Animate category items from right
-            document.querySelectorAll('.category-item').forEach((item, index) => {
-                gsap.to(item, {
-                    duration: 0.8,
-                    x: 0,
-                    opacity: 1,
-                    ease: "back.out(1.7)",
-                    delay: 1 + (index * 0.2)
-                });
-            });
-
-            currentSection = 6;
-        }
-
-        function startSection7() {
-            // Hide section 6 content by moving left
-            gsap.to('.section-six-content', {
-                duration: 1,
-                x: -window.innerWidth,
-                opacity: 0,
-                ease: "power2.inOut"
-            });
-
-            // Show section 7 content
-            gsap.to('.section-seven-content', {
-                duration: 0.5,
-                opacity: 1,
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                ease: "power2.inOut",
                 delay: 0.5
             });
 
-            // Show cafe content
-            gsap.to('.cafe-content', {
-                duration: 0.8,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1
-            });
-
-            // Show wheel controls
-            gsap.to('.wheel-controls', {
-                duration: 0.8,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.2
-            });
-
-            // Start wheel timer
-            startWheelTimer();
-
-            currentSection = 7;
-        }
-
-        function startSection8() {
-            gsap.set('#mask3', { y: 0 }); // Reset position
-    gsap.to('#mask3', {
-        duration: 0.8,
-        opacity: 0.7,
-        ease: "power2.inOut",
-        delay: 1
-    });
-            // Stop wheel timer
-            if (wheelInterval) {
-                clearInterval(wheelInterval);
-            }
-
-            // Hide section 7 content by moving up
-            gsap.to('.section-seven-content', {
-                duration: 1,
-                y: -window.innerHeight,
-                opacity: 0,
-                ease: "power2.inOut"
-            });
-
-            // Move 3D model to bottom first (unseen), then bring it up to center position
-            if (planet3D) {
-                // First move it to bottom off-screen
-                gsap.set(planet3D.position, {
+            if (planetBackground) {
+                gsap.to(planetBackground.position, {
+                    duration: 1.5,
                     x: 0,
-                    y: -15,
-                    z: 11
-                });
-
-                // Then animate it coming up from bottom
-                gsap.to(planet3D.position, {
-                    duration: 1.5,
                     y: -2,
+                    z: 3,
                     ease: "power2.inOut",
                     delay: 0.5
                 });
 
-                gsap.to(planet3D.scale, {
-                    duration: 1.5,
-                    x: 0.8,
-                    y: 0.8,
-                    z: 0.8,
-                    ease: "power2.inOut",
+                gsap.to(planetBackground.material, {
+                    duration: 1,
+                    opacity: 0.7,
                     delay: 0.5
                 });
-
-                if (planetBackground) {
-                    gsap.to(planetBackground.position, {
-                        duration: 1.5,
-                        x: 0,
-                        y: -2,
-                        z: 3,
-                        ease: "power2.inOut",
-                        delay: 0.5
-                    });
-
-                    gsap.to(planetBackground.material, {
-                        duration: 1,
-                        opacity: 0.7,
-                        delay: 0.5
-                    });
-                }
             }
-
-            // Show section 8 content
-            gsap.to('.section-eight-content', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 1
-            });
-
-            gsap.to('.ai-tool-header', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.2
-            });
-
-            gsap.to('.input-container', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.4,
-                transform: 'translate(-50%, -50%) translateY(0)'
-            });
-
-            currentSection = 8;
         }
 
-        // Update startSection9 function
-function startSection9() {
-    gsap.to('#mask4', {
-        duration: 0.5,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    gsap.to('#mask3', {
-        duration: 0.5,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    gsap.to('#mask5', {
-        duration: 0.8,
-        opacity: 1,
-        ease: "power2.inOut",
-        delay: 0.5
-    });
-
-    // Hide section 8 content
-    gsap.to('.ai-tool-header', {
-        duration: 1,
-        y: -200,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-
-    gsap.to('.input-container', {
-        duration: 1,
-        y: -200,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-
-    // Move 3D model to top
-    if (planet3D) {
-        gsap.to(planet3D.position, {
-            duration: 1.5,
-            y: 3,
-            ease: "power2.inOut",
-            delay: 0.5,
-            onStart: () => {
-                // Start orbit animations when model starts moving
-                setTimeout(() => {
-                    triggerOrbitAnimations();
-                }, 500);
-            }
+        gsap.to('.section-eight-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 1
         });
 
-        if (planetBackground) {
-            gsap.to(planetBackground.material, {
-                duration: 1,
-                opacity: 0,
-                delay: 0.5
+        gsap.to('.ai-tool-header', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.2
+        });
+
+        gsap.to('.input-container', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.4,
+            transform: 'translate(-50%, -50%) translateY(0)'
+        });
+    } else {
+        // Reverse animation (coming back from section 9)
+        gsap.to('#mask4', {
+            duration: 0.5,
+            opacity: 1,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask3', {
+            duration: 0.5,
+            opacity: 0.7,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask5', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-nine-content', {
+            duration: 1,
+            y: window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.ai-tool-header', {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.input-container', {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "power2.inOut",
+            transform: 'translate(-50%, -50%) translateY(0)'
+        });
+
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                y: -2,
+                ease: "power2.inOut"
             });
+
+            if (planetBackground) {
+                gsap.to(planetBackground.material, {
+                    duration: 1,
+                    opacity: 0.7
+                });
+            }
         }
+
+        gsap.to('.section-eight-content', {
+            duration: 0.5,
+            opacity: 1
+        });
     }
 
-    gsap.to('.section-nine-content', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 1
-    });
+    currentSection = 8;
+}
 
-    gsap.to('.rotating-container', {
-        duration: 1,
-        opacity: 1,
-        delay: 1.2
-    });
+function startSection9(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        gsap.to('#mask4', {
+            duration: 0.5,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask3', {
+            duration: 0.5,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask5', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+
+        gsap.to('.ai-tool-header', {
+            duration: 1,
+            y: -200,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.input-container', {
+            duration: 1,
+            y: -200,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                y: 3,
+                ease: "power2.inOut",
+                delay: 0.5,
+                onStart: () => {
+                    setTimeout(() => {
+                        triggerOrbitAnimations();
+                    }, 500);
+                }
+            });
+
+            if (planetBackground) {
+                gsap.to(planetBackground.material, {
+                    duration: 1,
+                    opacity: 0,
+                    delay: 0.5
+                });
+            }
+        }
+
+        gsap.to('.section-nine-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 1
+        });
+
+        gsap.to('.rotating-container', {
+            duration: 1,
+            opacity: 1,
+            delay: 1.2
+        });
+    } else {
+        // Reverse animation (coming back from section 10)
+        gsap.to('.section-ten-content', {
+            duration: 1,
+            y: window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1,
+                y: 3,
+                ease: "power2.inOut"
+            });
+
+            gsap.to(planet3D.scale, {
+                duration: 1,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                ease: "power2.inOut"
+            });
+        }
+
+        gsap.to('.section-nine-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+
+        gsap.to('.rotating-container', {
+            duration: 1,
+            opacity: 1
+        });
+
+        triggerOrbitAnimations();
+    }
 
     currentSection = 9;
 }
 
-// Add this new function to trigger orbit animations
-function triggerOrbitAnimations() {
-    const orbitOne = document.querySelector('.orbit-container.one');
-    const orbitTwo = document.querySelector('.orbit-container.two');
-    const orbitThree = document.querySelector('.orbit-container.three');
-    
-    // Reset and trigger animations
-    [orbitOne, orbitTwo, orbitThree].forEach(orbit => {
-        if (orbit) {
-            orbit.style.animation = 'none';
-            orbit.offsetHeight; // Trigger reflow
-        }
-    });
-    
-    // Re-apply animations with delays
-    setTimeout(() => {
-        if (orbitOne) orbitOne.style.animation = 'rotate-orbit-one 3s ease-in-out 0s forwards';
-    }, 100);
-    
-    setTimeout(() => {
-        if (orbitTwo) orbitTwo.style.animation = 'rotate-orbit-two 3s ease-in-out 0s forwards';
-    }, 1100);
-    
-    setTimeout(() => {
-        if (orbitThree) orbitThree.style.animation = 'rotate-orbit-three 3s ease-in-out 0s forwards';
-    }, 2100);
-}
+// Continue with the rest of the sections following the same pattern...
+function startSection10(reverse = false) {
+    if (!reverse) {
+        // Forward animation (original)
+        gsap.to('.section-nine-content', {
+            duration: 1,
+            y: -window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
 
-        function startSection1() {
-    if (!assetsLoaded && loadingProgress < 100) {
-        // If assets aren't fully loaded yet, wait a bit more
-        setTimeout(startSection1, 100);
-        return;
-    }
-    
-    const loadingSection = document.querySelector('.loading-section');
-    const semicircle = document.querySelector('.semicircle');
-    
-    // Transform circle to tombstone with downward line extension
-    gsap.to(semicircle, {
-        duration: 1,
-        width: '150px',
-        height: '300px',
-        borderRadius: '75px 75px 0 0',
-        ease: "power2.inOut",
-        onComplete: () => {
-            // Add bottom extension for tombstone effect
-            semicircle.style.borderBottom = '1px solid #ffffff5f';
-            gsap.to('.section-one-tombstone', {
-                duration: 0.5,
-                opacity: 1
-            });
-        }
-    });
-    
-    gsap.to('#mask1', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 1.5
-    });
-
-    gsap.to('.logo', {
-        duration: 1.2,
-        y: -window.innerHeight/2 + 60,
-        scale: 0.6,
-        ease: "power2.inOut"
-    });
-
-    gsap.to('.header-logo', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 1
-    });
-
-    gsap.to('.main-title', {
-        duration: 0.8,
-        y: 0,
-        opacity: 1,
-        ease: "back.out(1.7)",
-        delay: 1.2
-    });
-
-    gsap.to('.subtitle', {
-        duration: 0.8,
-        y: 0,
-        opacity: 1,
-        ease: "back.out(1.7)",
-        delay: 1.4
-    });
-
-    gsap.to(loadingSection, {
-        duration: 0.5,
-        opacity: 0,
-        delay: 1.5,
-        onComplete: () => {
-            loadingSection.style.display = 'none';
-            document.body.style.overflowY = 'auto';
-            setupScrolling();
-        }
-    });
-
-    currentSection = 1;
-}
-function startSection10() {
-            // Hide all section 9 content including model by moving up
-            gsap.to('.section-nine-content', {
+        if (planet3D) {
+            gsap.to(planet3D.position, {
                 duration: 1,
-                y: -window.innerHeight,
-                opacity: 0,
+                y: 15,
                 ease: "power2.inOut"
             });
 
-            if (planet3D) {
-                gsap.to(planet3D.position, {
-                    duration: 1,
-                    y: 15,
-                    ease: "power2.inOut"
-                });
+            gsap.to(planet3D.scale, {
+                duration: 1,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut"
+            });
+        }
 
-                gsap.to(planet3D.scale, {
+        gsap.to('.section-ten-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.5
+        });
+
+        gsap.to('.testimonial-header', {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 1,
+            transform: 'translateX(-50%) translateY(0)'
+        });
+
+        gsap.to('.cards-container', {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 1.3,
+            transform: 'translateX(-50%) translateY(0)'
+        });
+    } else {
+        // Reverse animation (coming back from section 11)
+        gsap.to('#mask5', {
+            duration: 1,
+            opacity: 1,
+            ease: "power2.inOut"
+        });
+        
+        gsap.set('#mask6', { y: 0 });
+        gsap.to('#mask6', {
+            duration: 1.5,
+            y: window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-eleven-content', {
+            duration: 1,
+            y: window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-ten-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+    }
+
+    currentSection = 10;
+}
+
+// Add the remaining sections with reverse animations...
+function startSection11(reverse = false) {
+    if (!reverse) {
+        gsap.to('#mask5', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.set('#mask6', { y: window.innerHeight });
+        gsap.to('#mask6', {
+            duration: 1.5,
+            y: 0,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+        
+        gsap.to('.section-ten-content', {
+            duration: 1,
+            y: -window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-eleven-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.5
+        });
+
+        gsap.to('.section-eleven-title', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1
+        });
+
+        gsap.to('.section-eleven-description', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.2
+        });
+    } else {
+        gsap.to('#mask6', {
+            duration: 1,
+            scale: 1,
+            opacity: 1,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask5', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-twelve-content', {
+            duration: 1,
+            y: window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-eleven-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+    }
+
+    currentSection = 11;
+}
+
+function startSection12(reverse = false) {
+    if (!reverse) {
+        gsap.to('#mask6', {
+            duration: 1,
+            scale: 2,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask5', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.8
+        });
+        
+        gsap.to('.section-eleven-content', {
+            duration: 1,
+            y: -window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-twelve-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.5
+        });
+
+        gsap.to('.section-twelve-left', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1
+        });
+
+        gsap.to('.rolling-image', {
+            duration: 1.5,
+            x: 0,
+            rotateY: 0,
+            scale: 1,
+            opacity: 1,
+            ease: "power2.out",
+            delay: 1.5
+        });
+
+        gsap.to('.section-twelve-right', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 1.8
+        });
+
+        gsap.to('.right-image', {
+            duration: 1,
+            scale: 1,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 2
+        });
+    } else {
+        gsap.to('.section-thirteen-content', {
+            duration: 1,
+            y: window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-twelve-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+    }
+
+    currentSection = 12;
+}
+
+function startSection13(reverse = false) {
+    if (!reverse) {
+        gsap.to('.section-twelve-content', {
+            duration: 1,
+            y: -window.innerHeight,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-thirteen-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.5
+        });
+
+        gsap.to('.section-thirteen-header', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1
+        });
+
+        document.querySelectorAll('.grid-icon').forEach((icon, index) => {
+            gsap.to(icon, {
+                duration: 0.6,
+                y: 0,
+                opacity: 1,
+                ease: "back.out(1.7)",
+                delay: 1.5 + (index * 0.2)
+            });
+        });
+    } else {
+        const transition = document.querySelector('.tombstone-transition');
+        
+        gsap.set(transition, { opacity: 1, transform: 'scale(15)' });
+        gsap.to(transition, {
+            duration: 1,
+            transform: 'scale(0)',
+            ease: "power2.inOut",
+            onStart: () => {
+                gsap.to('#mask7', {
+                    duration: 0.2,
+                    opacity: 0
+                });
+                
+                gsap.to('.section-fourteen-content', {
+                    duration: 0.5,
+                    opacity: 0
+                });
+            },
+            onComplete: () => {
+                gsap.to(transition, {
                     duration: 1,
-                    x: 0,
-                    y: 0,
-                    z: 0,
+                    transform: 'scale(15)',
+                    opacity: 0,
                     ease: "power2.inOut"
                 });
             }
+        });
 
-            // Show section 10 content from bottom
-            gsap.to('.section-ten-content', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 0.5
-            });
+        gsap.to('.section-thirteen-content', {
+            duration: 0.3,
+            opacity: 1,
+            delay: 1.5
+        });
+    }
 
-            gsap.to('.testimonial-header', {
-                duration: 1,
-                y: 0,
-                opacity: 1,
-                ease: "power2.inOut",
-                delay: 1,
-                transform: 'translateX(-50%) translateY(0)'
-            });
+    currentSection = 13;
+}
 
-            gsap.to('.cards-container', {
-                duration: 1,
-                y: 0,
-                opacity: 1,
-                ease: "power2.inOut",
-                delay: 1.3,
-                transform: 'translateX(-50%) translateY(0)'
-            });
+function startSection14(reverse = false) {
+    if (!reverse) {
+        gsap.to('.section-thirteen-content', {
+            duration: 0.3,
+            opacity: 0
+        });
 
-            currentSection = 10;
-        }
-
-        function startSection11() {
-            gsap.to('#mask5', {
-        duration: 1,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    // Bring background from bottom
-    gsap.set('#mask6', { y: window.innerHeight });
-    gsap.to('#mask6', {
-        duration: 1.5,
-        y: 0,
-        opacity: 1,
-        ease: "power2.inOut",
-        delay: 0.5
-    });
-            // Hide section 10 content
-            gsap.to('.section-ten-content', {
-                duration: 1,
-                y: -window.innerHeight,
-                opacity: 0,
-                ease: "power2.inOut"
-            });
-
-            // Show section 11 content
-            gsap.to('.section-eleven-content', {
-                duration: 0.5,
-                opacity: 1,delay: 0.5
-            });
-
-            gsap.to('.section-eleven-title', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1
-            });
-
-            gsap.to('.section-eleven-description', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.2
-            });
-
-            currentSection = 11;
-        }
-
-        function startSection12() {
-
-            gsap.to('#mask6', {
-        duration: 1,
-        scale: 2,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    // Bring back glows-2
-    gsap.to('#mask5', {
-        duration: 0.8,
-        opacity: 1,
-        ease: "power2.inOut",
-        delay: 0.8
-    });
-            // Hide section 11 content
-            gsap.to('.section-eleven-content', {
-                duration: 1,
-                y: -window.innerHeight,
-                opacity: 0,
-                ease: "power2.inOut"
-            });
-
-            // Show section 12 content
-            gsap.to('.section-twelve-content', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 0.5
-            });
-
-            // Show left content
-            gsap.to('.section-twelve-left', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1
-            });
-
-            // Roll in the image with proper rolling animation
-            gsap.to('.rolling-image', {
-                duration: 1.5,
-                x: 0,
-                rotateY: 0,
-                scale: 1,
-                opacity: 1,
-                ease: "power2.out",
-                delay: 1.5
-            });
-
-            // Show and scale in right image
-            gsap.to('.section-twelve-right', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 1.8
-            });
-
-            gsap.to('.right-image', {
-                duration: 1,
-                scale: 1,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 2
-            });
-
-            currentSection = 12;
-        }
-
-        function startSection13() {
-            // Hide section 12 content
-            gsap.to('.section-twelve-content', {
-                duration: 1,
-                y: -window.innerHeight,
-                opacity: 0,
-                ease: "power2.inOut"
-            });
-
-            // Show section 13 content
-            gsap.to('.section-thirteen-content', {
-                duration: 0.5,
-                opacity: 1,
-                delay: 0.5
-            });
-
-            // Show header
-            gsap.to('.section-thirteen-header', {
-                duration: 0.8,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1
-            });
-
-            // Animate icons consecutively
-            document.querySelectorAll('.grid-icon').forEach((icon, index) => {
-                gsap.to(icon, {
-                    duration: 0.6,
-                    y: 0,
-                    opacity: 1,
-                    ease: "back.out(1.7)",
-                    delay: 1.5 + (index * 0.2)
+        const transition = document.querySelector('.tombstone-transition');
+        
+        gsap.set(transition, { opacity: 1, transform: 'scale(0)' });
+        gsap.to(transition, {
+            duration: 1,
+            transform: 'scale(15)',
+            ease: "power2.inOut",
+            onComplete: () => {
+                gsap.to('#mask7', {
+                    duration: 0.2,
+                    opacity: 1
                 });
-            });
+                
+                gsap.to('.section-fourteen-content', {
+                    duration: 0.5,
+                    opacity: 1
+                });
+                
+                gsap.to(transition, {
+                    duration: 1,
+                    transform: 'scale(0)',
+                    opacity: 0,
+                    ease: "power2.inOut",
+                    delay: 0.5
+                });
+            }
+        });
 
-            currentSection = 13;
+        gsap.to('.section-fourteen-left', {
+            duration: 0.8,
+            x: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 2.5
+        });
+
+        gsap.to('.section-fourteen-right', {
+            duration: 0.8,
+            x: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 2.7
+        });
+    } else {
+        gsap.to('#mask7', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
         }
 
-        // Update startSection14 function with improved transition
-function startSection14() {
-    // Hide section 13 content immediately
-    gsap.to('.section-thirteen-content', {
-        duration: 0.3,
-        opacity: 0
-    });
+        gsap.to('.section-fifteen-content', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
 
-    const transition = document.querySelector('.tombstone-transition');
-    
-    // Start transition: zoom out the mask with tombstone hole
-    gsap.set(transition, { opacity: 1, transform: 'scale(0)' });
-    gsap.to(transition, {
-        duration: 1,
-        transform: 'scale(15)',
-        ease: "power2.inOut",
-        onComplete: () => {
-            // Load section 14 background
-            gsap.to('#mask7', {
-                duration: 0.2,
-                opacity: 1
-            });
-            
-            // Show section 14 content
-            gsap.to('.section-fourteen-content', {
-                duration: 0.5,
-                opacity: 1
-            });
-            
-            // Zoom in and fade out the mask
-            gsap.to(transition, {
-                duration: 1,
-                transform: 'scale(0)',
-                opacity: 0,
-                ease: "power2.inOut",
-                delay: 0.5
-            });
-        }
-    });
+        gsap.to('.section-fourteen-content', {
+            duration: 0.5,
+            opacity: 1
+        });
 
-    // Show section 14 content after transition
-    gsap.to('.section-fourteen-left', {
-        duration: 0.8,
-        x: 0,
-        opacity: 1,
-        ease: "back.out(1.7)",
-        delay: 2.5
-    });
-
-    gsap.to('.section-fourteen-right', {
-        duration: 0.8,
-        x: 0,
-        opacity: 1,
-        ease: "back.out(1.7)",
-        delay: 2.7
-    });
+        currentCarouselIndex = 0;
+    }
 
     currentSection = 14;
 }
-function startSection15() {
-    // Hide mask7 when leaving section 14
-    gsap.to('#mask7', {
-        duration: 0.8,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
 
-    // Rest of section 15 code...
-    if (carouselInterval) {
-        clearInterval(carouselInterval);
+function startSection15(reverse = false) {
+    if (!reverse) {
+        gsap.to('#mask7', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
+        }
+
+        gsap.to('.section-fourteen-content', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-fifteen-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.5
+        });
+
+        initializeCarousel();
+    } else {
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
+        }
+        
+        gsap.to('.section-fifteen-content', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('.section-fifteen-background', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask5', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-sixteen-content', {
+            duration: 0.5,
+            opacity: 0
+        });
+
+        initializeCarousel();
+        gsap.to('.section-fifteen-content', {
+            duration: 0.5,
+            opacity: 1
+        });
     }
 
-    gsap.to('.section-fourteen-content', {
-        duration: 1,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-
-    gsap.to('.section-fifteen-content', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 0.5
-    });
-
-    initializeCarousel();
     currentSection = 15;
 }
-currentCarouselIndex = 0;
-totalCarouselItems = 5;
-let section15ScrollProgress = 0;
 
+function startSection16(reverse = false) {
+    if (!reverse) {
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
+        }
+        
+        gsap.to('.section-fifteen-content', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('.section-fifteen-background', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('#mask5', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+        
+        gsap.to('.section-sixteen-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 1
+        });
+        
+        gsap.to('.section-sixteen-title', {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.2
+        });
+        
+        gsap.to('.logos-row', {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.5
+        });
+    } else {
+        gsap.to('.section-sixteen-title', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.5
+            });
+        
+        gsap.to('.logos-row', {
+            duration: 0.8,
+            y: 0,
+            opacity: 1,
+            ease: "power2.out"
+        });
+        
+        gsap.set('#mask3', { y: 0, opacity: 0 });
+        gsap.to('#mask3', {
+            duration: 0.8,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to('.section-seventeen-content', {
+            duration: 0.5,
+            opacity: 0
+        });
 
-function initializeCarousel() {
-    // Reset carousel state
-    currentCarouselIndex = 0;
-    section15ScrollProgress = 0;
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1.5,
+                y: 8,
+                ease: "power2.inOut"
+            });
 
-    // Show first background
-    document.querySelectorAll('.section-fifteen-background').forEach((bg, index) => {
-        bg.classList.toggle('active', index === 0);
-    });
-
-    // Position carousel container
-    const container = document.getElementById('carouselContainer');
-    if (container) {
-        container.style.transform = 'translateX(0)';
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut"
+            });
+        }
     }
 
-    // Set initial active state
-    document.querySelectorAll('.carousel-item').forEach((item, index) => {
-        item.classList.toggle('active', index === 0);
-    });
-}
-
-function updateCarouselOnScroll(direction) {
-    if (direction > 0 && currentCarouselIndex < totalCarouselItems - 1) {
-        nextCarouselItem();
-        return true;
-    } else if (direction < 0 && currentCarouselIndex > 0) {
-        prevCarouselItem();
-        return true;
-    }
-    
-    return false;
-}
-
-function nextCarouselItem() {
-    if (currentCarouselIndex >= totalCarouselItems - 1) return;
-    
-    const nextIndex = currentCarouselIndex + 1;
-    
-    // Update background
-    updateCarouselBackground(nextIndex + 1);
-    
-    // Update active states
-    document.querySelectorAll('.carousel-item').forEach((item, index) => {
-        item.classList.toggle('active', index === nextIndex);
-    });
-    
-    // Slide container
-    const container = document.getElementById('carouselContainer');
-    if (container) {
-        const translateX = -(nextIndex * 500);
-        container.style.transform = `translateX(${translateX}px)`;
-    }
-    
-    currentCarouselIndex = nextIndex;
-}
-
-function prevCarouselItem() {
-    if (currentCarouselIndex <= 0) return;
-    
-    const prevIndex = currentCarouselIndex - 1;
-    
-    // Update background
-    updateCarouselBackground(prevIndex + 1);
-    
-    // Update active states
-    document.querySelectorAll('.carousel-item').forEach((item, index) => {
-        item.classList.toggle('active', index === prevIndex);
-    });
-    
-    // Slide container
-    const container = document.getElementById('carouselContainer');
-    if (container) {
-        const translateX = -(prevIndex * 500);
-        container.style.transform = `translateX(${translateX}px)`;
-    }
-    
-    currentCarouselIndex = prevIndex;
-}
-
-function updateCarouselBackground(bgNumber) {
-    // Remove active from all backgrounds
-    document.querySelectorAll('.section-fifteen-background').forEach(bg => {
-        bg.classList.remove('active');
-    });
-    
-    // Add active to new background (CSS transition handles the crossfade)
-    const newBg = document.querySelector(`.bg-${bgNumber}`);
-    if (newBg) {
-        newBg.classList.add('active');
-    }
-}
-        function startSection16() {
-    // Stop carousel timer from section 15
-    if (carouselInterval) {
-        clearInterval(carouselInterval);
-    }
-    
-    // Hide section 15 content
-    gsap.to('.section-fifteen-content', {
-        duration: 1,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    // Hide all section 15 backgrounds
-    gsap.to('.section-fifteen-background', {
-        duration: 0.8,
-        opacity: 0,
-        ease: "power2.inOut"
-    });
-    
-    // Show glows-2 mask (same as section 13)
-    gsap.to('#mask5', {
-        duration: 0.8,
-        opacity: 1,
-        ease: "power2.inOut",
-        delay: 0.5
-    });
-    
-    // Show section 16 content
-    gsap.to('.section-sixteen-content', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 1
-    });
-    
-    // Animate title from top
-    gsap.to('.section-sixteen-title', {
-        duration: 1,
-        y: 0,
-        opacity: 1,
-        ease: "back.out(1.7)",
-        delay: 1.2
-    });
-    
-    // Animate logos from top
-    gsap.to('.logos-row', {
-        duration: 1,
-        y: 0,
-        opacity: 1,
-        ease: "back.out(1.7)",
-        delay: 1.5
-    });
-    
     currentSection = 16;
 }
 
-function startSection17() {
-    // Move section 16 content to top and vanish
-    gsap.to('.section-sixteen-title', {
-        duration: 0.8,
-        y: -200,
-        opacity: 0,
-        ease: "power2.in"
-    });
-    
-    gsap.to('.logos-row', {
-        duration: 0.8,
-        y: -200,
-        opacity: 0,
-        ease: "power2.in",
-        delay: 0.1
-    });
-    
-    // Add image 269 mask
-    gsap.set('#mask3', { y: 0, opacity: 0 }); // Reset position
-    gsap.to('#mask3', {
-        duration: 0.8,
-        opacity: 0.7,
-        ease: "power2.inOut",
-        delay: 0.5
-    });
-    
-    // Bring 3D model from bottom with orange color
-    if (planet3D) {
-        // Change material color to orange
-        if (planet3D.material) {
-            gsap.to(planet3D.material.color, {
-                duration: 0.5,
-                r: 1,
-                g: 0.5,
-                b: 0
-            });
-            gsap.to(planet3D.material, {
-                duration: 0.5,
-                emissive: new THREE.Color(0x442200)
-            });
-        } else if (planet3D.traverse) {
-            planet3D.traverse(function(child) {
-                if (child instanceof THREE.Mesh && child.material) {
-                    gsap.to(child.material.color, {
-                        duration: 0.5,
-                        r: 1,
-                        g: 0.5,
-                        b: 0
-                    });
-                    gsap.to(child.material, {
-                        duration: 0.5,
-                        emissive: new THREE.Color(0x442200)
-                    });
-                }
-            });
-        }
-        
-        // Position model at bottom first, then animate up
-        gsap.set(planet3D.position, {
-            x: 0,
-            y: -15,
-            z: 11
+function startSection17(reverse = false) {
+    if (!reverse) {
+        gsap.to('.section-sixteen-title', {
+            duration: 0.8,
+            y: -200,
+            opacity: 0,
+            ease: "power2.in"
         });
         
-        gsap.to(planet3D.position, {
-            duration: 1.5,
-            y: -2,
+        gsap.to('.logos-row', {
+            duration: 0.8,
+            y: -200,
+            opacity: 0,
+            ease: "power2.in",
+            delay: 0.1
+        });
+        
+        gsap.set('#mask3', { y: 0, opacity: 0 });
+        gsap.to('#mask3', {
+            duration: 0.8,
+            opacity: 0.7,
             ease: "power2.inOut",
-            delay: 0.8
+            delay: 0.5
         });
         
-        gsap.to(planet3D.scale, {
-            duration: 1.5,
-            x: 0.8,
-            y: 0.8,
-            z: 0.8,
-            ease: "power2.inOut",
-            delay: 0.8
-        });
-        
-        if (planetBackground) {
-            gsap.to(planetBackground.position, {
-                duration: 1.5,
+        if (planet3D) {
+            if (planet3D.material) {
+                gsap.to(planet3D.material.color, {
+                    duration: 0.5,
+                    r: 1,
+                    g: 0.5,
+                    b: 0
+                });
+                gsap.to(planet3D.material, {
+                    duration: 0.5,
+                    emissive: new THREE.Color(0x442200)
+                });
+            } else if (planet3D.traverse) {
+                planet3D.traverse(function(child) {
+                    if (child instanceof THREE.Mesh && child.material) {
+                        gsap.to(child.material.color, {
+                            duration: 0.5,
+                            r: 1,
+                            g: 0.5,
+                            b: 0
+                        });
+                        gsap.to(child.material, {
+                            duration: 0.5,
+                            emissive: new THREE.Color(0x442200)
+                        });
+                    }
+                });
+            }
+            
+            gsap.set(planet3D.position, {
                 x: 0,
+                y: -15,
+                z: 11
+            });
+            
+            gsap.to(planet3D.position, {
+                duration: 1.5,
                 y: -2,
-                z: 3,
                 ease: "power2.inOut",
                 delay: 0.8
             });
             
-            gsap.to(planetBackground.material, {
-                duration: 1,
-                opacity: 0.7,
+            gsap.to(planet3D.scale, {
+                duration: 1.5,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                ease: "power2.inOut",
                 delay: 0.8
+            });
+            
+            if (planetBackground) {
+                gsap.to(planetBackground.position, {
+                    duration: 1.5,
+                    x: 0,
+                    y: -2,
+                    z: 3,
+                    ease: "power2.inOut",
+                    delay: 0.8
+                });
+                
+                gsap.to(planetBackground.material, {
+                    duration: 1,
+                    opacity: 0.7,
+                    delay: 0.8
+                });
+            }
+        }
+        
+        gsap.to('.section-seventeen-content', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 1
+        });
+        
+        gsap.to('.section-seventeen-main', {
+            duration: 1.2,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.5
+        });
+    } else {
+        // Reverse from footer
+        gsap.to('.footer-container', {
+            duration: 1,
+            y: '100%',
+            opacity: 0,
+            ease: "power2.in"
+        });
+        
+        gsap.to('.section-seventeen-main', {
+            duration: 1,
+            y: 0,
+            ease: "power2.inOut",
+            delay: 0.3
+        });
+        
+        if (planet3D) {
+            gsap.to(planet3D.position, {
+                duration: 1,
+                y: -2,
+                ease: "power2.inOut",
+                delay: 0.3
             });
         }
     }
-    
-    // Show section 17 content
-    gsap.to('.section-seventeen-content', {
-        duration: 0.5,
-        opacity: 1,
-        delay: 1
-    });
-    
-    // Animate content from bottom
-    gsap.to('.section-seventeen-main', {
-        duration: 1.2,
-        y: 0,
-        opacity: 1,
-        ease: "back.out(1.7)",
-        delay: 1.5
-    });
-    
+
     currentSection = 17;
 }
 
 function showFooter() {
-    // Move text content and 3D model upwards
     gsap.to('.section-seventeen-main', {
         duration: 1,
         y: -150,
@@ -1868,7 +2271,6 @@ function showFooter() {
         }
     }
     
-    // Show footer from bottom
     gsap.to('.footer-container', {
         duration: 1,
         y: 0,
@@ -1877,17 +2279,43 @@ function showFooter() {
         delay: 0.3
     });
     
-    currentSection = 18; // Footer state
+    currentSection = 18;
 }
 
-        // Wheel management functions
-        function startWheelTimer() {
-            wheelInterval = setInterval(() => {
-                nextWheelImage();
-            }, 3000);
+// Add this new function to trigger orbit animations
+function triggerOrbitAnimations() {
+    const orbitOne = document.querySelector('.orbit-container.one');
+    const orbitTwo = document.querySelector('.orbit-container.two');
+    const orbitThree = document.querySelector('.orbit-container.three');
+    
+    [orbitOne, orbitTwo, orbitThree].forEach(orbit => {
+        if (orbit) {
+            orbit.style.animation = 'none';
+            orbit.offsetHeight;
         }
+    });
+    
+    setTimeout(() => {
+        if (orbitOne) orbitOne.style.animation = 'rotate-orbit-one 3s ease-in-out 0s forwards';
+    }, 100);
+    
+    setTimeout(() => {
+        if (orbitTwo) orbitTwo.style.animation = 'rotate-orbit-two 3s ease-in-out 0s forwards';
+    }, 1100);
+    
+    setTimeout(() => {
+        if (orbitThree) orbitThree.style.animation = 'rotate-orbit-three 3s ease-in-out 0s forwards';
+    }, 2100);
+}
 
-        function nextWheelImage() {
+// Wheel management functions
+function startWheelTimer() {
+    wheelInterval = setInterval(() => {
+        nextWheelImage();
+    }, 3000);
+}
+
+function nextWheelImage() {
     currentWheelIndex = (currentWheelIndex + 1) % totalWheelImages;
     rotateWheel();
     updateWheelCounter();
@@ -1900,73 +2328,160 @@ function prevWheelImage() {
     updateWheelCounter();
     updateCafeImage();
 }
+
 function updateCafeImage() {
     document.querySelectorAll('.cafe-image').forEach((img, index) => {
         img.classList.toggle('active', index === currentWheelIndex);
     });
 }
 
-        function rotateWheel() {
-            const wheel = document.getElementById('imageWheel');
-            const rotationY = -(currentWheelIndex * 72); // 360/5 = 72 degrees per image
-            wheel.style.transform = `perspective(1000px) rotateY(${rotationY}deg)`;
-        }
+function rotateWheel() {
+    const wheel = document.getElementById('imageWheel');
+    const rotationY = -(currentWheelIndex * 72);
+    wheel.style.transform = `perspective(1000px) rotateY(${rotationY}deg)`;
+}
 
-        function updateWheelCounter() {
-            document.getElementById('wheelCounter').textContent = 
-                String(currentWheelIndex + 1).padStart(2, '0') + '/05';
-        }
+function updateWheelCounter() {
+    document.getElementById('wheelCounter').textContent = 
+        String(currentWheelIndex + 1).padStart(2, '0') + '/05';
+}
 
-        
+// Carousel functions
+currentCarouselIndex = 0;
+totalCarouselItems = 5;
+let section15ScrollProgress = 0;
 
-        function nextCarouselItem() {
+function initializeCarousel() {
+    currentCarouselIndex = 0;
+    section15ScrollProgress = 0;
+
+    document.querySelectorAll('.section-fifteen-background').forEach((bg, index) => {
+        bg.classList.toggle('active', index === 0);
+    });
+
     const container = document.getElementById('carouselContainer');
-    const currentItem = document.querySelector('.carousel-item.active');
-    const nextIndex = (currentCarouselIndex + 1) % totalCarouselItems;
-    const nextItem = document.querySelector(`.carousel-item[data-bg="${nextIndex + 1}"]`);
+    if (container) {
+        container.style.transform = 'translateX(0)';
+    }
+
+    document.querySelectorAll('.carousel-item').forEach((item, index) => {
+        item.classList.toggle('active', index === 0);
+    });
+}
+
+function updateCarouselOnScroll(direction) {
+    if (direction > 0 && currentCarouselIndex < totalCarouselItems - 1) {
+        nextCarouselItem();
+        return true;
+    } else if (direction < 0 && currentCarouselIndex > 0) {
+        prevCarouselItem();
+        return true;
+    }
     
-    // Slide container to left
-    const translateX = -(nextIndex * 100);
-    container.style.transform = `translateX(${translateX}vw)`;
+    return false;
+}
+
+function nextCarouselItem() {
+    if (currentCarouselIndex >= totalCarouselItems - 1) return;
     
-    // Update active class
-    currentItem.classList.remove('active');
-    nextItem.classList.add('active');
+    const nextIndex = currentCarouselIndex + 1;
     
-    // Change background
     updateCarouselBackground(nextIndex + 1);
+    
+    document.querySelectorAll('.carousel-item').forEach((item, index) => {
+        item.classList.toggle('active', index === nextIndex);
+    });
+    
+    const container = document.getElementById('carouselContainer');
+    if (container) {
+        const translateX = -(nextIndex * 500);
+        container.style.transform = `translateX(${translateX}px)`;
+    }
     
     currentCarouselIndex = nextIndex;
 }
 
-        function updateCarouselBackground(bgNumber) {
-            // Fade out all backgrounds
-            document.querySelectorAll('.section-fifteen-background').forEach(bg => {
-                gsap.to(bg, {
-                    duration: 0.5,
-                    opacity: 0
-                });
-            });
+function prevCarouselItem() {
+    if (currentCarouselIndex <= 0) return;
+    
+    const prevIndex = currentCarouselIndex - 1;
+    
+    updateCarouselBackground(prevIndex + 1);
+    
+    document.querySelectorAll('.carousel-item').forEach((item, index) => {
+        item.classList.toggle('active', index === prevIndex);
+    });
+    
+    const container = document.getElementById('carouselContainer');
+    if (container) {
+        const translateX = -(prevIndex * 500);
+        container.style.transform = `translateX(${translateX}px)`;
+    }
+    
+    currentCarouselIndex = prevIndex;
+}
 
-            // Fade in new background
-            gsap.to(`.bg-${bgNumber}`, {
-                duration: 0.8,
-                opacity: 1,
-                delay: 0.3
-            });
-        }
+function updateCarouselBackground(bgNumber) {
+    document.querySelectorAll('.section-fifteen-background').forEach(bg => {
+        bg.classList.remove('active');
+    });
+    
+    const newBg = document.querySelector(`.bg-${bgNumber}`);
+    if (newBg) {
+        newBg.classList.add('active');
+    }
+}
 
-        function updateCardSlider() {
-            const slider = document.getElementById('cardsSlider');
-            const cardWidth = 330; // 300px width + 30px gap
-            const translateX = -(currentCardIndex * cardWidth);
-            slider.style.transform = `translateX(${translateX}px)`;
-        }
+function updateCardSlider() {
+    const slider = document.getElementById('cardsSlider');
+    const cardWidth = 330;
+    const translateX = -(currentCardIndex * cardWidth);
+    slider.style.transform = `translateX(${translateX}px)`;
+}
 
-        function setupScrolling() {
-            let isScrolling = false;
+// Mobile touch support
+let touchStartY = 0;
+let touchStartX = 0;
+let lastTouchTime = 0;
+const touchThreshold = 50; // Minimum swipe distance
+const timeThreshold = 300; // Maximum time for swipe
 
-            window.addEventListener('wheel', (e) => {
+function handleTouchStart(e) {
+    touchStartY = e.touches[0].clientY;
+    touchStartX = e.touches[0].clientX;
+    lastTouchTime = Date.now();
+}
+
+function handleTouchEnd(e) {
+    if (!touchStartY || !touchStartX) return;
+    
+    const touchEndY = e.changedTouches[0].clientY;
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchTime = Date.now() - lastTouchTime;
+    
+    const deltaY = touchStartY - touchEndY;
+    const deltaX = Math.abs(touchStartX - touchEndX);
+    
+    // Only process vertical swipes (ignore horizontal swipes)
+    if (Math.abs(deltaY) > touchThreshold && deltaX < touchThreshold && touchTime < timeThreshold) {
+        e.preventDefault();
+        
+        // Simulate wheel event
+        const wheelEvent = {
+            deltaY: deltaY > 0 ? 100 : -100,
+            preventDefault: () => {}
+        };
+        
+        handleScroll(wheelEvent);
+    }
+    
+    touchStartY = 0;
+    touchStartX = 0;
+}
+
+// Updated scroll handling function that supports both directions and mobile
+let isScrolling = false;
+function handleScroll(e) {
     if (isScrolling) return;
     
     e.preventDefault();
@@ -1977,56 +2492,33 @@ function updateCafeImage() {
     if (currentSection === 15) {
         const handled = updateCarouselOnScroll(e.deltaY);
         if (handled) {
-            // Carousel handled the scroll, don't change sections
             isScrolling = true;
             setTimeout(() => { isScrolling = false; }, 300);
             return;
         }
-        // If carousel didn't handle it, proceed to section change
     }
     
-    if (e.deltaY > 0 && currentSection < 17) {
-        targetSection = currentSection + 1;
-    } else if (e.deltaY > 0 && currentSection === 17) {
-        // Show footer when scrolling down from section 17
-        if (currentSection !== 18) {
+    if (e.deltaY > 0) {
+        // Scrolling down
+        if (currentSection < 17) {
+            targetSection = currentSection + 1;
+        } else if (currentSection === 17 && currentSection !== 18) {
             showFooter();
-            isScrolling = true;
-            setTimeout(() => { isScrolling = false; }, 2000);
-        }
-        return;
-    } else if (e.deltaY < 0 && currentSection > 1) {
-        if (currentSection === 18) {
-            // Hide footer and go back to section 17
-            gsap.to('.footer-container', {
-                duration: 1,
-                y: '100%',
-                opacity: 0,
-                ease: "power2.in"
-            });
-            
-            gsap.to('.section-seventeen-main', {
-                duration: 1,
-                y: 0,
-                ease: "power2.inOut",
-                delay: 0.3
-            });
-            
-            if (planet3D) {
-                gsap.to(planet3D.position, {
-                    duration: 1,
-                    y: -2,
-                    ease: "power2.inOut",
-                    delay: 0.3
-                });
-            }
-            
-            currentSection = 17;
             isScrolling = true;
             setTimeout(() => { isScrolling = false; }, 2000);
             return;
         }
-        targetSection = currentSection - 1;
+    } else if (e.deltaY < 0) {
+        // Scrolling up
+        if (currentSection === 18) {
+            // Hide footer and go back to section 17
+            startSection17(true); // Pass true for reverse
+            isScrolling = true;
+            setTimeout(() => { isScrolling = false; }, 2000);
+            return;
+        } else if (currentSection > 1) {
+            targetSection = currentSection - 1;
+        }
     }
     
     if (targetSection !== currentSection) {
@@ -2045,70 +2537,87 @@ function updateCafeImage() {
             clearInterval(carouselInterval);
         }
         
+        // Call the appropriate section function with reverse flag
+        const isReverse = targetSection < currentSection;
+        
         switch(targetSection) {
-            case 2: startSection2(); break;
-            case 3: startSection3(); break;
-            case 4: startSection4(); break;
-            case 5: startSection5(); break;
-            case 6: startSection6(); break;
-            case 7: startSection7(); break;
-            case 8: startSection8(); break;
-            case 9: startSection9(); break;
-            case 10: startSection10(); break;
-            case 11: startSection11(); break;
-            case 12: startSection12(); break;
-            case 13: startSection13(); break;
-            case 14: startSection14(); break;
-            case 15: startSection15(); break;
-            case 16: startSection16(); break;
-            case 17: startSection17(); break;
+            case 1: startSection1(isReverse); break;
+            case 2: startSection2(isReverse); break;
+            case 3: startSection3(isReverse); break;
+            case 4: startSection4(isReverse); break;
+            case 5: startSection5(isReverse); break;
+            case 6: startSection6(isReverse); break;
+            case 7: startSection7(isReverse); break;
+            case 8: startSection8(isReverse); break;
+            case 9: startSection9(isReverse); break;
+            case 10: startSection10(isReverse); break;
+            case 11: startSection11(isReverse); break;
+            case 12: startSection12(isReverse); break;
+            case 13: startSection13(isReverse); break;
+            case 14: startSection14(isReverse); break;
+            case 15: startSection15(isReverse); break;
+            case 16: startSection16(isReverse); break;
+            case 17: startSection17(isReverse); break;
         }
         
         setTimeout(() => {
             isScrolling = false;
         }, 2000);
     }
-}, { passive: false });
+}
 
-            // Setup wheel controls
-            document.getElementById('prevArrow').addEventListener('click', () => {
-                if (wheelInterval) clearInterval(wheelInterval);
-                prevWheelImage();
-                startWheelTimer();
-            });
+function setupScrolling() {
+    // Desktop mouse wheel support
+    window.addEventListener('wheel', handleScroll, { passive: false });
+    
+    // Mobile touch support
+    window.addEventListener('touchstart', handleTouchStart, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    
+    // Prevent default touch behaviors that might interfere
+    document.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+    }, { passive: false });
 
-            document.getElementById('nextArrow').addEventListener('click', () => {
-                if (wheelInterval) clearInterval(wheelInterval);
-                nextWheelImage();
-                startWheelTimer();
-            });
+    // Setup wheel controls
+    document.getElementById('prevArrow')?.addEventListener('click', () => {
+        if (wheelInterval) clearInterval(wheelInterval);
+        prevWheelImage();
+        startWheelTimer();
+    });
 
-            // Setup testimonial card controls
-            document.getElementById('testPrevArrow').addEventListener('click', () => {
-                if (currentCardIndex > 0) {
-                    currentCardIndex--;
-                    updateCardSlider();
-                }
-            });
+    document.getElementById('nextArrow')?.addEventListener('click', () => {
+        if (wheelInterval) clearInterval(wheelInterval);
+        nextWheelImage();
+        startWheelTimer();
+    });
 
-            document.getElementById('testNextArrow').addEventListener('click', () => {
-                if (currentCardIndex < totalCards - 3) { // Show 3 cards at once
-                    currentCardIndex++;
-                    updateCardSlider();
-                }
-            });
+    // Setup testimonial card controls
+    document.getElementById('testPrevArrow')?.addEventListener('click', () => {
+        if (currentCardIndex > 0) {
+            currentCardIndex--;
+            updateCardSlider();
         }
+    });
 
-        // Handle resize
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+    document.getElementById('testNextArrow')?.addEventListener('click', () => {
+        if (currentCardIndex < totalCards - 3) {
+            currentCardIndex++;
+            updateCardSlider();
+        }
+    });
+}
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            load3DPlanet();
-            animate();
-            initializeAssetLoading();
-        });
+// Handle resize
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    load3DPlanet();
+    animate();
+    initializeAssetLoading();
+});
