@@ -23,6 +23,69 @@ camera.position.z = 15;
 
 let particleSystem = null;
 
+let touchStartY = 0;
+let touchStartX = 0;
+let lastTouchTime = 0;
+let isTouchDevice = false;
+let touchSensitivity = 50; // Minimum swipe distance
+let touchTimeLimit = 500; // Maximum time for swipe gesture
+
+// Detect if device supports touch
+function detectTouchDevice() {
+    isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    if (isTouchDevice) {
+        document.body.classList.add('touch-device');
+    }
+}
+
+// Mobile touch handlers
+function handleTouchStart(e) {
+    const touch = e.touches[0];
+    touchStartY = touch.clientY;
+    touchStartX = touch.clientX;
+    lastTouchTime = Date.now();
+}
+
+function handleTouchMove(e) {
+    // Prevent default scrolling behavior
+    e.preventDefault();
+}
+
+function handleTouchEnd(e) {
+    if (!touchStartY || !touchStartX) return;
+    
+    const touch = e.changedTouches[0];
+    const touchEndY = touch.clientY;
+    const touchEndX = touch.clientX;
+    const touchDuration = Date.now() - lastTouchTime;
+    
+    const deltaY = touchStartY - touchEndY;
+    const deltaX = Math.abs(touchStartX - touchEndX);
+    const absDeltaY = Math.abs(deltaY);
+    
+    // Check if it's a valid vertical swipe
+    if (absDeltaY > touchSensitivity && 
+        deltaX < touchSensitivity && 
+        touchDuration < touchTimeLimit) {
+        
+        e.preventDefault();
+        
+        // Create a synthetic wheel event
+        const syntheticEvent = {
+            deltaY: deltaY > 0 ? 100 : -100, // Positive for down, negative for up
+            preventDefault: () => {}
+        };
+        
+        // Use the existing scroll handler
+        handleScrollEvent(syntheticEvent);
+    }
+    
+    // Reset touch values
+    touchStartY = 0;
+    touchStartX = 0;
+    lastTouchTime = 0;
+}
+
 // Image preloader system - Updated
 class AssetLoader {
     constructor() {
@@ -2440,9 +2503,9 @@ function updateCardSlider() {
 }
 
 // Mobile touch support
-let touchStartY = 0;
-let touchStartX = 0;
-let lastTouchTime = 0;
+// let touchStartY = 0;
+// let touchStartX = 0;
+// let lastTouchTime = 0;
 const touchThreshold = 50; // Minimum swipe distance
 const timeThreshold = 300; // Maximum time for swipe
 
@@ -2565,47 +2628,265 @@ function handleScroll(e) {
         }, 2000);
     }
 }
+function handleScrollEvent(e) {
+    if (window.isScrolling) return;
+    
+    e.preventDefault();
+    
+    let targetSection = currentSection;
+    
+    // Special handling for section 15 carousel
+    if (currentSection === 15) {
+        const handled = updateCarouselOnScroll(e.deltaY);
+        if (handled) {
+            window.isScrolling = true;
+            setTimeout(() => { window.isScrolling = false; }, 300);
+            return;
+        }
+    }
+    
+    // Determine scroll direction and target section
+    if (e.deltaY > 0) {
+        // Scrolling down
+        if (currentSection < 17) {
+            targetSection = currentSection + 1;
+        } else if (currentSection === 17 && currentSection !== 18) {
+            showFooter();
+            window.isScrolling = true;
+            setTimeout(() => { window.isScrolling = false; }, 2000);
+            return;
+        }
+    } else if (e.deltaY < 0) {
+        // Scrolling up
+        if (currentSection === 18) {
+            // Hide footer and return to section 17
+            gsap.to('.footer-container', {
+                duration: 1,
+                y: '100%',
+                opacity: 0,
+                ease: "power2.in"
+            });
+            
+            gsap.to('.section-seventeen-main', {
+                duration: 1,
+                y: 0,
+                ease: "power2.inOut",
+                delay: 0.3
+            });
+            
+            if (planet3D) {
+                gsap.to(planet3D.position, {
+                    duration: 1,
+                    y: -2,
+                    ease: "power2.inOut",
+                    delay: 0.3
+                });
+            }
+            
+            currentSection = 17;
+            window.isScrolling = true;
+            setTimeout(() => { window.isScrolling = false; }, 2000);
+            return;
+        } else if (currentSection > 1) {
+            targetSection = currentSection - 1;
+        }
+    }
+    
+    // Execute section transition if target changed
+    if (targetSection !== currentSection) {
+        window.isScrolling = true;
+        
+        // Update navigation dots
+        document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+            dot.classList.toggle('active', index === targetSection - 1);
+        });
+
+        // Stop timers when leaving certain sections
+        if (currentSection === 7 && wheelInterval) {
+            clearInterval(wheelInterval);
+        }
+        if (currentSection === 15 && carouselInterval) {
+            clearInterval(carouselInterval);
+        }
+        
+        // Execute the appropriate section transition
+        switch(targetSection) {
+            case 1: startSection1(); break;
+            case 2: startSection2(); break;
+            case 3: startSection3(); break;
+            case 4: startSection4(); break;
+            case 5: startSection5(); break;
+            case 6: startSection6(); break;
+            case 7: startSection7(); break;
+            case 8: startSection8(); break;
+            case 9: startSection9(); break;
+            case 10: startSection10(); break;
+            case 11: startSection11(); break;
+            case 12: startSection12(); break;
+            case 13: startSection13(); break;
+            case 14: startSection14(); break;
+            case 15: startSection15(); break;
+            case 16: startSection16(); break;
+            case 17: startSection17(); break;
+        }
+        
+        // Reset scroll lock after animation completes
+        setTimeout(() => {
+            window.isScrolling = false;
+        }, 2000);
+    }
+}
 
 function setupScrolling() {
+    // Initialize touch detection
+    detectTouchDevice();
+    
+    // Initialize scroll lock
+    window.isScrolling = false;
+    
     // Desktop mouse wheel support
-    window.addEventListener('wheel', handleScroll, { passive: false });
+    window.addEventListener('wheel', handleScrollEvent, { 
+        passive: false,
+        capture: true 
+    });
     
     // Mobile touch support
-    window.addEventListener('touchstart', handleTouchStart, { passive: false });
-    window.addEventListener('touchend', handleTouchEnd, { passive: false });
+    if (isTouchDevice) {
+        console.log('Touch device detected - enabling mobile scrolling');
+        
+        // Add touch event listeners
+        document.addEventListener('touchstart', handleTouchStart, { 
+            passive: false,
+            capture: true 
+        });
+        
+        document.addEventListener('touchmove', handleTouchMove, { 
+            passive: false,
+            capture: true 
+        });
+        
+        document.addEventListener('touchend', handleTouchEnd, { 
+            passive: false,
+            capture: true 
+        });
+        
+        // Prevent elastic scrolling on iOS
+        document.body.addEventListener('touchstart', (e) => {
+            if (e.target === document.body) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        document.body.addEventListener('touchend', (e) => {
+            if (e.target === document.body) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        document.body.addEventListener('touchmove', (e) => {
+            if (e.target === document.body) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    }
+
+    // Setup wheel controls (existing code)
+    const prevArrow = document.getElementById('prevArrow');
+    const nextArrow = document.getElementById('nextArrow');
     
-    // Prevent default touch behaviors that might interfere
-    document.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-    }, { passive: false });
+    if (prevArrow) {
+        prevArrow.addEventListener('click', () => {
+            if (wheelInterval) clearInterval(wheelInterval);
+            prevWheelImage();
+            startWheelTimer();
+        });
+    }
 
-    // Setup wheel controls
-    document.getElementById('prevArrow')?.addEventListener('click', () => {
-        if (wheelInterval) clearInterval(wheelInterval);
-        prevWheelImage();
-        startWheelTimer();
-    });
+    if (nextArrow) {
+        nextArrow.addEventListener('click', () => {
+            if (wheelInterval) clearInterval(wheelInterval);
+            nextWheelImage();
+            startWheelTimer();
+        });
+    }
 
-    document.getElementById('nextArrow')?.addEventListener('click', () => {
-        if (wheelInterval) clearInterval(wheelInterval);
-        nextWheelImage();
-        startWheelTimer();
-    });
+    // Setup testimonial card controls (existing code)
+    const testPrevArrow = document.getElementById('testPrevArrow');
+    const testNextArrow = document.getElementById('testNextArrow');
+    
+    if (testPrevArrow) {
+        testPrevArrow.addEventListener('click', () => {
+            if (currentCardIndex > 0) {
+                currentCardIndex--;
+                updateCardSlider();
+            }
+        });
+    }
 
-    // Setup testimonial card controls
-    document.getElementById('testPrevArrow')?.addEventListener('click', () => {
-        if (currentCardIndex > 0) {
-            currentCardIndex--;
-            updateCardSlider();
+    if (testNextArrow) {
+        testNextArrow.addEventListener('click', () => {
+            if (currentCardIndex < totalCards - 3) {
+                currentCardIndex++;
+                updateCardSlider();
+            }
+        });
+    }
+}
+
+// Add mobile-specific CSS to prevent default behaviors
+function addMobileStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .touch-device {
+            -webkit-overflow-scrolling: touch;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
-    });
-
-    document.getElementById('testNextArrow')?.addEventListener('click', () => {
-        if (currentCardIndex < totalCards - 3) {
-            currentCardIndex++;
-            updateCardSlider();
+        
+        .touch-device body {
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
-    });
+        
+        /* Prevent pull-to-refresh on mobile */
+        .touch-device {
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: none;
+        }
+        
+        /* Improve touch responsiveness */
+        .touch-device * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+        }
+        
+        /* Ensure buttons are still touchable */
+        .touch-device button,
+        .touch-device .wheel-arrow,
+        .touch-device .testimonial-arrow,
+        .touch-device .explore-button,
+        .touch-device .brainstorm-button,
+        .touch-device .chat-button,
+        .touch-device .ved-button,
+        .touch-device .contact-button,
+        .touch-device .explore-ips-button {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: auto;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0.2);
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Handle resize
@@ -2617,6 +2898,7 @@ window.addEventListener('resize', () => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    addMobileStyles()
     load3DPlanet();
     animate();
     initializeAssetLoading();
