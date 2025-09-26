@@ -2745,25 +2745,25 @@ function handleScroll(e) {
         // Call the appropriate section function with reverse flag
         const isReverse = targetSection < currentSection;
         
-        switch(targetSection) {
-            case 1: startSection1(isReverse); break;
-            case 2: startSection2(isReverse); break;
-            case 3: startSection3(isReverse); break;
-            case 4: startSection4(isReverse); break;
-            case 5: startSection5(isReverse); break;
-            case 6: startSection6(isReverse); break;
-            case 7: startSection7(isReverse); break;
-            case 8: startSection8(isReverse); break;
-            case 9: startSection9(isReverse); break;
-            case 10: startSection10(isReverse); break;
-            case 11: startSection11(isReverse); break;
-            case 12: startSection12(isReverse); break;
-            case 13: startSection13(isReverse); break;
-            case 14: startSection14(isReverse); break;
-            case 15: startSection15(isReverse); break;
-            case 16: startSection16(isReverse); break;
-            case 17: startSection17(isReverse); break;
-        }
+        // switch(targetSection) {
+        //     case 1: startSection1(isReverse); break;
+        //     case 2: startSection2(isReverse); break;
+        //     case 3: startSection3(isReverse); break;
+        //     case 4: startSection4(isReverse); break;
+        //     case 5: startSection5(isReverse); break;
+        //     case 6: startSection6(isReverse); break;
+        //     case 7: startSection7(isReverse); break;
+        //     case 8: startSection8(isReverse); break;
+        //     case 9: startSection9(isReverse); break;
+        //     case 10: startSection10(isReverse); break;
+        //     case 11: startSection11(isReverse); break;
+        //     case 12: startSection12(isReverse); break;
+        //     case 13: startSection13(isReverse); break;
+        //     case 14: startSection14(isReverse); break;
+        //     case 15: startSection15(isReverse); break;
+        //     case 16: startSection16(isReverse); break;
+        //     case 17: startSection17(isReverse); break;
+        // }
         
         setTimeout(() => {
             isScrolling = false;
