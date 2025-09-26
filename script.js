@@ -85,7 +85,92 @@ function handleTouchEnd(e) {
     touchStartX = 0;
     lastTouchTime = 0;
 }
+function createModelPlane() {
+    // Create particle system for X shape with concentration towards the center lines
+    const particleCount = 5000;
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
 
+    // Create X shape pattern with concentration towards the main lines
+    for (let i = 0; i < particleCount; i++) {
+        const i3 = i * 3;
+        
+        // Define X shape parameters
+        const maxDistance = 6; // Maximum distance from the center lines
+        const concentrationFactor = 1.0; // Higher = more concentrated near lines
+        
+        // Generate a random distance from the lines with exponential falloff
+        // This creates the concentration effect
+        const randomDistance = Math.pow(Math.random(), concentrationFactor) * maxDistance;
+        
+        // Randomly choose which of the two X lines to use as base
+        const useFirstLine = Math.random() > 0.5;
+        
+        // Random position along the chosen line
+        const linePosition = (Math.random() - 0.5) * 12;
+        
+        let x, y;
+        
+        if (useFirstLine) {
+            // First diagonal line: y = x
+            const baseX = linePosition;
+            const baseY = linePosition;
+            
+            // Add perpendicular offset with the concentrated distance
+            const angle = Math.PI / 4; // 45 degrees for perpendicular to y=x
+            const offsetX = randomDistance * Math.cos(angle) * (Math.random() > 0.5 ? 1 : -1);
+            const offsetY = randomDistance * Math.sin(angle) * (Math.random() > 0.5 ? 1 : -1);
+            
+            x = baseX + offsetX;
+            y = baseY + offsetY;
+        } else {
+            // Second diagonal line: y = -x
+            const baseX = linePosition;
+            const baseY = -linePosition;
+            
+            // Add perpendicular offset with the concentrated distance
+            const angle = -Math.PI / 4; // -45 degrees for perpendicular to y=-x
+            const offsetX = randomDistance * Math.cos(angle) * (Math.random() > 0.5 ? 1 : -1);
+            const offsetY = randomDistance * Math.sin(angle) * (Math.random() > 0.5 ? 1 : -1);
+            
+            x = baseX + offsetX;
+            y = baseY + offsetY;
+        }
+        
+        // Optional: Add some random noise for natural look
+        const noise = 0.1;
+        x += (Math.random() - 0.5) * noise;
+        y += (Math.random() - 0.5) * noise;
+        
+        positions[i3] = x;
+        positions[i3 + 1] = y;
+        positions[i3 + 2] = 0;
+        
+        // Color variation based on distance from center for visual effect
+        const distanceFactor = 1 - (randomDistance / maxDistance);
+        colors[i3] = 0.5 + distanceFactor * 0.5; // Red increases near center
+        colors[i3 + 1] = 0.3 + distanceFactor * 0.4; // Green increases near center
+        colors[i3 + 2] = 0.5 + distanceFactor * 0.3; // Blue increases near center
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+    const material = new THREE.PointsMaterial({
+        size: 0.08,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.9,
+        sizeAttenuation: false
+    });
+
+    const modelPlane = new THREE.Points(geometry, material);
+    modelPlane.position.set(0, 0, 0);
+    scene.add(modelPlane);
+    
+    return modelPlane;
+}
 // Image preloader system - Updated
 class AssetLoader {
     constructor() {
@@ -423,6 +508,7 @@ function createPlaceholderPlanet() {
         emissiveIntensity: 0.3,
         map: gradientTexture
     });
+    window.modelPlane = createModelPlane();
 
     // Load additional textures...
     textureLoader.load('./3d assets/First Planet/fbx/tex/RS Standard_0_diffuse_red_00000.png', 
@@ -539,6 +625,17 @@ function animate() {
             window.modelBackgroundParticles.rotation.x += 0.001;
         }
     }
+    
+    if (planet3D && window.modelPlane) {
+        if (currentSection === 2) {
+            window.modelPlane.visible = false;
+        } else {
+            // Show X-plane when 3D model is visible (has scale > 0)
+            const isModelVisible = planet3D.scale.x > 0 || planet3D.scale.y > 0 || planet3D.scale.z > 0;
+            window.modelPlane.visible = isModelVisible;
+        }
+    window.modelPlane.position.copy(planet3D.position);
+}
 
     renderer.clear();
     renderer.render(scene, camera);
@@ -1869,8 +1966,100 @@ function startSection12(reverse = false) {
     currentSection = 12;
 }
 
+function startSection14(reverse = false) {
+    if (!reverse) {
+        // Hide section 13 content immediately
+        gsap.to('.section-thirteen-content', {
+            duration: 0.2,
+            opacity: 0
+        });
+
+        const transition = document.querySelector('.tombstone-transition');
+        
+        // Step 1: Show transition overlay while section 13 background is still visible
+        gsap.set(transition, { 
+            opacity: 0, 
+            transform: 'scale(0)' 
+        });
+        
+        gsap.to(transition, {
+            duration: 0.8,
+            opacity: 1,
+            transform: 'scale(15)',
+            ease: "power2.out",
+            onComplete: () => {
+                // Step 2: Change background to section 14 while overlay is visible
+                gsap.to('#mask7', {
+                    duration: 0.1,
+                    opacity: 1
+                });
+                
+                // Step 3: Wait a moment, then zoom transition back in
+                gsap.to(transition, {
+                    duration: 1,
+                    transform: 'scale(0)',
+                    opacity: 0,
+                    ease: "power2.in",
+                    delay: 1, // Wait 1 second before zooming back in
+                    onComplete: () => {
+                        // Step 4: Show section 14 content
+                        gsap.to('.section-fourteen-content', {
+                            duration: 0.5,
+                            opacity: 1
+                        });
+                    }
+                });
+            }
+        });
+
+        // Animate section 14 content with delay
+        gsap.to('.section-fourteen-left', {
+            duration: 0.8,
+            x: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 2.8 // After transition completes
+        });
+
+        gsap.to('.section-fourteen-right', {
+            duration: 0.8,
+            x: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 3
+        });
+    } else {
+        // Reverse animation code remains the same
+        gsap.to('#mask7', {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power2.inOut"
+        });
+
+        if (carouselInterval) {
+            clearInterval(carouselInterval);
+        }
+
+        gsap.to('.section-fifteen-content', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        gsap.to('.section-fourteen-content', {
+            duration: 0.5,
+            opacity: 1
+        });
+
+        currentCarouselIndex = 0;
+    }
+
+    currentSection = 14;
+}
+
 function startSection13(reverse = false) {
     if (!reverse) {
+        // Forward transition (normal)
         gsap.to('.section-twelve-content', {
             duration: 1,
             y: -window.innerHeight,
@@ -1902,120 +2091,52 @@ function startSection13(reverse = false) {
             });
         });
     } else {
+        // Reverse transition (from section 14 back to 13)
         const transition = document.querySelector('.tombstone-transition');
         
-        gsap.set(transition, { opacity: 1, transform: 'scale(15)' });
+        // Start reverse transition - zoom out
+        gsap.set(transition, { 
+            opacity: 1, 
+            transform: 'scale(0)' 
+        });
+        
         gsap.to(transition, {
-            duration: 1,
-            transform: 'scale(0)',
-            ease: "power2.inOut",
+            duration: 0.8,
+            transform: 'scale(15)',
+            ease: "power2.out",
             onStart: () => {
-                gsap.to('#mask7', {
+                // Hide section 14 content and background
+                gsap.to('.section-fourteen-content', {
                     duration: 0.2,
                     opacity: 0
                 });
                 
-                gsap.to('.section-fourteen-content', {
-                    duration: 0.5,
-                    opacity: 0
+                gsap.to('#mask7', {
+                    duration: 0.1,
+                    opacity: 0,
+                    delay: 0.4
                 });
             },
             onComplete: () => {
+                // Show section 13 content
+                gsap.to('.section-thirteen-content', {
+                    duration: 0.3,
+                    opacity: 1
+                });
+                
+                // Zoom transition back in to hide it
                 gsap.to(transition, {
-                    duration: 1,
-                    transform: 'scale(15)',
+                    duration: 0.8,
+                    transform: 'scale(0)',
                     opacity: 0,
-                    ease: "power2.inOut"
+                    ease: "power2.in",
+                    delay: 0.2
                 });
             }
-        });
-
-        gsap.to('.section-thirteen-content', {
-            duration: 0.3,
-            opacity: 1,
-            delay: 1.5
         });
     }
 
     currentSection = 13;
-}
-
-function startSection14(reverse = false) {
-    if (!reverse) {
-        gsap.to('.section-thirteen-content', {
-            duration: 0.3,
-            opacity: 0
-        });
-
-        const transition = document.querySelector('.tombstone-transition');
-        
-        gsap.set(transition, { opacity: 1, transform: 'scale(0)' });
-        gsap.to(transition, {
-            duration: 1,
-            transform: 'scale(15)',
-            ease: "power2.inOut",
-            onComplete: () => {
-                gsap.to('#mask7', {
-                    duration: 0.2,
-                    opacity: 1
-                });
-                
-                gsap.to('.section-fourteen-content', {
-                    duration: 0.5,
-                    opacity: 1
-                });
-                
-                gsap.to(transition, {
-                    duration: 1,
-                    transform: 'scale(0)',
-                    opacity: 0,
-                    ease: "power2.inOut",
-                    delay: 0.5
-                });
-            }
-        });
-
-        gsap.to('.section-fourteen-left', {
-            duration: 0.8,
-            x: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 2.5
-        });
-
-        gsap.to('.section-fourteen-right', {
-            duration: 0.8,
-            x: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 2.7
-        });
-    } else {
-        gsap.to('#mask7', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        if (carouselInterval) {
-            clearInterval(carouselInterval);
-        }
-
-        gsap.to('.section-fifteen-content', {
-            duration: 1,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-fourteen-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-
-        currentCarouselIndex = 0;
-    }
-
-    currentSection = 14;
 }
 
 function startSection15(reverse = false) {
@@ -2831,6 +2952,8 @@ function setupScrolling() {
             }
         });
     }
+
+
 }
 
 // Add mobile-specific CSS to prevent default behaviors
