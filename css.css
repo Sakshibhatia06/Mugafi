@@ -2009,3 +2009,695 @@
 .mask-5 { background-image: url('./assets/glows-2.png'); }
 .mask-6 { background-image: url('./assets/koncepted.ai_red_rose_color_pallete_detailed_smooth_mountains_i_81b88cf3-c6dd-4118-9c38-94b63a67f4d2-2 1.png'); }
 .mask-7 { background-image: url('./assets/image 376.png'); }
+
+/* Mobile-first responsive design */
+@media (max-width: 768px) {
+    body {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* Loading Section Mobile */
+    .semicircle {
+        width: 100px;
+        height: 50px;
+        border-radius: 50px 50px 0 0;
+    }
+
+    .logo {
+        width: 40px;
+    }
+
+    .progress-line {
+        width: 120px;
+    }
+
+    /* Section One Mobile */
+    .header-logo {
+        top: 20px;
+        width: 40px;
+    }
+
+    .main-title {
+        font-size: clamp(1.5rem, 8vw, 3rem);
+        padding: 0 20px;
+        text-align: center;
+    }
+
+    .subtitle {
+        font-size: clamp(0.8rem, 4vw, 1.2rem);
+        padding: 0 30px;
+        text-align: center;
+        max-width: 90vw;
+    }
+
+    .section-one-tombstone {
+        width: 100px;
+    }
+
+    .tombstone-structure {
+        width: 100px;
+    }
+
+    /* Section Three Mobile */
+    .section-three-content {
+        top: 15%;
+        padding: 0 20px;
+    }
+
+    .section-three-title {
+        font-size: clamp(1.2rem, 6vw, 2rem);
+        text-align: center;
+    }
+
+    .explore-button {
+        padding: 12px 25px;
+        font-size: 0.9rem;
+    }
+
+    .content-image {
+        width: 35px;
+    }
+
+    .connection-curves {
+        width: 300px;
+        height: 300px;
+        top: 60%;
+    }
+
+    /* Section Four Mobile */
+    .section-four-content {
+        top: 10%;
+        padding: 0 20px;
+    }
+
+    .section-four-title {
+        font-size: clamp(1.2rem, 6vw, 2rem);
+        text-align: center;
+        max-width: 100%;
+    }
+
+    .image-gallery {
+        flex-direction: row;
+        gap: 15px;
+        overflow-x: auto;
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .gallery-image {
+        width: 120px;
+        flex-shrink: 0;
+    }
+
+    .bottom-content {
+        bottom: 2%;
+        padding: 0 20px;
+    }
+
+    .bottom-header {
+        font-size: clamp(1rem, 5vw, 1.5rem);
+    }
+
+    .bottom-description {
+        font-size: clamp(0.8rem, 3vw, 1rem);
+    }
+
+    .section-five-button {
+        bottom: 15%;
+    }
+
+    .explore-ips-button {
+        padding: 12px 30px;
+        font-size: 1rem;
+    }
+
+    /* Section Six Mobile */
+    .section-six-content {
+        flex-direction: column;
+        gap: 25px;
+        align-items: center;
+        top: 25%;
+    }
+
+    .category-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .category-shape {
+        width: 30px;
+        height: 30px;
+    }
+
+    .category-title {
+        font-size: clamp(0.9rem, 4vw, 1.2rem);
+    }
+
+    /* Section Seven Mobile */
+    .image-wheel-container {
+        left: 50%;
+        top: 30%;
+        transform: translate(-50%, -50%) rotateZ(0deg);
+        width: 200px;
+        height: 200px;
+    }
+
+    .slider span {
+        transform: rotateY(calc(var(--i) * 72deg)) translateZ(200px);
+    }
+
+    .cafe-content {
+        bottom: 5%;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+    }
+
+    .cafe-title {
+        font-size: clamp(1.5rem, 6vw, 2rem);
+    }
+
+    .cafe-images-container {
+        width: 280px;
+        height: 180px;
+    }
+
+    .wheel-controls {
+        bottom: 15%;
+        right: 50%;
+        transform: translateX(50%);
+    }
+
+    .wheel-arrow {
+        width: 35px;
+        height: 35px;
+    }
+
+    /* Section Eight Mobile */
+    .ai-tool-header {
+        top: 15%;
+        padding: 0 20px;
+    }
+
+    .ai-tool-title {
+        font-size: clamp(1.5rem, 6vw, 2.5rem);
+    }
+
+    .ai-tool-description {
+        font-size: clamp(0.9rem, 4vw, 1.2rem);
+    }
+
+    .input-container {
+        width: 90vw;
+        max-width: 400px;
+        padding: 15px;
+    }
+
+    .story-input {
+        font-size: 1rem;
+        padding: 8px;
+    }
+
+    .brainstorm-button {
+        padding: 12px 25px;
+        font-size: 0.9rem;
+        width: 100%;
+        margin-top: 10px;
+        float: none;
+    }
+
+    /* Section Nine Mobile */
+    .rotating-container {
+        top: -30%;
+        width: 800px;
+        height: 800px;
+    }
+
+    /* Section Ten Mobile */
+    .testimonial-header {
+        top: 10%;
+        padding: 0 20px;
+    }
+
+    .testimonial-title {
+        font-size: clamp(1.2rem, 5vw, 2rem);
+    }
+
+    .testimonial-controls {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    #testPrevArrow, #testNextArrow {
+        position: static;
+        transform: none;
+        width: 30px;
+        height: 30px;
+    }
+
+    #testNextArrow {
+        transform: scaleX(-1);
+    }
+
+    .cards-container {
+        bottom: -20%;
+        width: 95vw;
+    }
+
+    .testimonial-card {
+        min-width: 280px;
+    }
+
+    .card-image {
+        width: 100%;
+        height: 60px;
+    }
+
+    /* Section Eleven Mobile */
+    .section-eleven-title {
+        font-size: clamp(1.5rem, 6vw, 3rem);
+        text-align: center;
+        padding: 0 20px;
+    }
+
+    .section-eleven-description {
+        font-size: clamp(0.9rem, 4vw, 1.2rem);
+        text-align: center;
+        padding: 0 20px;
+        max-width: 90vw;
+    }
+
+    /* Section Twelve Mobile */
+    .section-twelve-left {
+        top: 10%;
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+
+    .section-twelve-title {
+        font-size: clamp(1.2rem, 6vw, 2rem);
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .section-twelve-description {
+        font-size: clamp(0.9rem, 4vw, 1rem);
+    }
+
+    .rolling-image {
+        width: 200px;
+        margin: 20px auto 0;
+        display: block;
+    }
+
+    .section-twelve-right {
+        top: auto;
+        bottom: 10%;
+        right: 50%;
+        transform: translateX(50%);
+    }
+
+    .right-image {
+        width: 250px;
+    }
+
+    /* Section Thirteen Mobile */
+    .section-thirteen-header {
+        width: 90%;
+        margin-bottom: 30px;
+    }
+
+    .section-thirteen-title {
+        font-size: clamp(1.5rem, 6vw, 2.5rem);
+        padding: 0 20px;
+    }
+
+    .icons-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 20px;
+        width: 280px;
+    }
+
+    .grid-icon {
+        width: 120px;
+    }
+
+    /* Section Fourteen Mobile */
+    .transition-image {
+        width: 200px;
+    }
+
+    .section-fourteen-left {
+        top: 15%;
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+
+    .section-fourteen-header {
+        font-size: clamp(1.2rem, 6vw, 2rem);
+    }
+
+    .section-fourteen-right {
+        top: auto;
+        bottom: 15%;
+        right: 20px;
+        left: 20px;
+        max-width: none;
+    }
+
+    .section-fourteen-description {
+        font-size: clamp(0.9rem, 4vw, 1rem);
+    }
+
+    /* Section Fifteen Mobile */
+    .text-carousel {
+        bottom: 5%;
+        left: 20px;
+        right: 20px;
+        width: calc(100vw - 40px);
+    }
+
+    .carousel-container {
+        width: auto;
+    }
+
+    .carousel-item {
+        min-width: calc(100vw - 40px);
+        padding-right: 0;
+        margin: 0;
+    }
+
+    .carousel-header {
+        font-size: clamp(1.3rem, 5vw, 2rem);
+    }
+
+    .carousel-detail {
+        font-size: clamp(0.8rem, 3vw, 1rem);
+        max-width: 100%;
+    }
+
+    /* Section Sixteen Mobile */
+    .section-sixteen-title {
+        font-size: clamp(1.5rem, 6vw, 2.5rem);
+        padding: 0 20px;
+    }
+
+    .logos-row {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .logo-item {
+        width: 80px;
+    }
+
+    /* Section Seventeen Mobile */
+    .section-seventeen-main {
+        padding: 0 20px;
+        max-width: 100%;
+    }
+
+    .section-seventeen-title {
+        font-size: clamp(1.5rem, 6vw, 2.5rem);
+    }
+
+    .section-seventeen-description {
+        font-size: clamp(0.9rem, 4vw, 1.2rem);
+        max-width: 100%;
+    }
+
+    .section-seventeen-buttons {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .ved-button, .contact-button {
+        width: 100%;
+        max-width: 250px;
+        padding: 12px 20px;
+        font-size: 0.9rem;
+    }
+
+    /* Navigation Mobile */
+    .nav-frame {
+        margin: 10px;
+    }
+
+    .nav-links-container {
+        top: 10px;
+        right: 10px;
+        padding: 15px;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .nav-links a {
+        font-size: 0.8rem;
+    }
+
+    .nav-indicators {
+        left: 30px;
+        gap: 15px;
+    }
+
+    .nav-dot {
+        width: 2px;
+        height: 15px;
+    }
+
+    .nav-dot.active {
+        height: 20px;
+    }
+
+    /* Footer Mobile */
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        padding: 40px 20px 30px;
+        text-align: center;
+    }
+
+    .footer-nav {
+        align-items: center;
+    }
+
+    .footer-bottom {
+        padding: 20px;
+    }
+
+    .footer-bottom-content {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .footer-legal {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    /* 3D Elements Mobile */
+    .model-circle {
+        width: 800px;
+        height: 800px;
+    }
+
+    .feature-item-1 {
+        top: 10%;
+        left: 20px;
+        right: 20px;
+        max-width: none;
+    }
+
+    .feature-item-2 {
+        top: 50%;
+        left: 20px;
+        right: 20px;
+        max-width: none;
+        transform: translateY(-50%);
+    }
+
+    .feature-item-3 {
+        bottom: 10%;
+        left: 20px;
+        right: 20px;
+        max-width: none;
+        transform: none;
+    }
+
+    .feature-circle-2d {
+        width: 60px;
+        height: 60px;
+    }
+
+    .feature-circle-2d i {
+        font-size: 30px;
+    }
+
+    .feature-header {
+        font-size: 1.2rem;
+    }
+
+    .feature-description {
+        font-size: 0.8rem;
+    }
+}
+
+/* Tablet styles */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-title {
+        font-size: clamp(2rem, 6vw, 3.5rem);
+    }
+
+    .subtitle {
+        font-size: clamp(1rem, 3vw, 1.3rem);
+        max-width: 80vw;
+    }
+
+    .section-three-title,
+    .section-four-title {
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+    }
+
+    .image-gallery {
+        gap: 20px;
+    }
+
+    .gallery-image {
+        width: 150px;
+    }
+
+    .input-container {
+        width: 80vw;
+        max-width: 500px;
+    }
+
+    .icons-grid {
+        width: 400px;
+        gap: 25px;
+    }
+
+    .grid-icon {
+        width: 150px;
+    }
+
+    .footer-content {
+        padding: 50px 40px 35px;
+        gap: 40px;
+    }
+}
+
+/* Ultra-wide mobile (landscape orientation) */
+@media (max-width: 768px) and (orientation: landscape) {
+    .section-three-content {
+        top: 10%;
+    }
+
+    .section-four-content {
+        top: 5%;
+    }
+
+    .bottom-content {
+        bottom: 5%;
+    }
+
+    .testimonial-header {
+        top: 5%;
+    }
+
+    .cards-container {
+        bottom: -10%;
+    }
+
+    .text-carousel {
+        bottom: 10%;
+    }
+
+    .nav-indicators {
+        gap: 10px;
+    }
+
+    .nav-dot {
+        height: 12px;
+    }
+
+    .nav-dot.active {
+        height: 15px;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+    .semicircle {
+        width: 80px;
+        height: 40px;
+        border-radius: 40px 40px 0 0;
+    }
+
+    .logo {
+        width: 35px;
+    }
+
+    .main-title {
+        font-size: clamp(1.2rem, 8vw, 2.5rem);
+    }
+
+    .subtitle {
+        font-size: clamp(0.7rem, 4vw, 1rem);
+        padding: 0 25px;
+    }
+
+    .explore-button {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+    }
+
+    .image-gallery {
+        gap: 10px;
+        padding: 0 5px;
+    }
+
+    .gallery-image {
+        width: 100px;
+    }
+
+    .input-container {
+        width: 95vw;
+        padding: 12px;
+    }
+
+    .brainstorm-button {
+        padding: 10px 20px;
+        font-size: 0.8rem;
+    }
+
+    .testimonial-card {
+        min-width: 260px;
+    }
+
+    .icons-grid {
+        width: 240px;
+        gap: 15px;
+    }
+
+    .grid-icon {
+        width: 100px;
+    }
+
+    .ved-button, .contact-button {
+        padding: 10px 15px;
+        font-size: 0.8rem;
+    }
+}
