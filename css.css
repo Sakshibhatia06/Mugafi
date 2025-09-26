@@ -11,6 +11,50 @@
             overflow-x: hidden;
             overflow-y: hidden;
         }
+        @font-face {
+    font-family: 'slussen-trial';
+    src: url('./fonts/Slussen-Condensed-Regular-TRIAL.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'slussen-stencil-trial';
+    src: url('./fonts/Slussen-Stencil-Regular-TRIAL.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'slussen-mono-trial';
+    src: url('./fonts/Slussen-Mono-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'slussen-trial', 'slussen-stencil-trial', 'slussen-mono-trial', Arial, sans-serif;
+}
+
+body {
+    font-family: 'slussen-trial', 'slussen-stencil-trial', 'slussen-mono-trial', Arial, sans-serif;
+    background: #000;
+    color: white;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+/* Apply to all text elements specifically */
+h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
+    font-family: 'slussen-trial', 'slussen-stencil-trial', 'slussen-mono-trial', Arial, sans-serif;
+}
+
 
         #canvas-container {
             position: fixed;
@@ -1589,7 +1633,7 @@
 
 #curveSvg3 {
     position: absolute;
-    bottom: 250px;
+    bottom: 350px;
 }
 
 .curve-path {

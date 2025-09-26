@@ -171,6 +171,27 @@ function createModelPlane() {
     
     return modelPlane;
 }
+function updateNavigationDots() {
+    const navIndicators = document.querySelector('.nav-indicators');
+    navIndicators.innerHTML = `
+        <div class="nav-dot active"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+    `;
+}
 // Image preloader system - Updated
 class AssetLoader {
     constructor() {
@@ -627,7 +648,7 @@ function animate() {
     }
     
     if (planet3D && window.modelPlane) {
-        if (currentSection === 2) {
+        if (currentSection === 1) {
             window.modelPlane.visible = false;
         } else {
             // Show X-plane when 3D model is visible (has scale > 0)
@@ -2780,7 +2801,6 @@ function handleScrollEvent(e) {
     } else if (e.deltaY < 0) {
         // Scrolling up
         if (currentSection === 18) {
-            // Hide footer and return to section 17
             gsap.to('.footer-container', {
                 duration: 1,
                 y: '100%',
@@ -2817,9 +2837,12 @@ function handleScrollEvent(e) {
     if (targetSection !== currentSection) {
         window.isScrolling = true;
         
-        // Update navigation dots
+        // Update navigation dots (skip section 2 for dot indexing)
         document.querySelectorAll('.nav-dot').forEach((dot, index) => {
-            dot.classList.toggle('active', index === targetSection - 1);
+            let dotSection = targetSection;
+            if (targetSection > 2) dotSection = targetSection - 1; // Adjust for skipped section 2
+            if (targetSection === 1) dotSection = 0;
+            dot.classList.toggle('active', index === dotSection);
         });
 
         // Stop timers when leaving certain sections
@@ -2851,7 +2874,6 @@ function handleScrollEvent(e) {
             case 17: startSection17(); break;
         }
         
-        // Reset scroll lock after animation completes
         setTimeout(() => {
             window.isScrolling = false;
         }, 2000);
@@ -3021,6 +3043,7 @@ window.addEventListener('resize', () => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    updateNavigationDots();
     addMobileStyles()
     load3DPlanet();
     animate();
