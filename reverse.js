@@ -1310,14 +1310,25 @@ class ReverseScrollHandler {
 
         // Reset planet position
         if (window.planet3D) {
-            gsap.to(window.planet3D.position, {
-                duration: 1.5,
-                x: 0,
-                y: -2,
-                z: 11,
-                ease: "power2.inOut",
-                delay: 0.5
-            });
+            if (typeof window !== 'undefined' && window.innerWidth <= 768 && window.planet3D) {
+        gsap.to(window.planet3D.position, {
+            duration: 1.5,
+            x: 0,
+            y: -3,
+            z: 10,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+    } else if (window.planet3D) {
+        gsap.to(window.planet3D.position, {
+            duration: 1.5,
+            x: 0,
+            y: -2,
+            z: 11,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+    }
 
             if (window.planetBackground) {
                 gsap.to(window.planetBackground.position, {

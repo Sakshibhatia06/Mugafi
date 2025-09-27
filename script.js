@@ -45,6 +45,25 @@ function handleTouchStart(e) {
     touchStartX = touch.clientX;
     lastTouchTime = Date.now();
 }
+function initMobileNavigation() {
+    const mobileToggle = document.getElementById('mobileNavToggle');
+    const mobileMenu = document.getElementById('mobileNavMenu');
+    
+    if (mobileToggle && mobileMenu) {
+        mobileToggle.addEventListener('click', () => {
+            mobileToggle.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+        
+        // Close menu when clicking on links
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileToggle.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            });
+        });
+    }
+}
 
 function handleTouchMove(e) {
     // Prevent default scrolling behavior
@@ -193,6 +212,9 @@ function updateNavigationDots() {
         <div class="nav-dot"></div>
         <div class="nav-dot"></div>
     `;
+}
+function isMobile() {
+    return window.innerWidth <= 768;
 }
 
 // Image preloader system
@@ -810,12 +832,21 @@ function startSection3() {
     });
     
     if (planet3D) {
+        if (isMobile() && planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            z: 10,
+            y: -3,
+            ease: "power2.inOut"
+        });
+    } else if (planet3D) {
         gsap.to(planet3D.position, {
             duration: 1.5,
             z: 11,
             y: -2,
             ease: "power2.inOut"
         });
+    }
 
         if (planetBackground) {
             gsap.to(planetBackground.position, {
@@ -960,11 +991,19 @@ function startSection4() {
     });
     
     if (planet3D) {
+        if (isMobile() && planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            y: 4.5,
+            ease: "power2.inOut"
+        });
+    } else if (planet3D) {
         gsap.to(planet3D.position, {
             duration: 1.5,
             y: 3,
             ease: "power2.inOut"
         });
+    }
 
         if (planetBackground) {
             gsap.to(planetBackground.material, {
@@ -1040,11 +1079,19 @@ function startSection5() {
     });
     
     if (planet3D) {
+        if (isMobile() && planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            x: -3,
+            ease: "power2.inOut"
+        });
+    } else if (planet3D) {
         gsap.to(planet3D.position, {
             duration: 1.5,
             x: -6,
             ease: "power2.inOut"
         });
+    }
         
         gsap.to(planet3D.scale, {
             duration: 1.5,
@@ -1252,6 +1299,62 @@ function startSection8() {
         window.reverseScrollHandler.setCurrentSection(8);
     }
 }
+function triggerMobileOrbitAnimations() {
+    const orbitContainers = [
+        document.querySelector('.orbit-container.one'),
+        document.querySelector('.orbit-container.two'),
+        document.querySelector('.orbit-container.three')
+    ];
+    
+    const rotations = [180, 180, 180];
+    const finalRotations = [220, 180, 140];
+    
+    orbitContainers.forEach((orbit, index) => {
+        if (orbit) {
+            // Reset animation
+            orbit.style.animation = 'none';
+            orbit.offsetHeight;
+            
+            setTimeout(() => {
+                // First rotation
+                gsap.to(orbit, {
+                    duration: 1,
+                    rotation: rotations[index],
+                    ease: "power2.inOut",
+                    onComplete: () => {
+                        // Wait 3 seconds then move to final position
+                        setTimeout(() => {
+                            gsap.to(orbit, {
+                                duration: 1,
+                                rotation: finalRotations[index],
+                                ease: "power2.inOut"
+                            });
+                        }, 3000);
+                    }
+                });
+                
+                // Counter-rotate the content
+                const featureOrbit = orbit.querySelector('.feature-orbit');
+                if (featureOrbit) {
+                    gsap.to(featureOrbit, {
+                        duration: 1,
+                        rotation: -rotations[index],
+                        ease: "power2.inOut",
+                        onComplete: () => {
+                            setTimeout(() => {
+                                gsap.to(featureOrbit, {
+                                    duration: 1,
+                                    rotation: -finalRotations[index],
+                                    ease: "power2.inOut"
+                                });
+                            }, 3000);
+                        }
+                    });
+                }
+            }, index * 1000); // 1 second gap between transitions
+        }
+    });
+}
 
 function startSection9() {
     gsap.to('#mask4', {
@@ -1294,9 +1397,15 @@ function startSection9() {
             ease: "power2.inOut",
             delay: 0.5,
             onStart: () => {
-                setTimeout(() => {
-                    triggerOrbitAnimations();
-                }, 500);
+                if (isMobile()) {
+        setTimeout(() => {
+            triggerMobileOrbitAnimations();
+        }, 1200);
+    } else {
+        setTimeout(() => {
+            triggerOrbitAnimations();
+        }, 1200);
+    }
             }
         });
 
@@ -2242,6 +2351,7 @@ window.addEventListener('resize', () => {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    initMobileNavigation();
     updateNavigationDots();
     addMobileStyles();
     createPlaceholderPlanet();;
