@@ -838,6 +838,21 @@ function startSection2() {
     if (window.reverseScrollHandler) {
         window.reverseScrollHandler.setCurrentSection(2);
     }
+    setTimeout(() => {
+        if (currentSection === 2) { // Only transition if still on section 2
+            isScrolling = true; // Prevent manual scrolling during transition
+            
+            
+                // Going forward to section 3
+                updateNavigationDots(3);
+                startSection3();
+            
+            
+            setTimeout(() => {
+                isScrolling = false;
+            }, 2000);
+        }
+    }, 1000);
 }
 
 function startSection3() {
