@@ -2190,12 +2190,14 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         opacity: 0 ;
         top: 30% !important;
         position: absolute;
+        width: 80%;
+
     }
     
     .bottom-header
      {
         /* opacity: 0.4 !important; */
-        font-size: 23px;
+        font-size: 25px;
     }
     .bottom-description{
         font-size: 14px;
