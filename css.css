@@ -659,6 +659,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             font-weight: bold;
             color: white;
             margin-bottom: 15px;
+            opacity: 0.3
         }
 
         .bottom-description {
@@ -2196,11 +2197,12 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     
     .bottom-header
      {
-        /* opacity: 0.4 !important; */
+        opacity: 0 ;
         font-size: 25px;
     }
     .bottom-description{
         font-size: 14px;
+        opacity: 0;
     }
     
     /* Section 5 Mobile Adjustments */
@@ -2217,7 +2219,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     }
     
     .cafe-content {
-        bottom: 5%;
+        bottom:-5%;
         left: 50%;
         transform: translateX(-50%);
         width: 90%;
@@ -2226,6 +2228,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     
     .cafe-images-container {
         width: 100%;
+        position: relative;
+        bottom:-20%; 
     }
     
     .wheel-controls {

@@ -1121,6 +1121,11 @@ function startSection5() {
         opacity: 1,
         delay: 0.8
     });
+    gsap.to('.bottom-header', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.8
+    });
 
     currentSection = 5;
     if (window.reverseScrollHandler) {
