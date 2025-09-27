@@ -44,7 +44,7 @@
 
 body {
     font-family: 'slussen-trial', 'slussen-stencil-trial', 'slussen-mono-trial', Arial, sans-serif;
-    background: #000;
+    background: #151515;
     color: white;
     overflow-x: hidden;
     overflow-y: hidden;
@@ -203,7 +203,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 .ved-button {
     background: transparent;
     border: 2px solid #00ffff;
-    color: #00ffff;
+    color: #ffffff;
 }
 
 .ved-button:hover {
@@ -424,7 +424,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
         .loading-percentage {
             font-weight: bold;
-            color: #00ffff;
+            color: #ffffff;
         }
 
         /* UI Overlays */
@@ -470,7 +470,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             font-size: clamp(2rem, 5vw, 4rem);
             font-weight: bold;
             text-transform: uppercase;
-            background: linear-gradient(45deg, #ff0080, #00ffff, #ff8000);
+            background: white;
             background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -580,7 +580,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             padding: 15px 30px;
             border: 2px solid #00ffff;
             background: rgba(0, 255, 255, 0.1);
-            color: #00ffff;
+            color: #ffffff;
             font-size: 1rem;
             font-weight: bold;
             text-transform: uppercase;
@@ -1759,8 +1759,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 .explore-ips-button {
     padding: 15px 40px;
     background: transparent;
-    border: 2px solid #ff0080;
-    color: #ff0080;
+    border: 2px solid #ffffff;
+    color: #ffffff;
     font-size: 1.2rem;
     font-weight: bold;
     text-transform: uppercase;
