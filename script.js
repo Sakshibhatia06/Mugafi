@@ -557,73 +557,6 @@ function createPlaceholderPlanet() {
     window.modelBackgroundParticles = createModelParticleBackground();
 }
 
-// Load 3D Planet with FBX fallback
-function load3DPlanet() {
-    if (typeof THREE.FBXLoader !== 'undefined') {
-        const textureLoader = new THREE.TextureLoader();
-        const loader = new THREE.FBXLoader();
-        
-        loader.setPath('./3d assets/First Planet/fbx/');
-        loader.load('Planet_1fbx.fbx', 
-            function (model) {
-                model.traverse(function (child) {
-                    if (child instanceof THREE.Mesh) {
-                        // Create gradient material with darker bottom
-                        const canvas = document.createElement('canvas');
-                        canvas.width = 256;
-                        canvas.height = 256;
-                        const ctx = canvas.getContext('2d');
-                        
-                        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                        gradient.addColorStop(0, '#ff4444');
-                        gradient.addColorStop(0.7, '#ff4444');
-                        gradient.addColorStop(1, '#333333');
-                        
-                        ctx.fillStyle = gradient;
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        
-                        const gradientTexture = new THREE.CanvasTexture(canvas);
-                        
-                        const material = new THREE.MeshStandardMaterial({
-                            color: 0xff4444,
-                            metalness: 0.5,
-                            roughness: 0.5,
-                            emissive: 0x220000,
-                            map: gradientTexture
-                        });
-
-                        textureLoader.load('./assets/RS Standard_0_diffuse_red_00000.png', 
-                            (texture) => {
-                                // Blend with gradient
-                                material.map = texture;
-                                material.needsUpdate = true;
-                            }
-                        );
-
-                        child.material = material;
-                    }
-                });
-
-                model.scale.set(0, 0, 0);
-                model.position.set(0, 0, 0);
-                scene.add(model);
-                planet3D = model;
-
-                // Create particle system
-                createParticleSystem();
-                window.modelBackgroundParticles = createModelParticleBackground();
-            },
-            undefined,
-            function (error) {
-                console.log('FBX model not found, using placeholder sphere');
-                createPlaceholderPlanet();
-            }
-        );
-    } else {
-        console.log('FBXLoader not available, using placeholder sphere');
-        createPlaceholderPlanet();
-    }
-}
 
 // Animation loop
 function animate() {
@@ -883,6 +816,11 @@ function startSection3() {
             y: -2,
             ease: "power2.inOut"
         });
+        // gsap.to(planet3D.scale, {
+        //     duration: 1.5,
+        //     x:0.77,
+        //     ease: "power2.inOut"
+        // });
 
         if (planetBackground) {
             gsap.to(planetBackground.position, {
@@ -2303,7 +2241,7 @@ window.addEventListener('resize', () => {
 document.addEventListener('DOMContentLoaded', () => {
     updateNavigationDots();
     addMobileStyles();
-    load3DPlanet();
+    createPlaceholderPlanet();;
     animate();
     initializeAssetLoading();
 });
