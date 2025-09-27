@@ -85,6 +85,7 @@ function handleTouchEnd(e) {
     touchStartX = 0;
     lastTouchTime = 0;
 }
+
 function createModelPlane() {
     // Create particle system for X shape with concentration towards the center lines
     const particleCount = 5000;
@@ -171,6 +172,7 @@ function createModelPlane() {
     
     return modelPlane;
 }
+
 function updateNavigationDots() {
     const navIndicators = document.querySelector('.nav-indicators');
     navIndicators.innerHTML = `
@@ -192,7 +194,8 @@ function updateNavigationDots() {
         <div class="nav-dot"></div>
     `;
 }
-// Image preloader system - Updated
+
+// Image preloader system
 class AssetLoader {
     constructor() {
         this.imageSources = [];
@@ -364,7 +367,7 @@ class AssetLoader {
     }
 }
 
-// Updated loading system - ONLY progresses with real asset loading
+// Loading system
 let assetLoader;
 let assetsLoaded = false;
 
@@ -655,8 +658,8 @@ function animate() {
             const isModelVisible = planet3D.scale.x > 0 || planet3D.scale.y > 0 || planet3D.scale.z > 0;
             window.modelPlane.visible = isModelVisible;
         }
-    window.modelPlane.position.copy(planet3D.position);
-}
+        window.modelPlane.position.copy(planet3D.position);
+    }
 
     renderer.clear();
     renderer.render(scene, camera);
@@ -664,7 +667,16 @@ function animate() {
 
 // Animation and section management
 let loadingProgress = 0;
-let currentSection = 0;
+Object.defineProperty(window, 'currentSection', {
+    get: function() {
+        return window.reverseScrollHandler ? window.reverseScrollHandler.currentSection : 1;
+    },
+    set: function(value) {
+        if (window.reverseScrollHandler) {
+            window.reverseScrollHandler.currentSection = value;
+        }
+    }
+});
 let currentCardIndex = 0;
 let currentWheelIndex = 0;
 let currentCarouselIndex = 0;
@@ -674,1783 +686,1162 @@ const totalCards = 5;
 const totalWheelImages = 5;
 let totalCarouselItems = 5;
 
-// Section transition functions with reverse capability
-function startSection1(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        if (!assetsLoaded) {
-            setTimeout(() => startSection1(reverse), 100);
-            return;
-        }
-        
-        const loadingSection = document.querySelector('.loading-section');
-        const semicircle = document.querySelector('.semicircle');
-        
-        gsap.to(semicircle, {
-            duration: 1,
-            width: '150px',
-            height: '300px',
-            borderRadius: '75px 75px 0 0',
-            ease: "power2.inOut",
-            onComplete: () => {
-                semicircle.style.borderBottom = '1px solid #ffffff5f';
-                gsap.to('.section-one-tombstone', {
-                    duration: 0.5,
-                    opacity: 1
-                });
-            }
-        });
-        
-        gsap.to('#mask1', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1.5
-        });
-
-        gsap.to('.logo', {
-            duration: 1.2,
-            y: -window.innerHeight/2 + 60,
-            scale: 0.6,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.header-logo', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1
-        });
-
-        gsap.to('.main-title', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.2
-        });
-
-        gsap.to('.subtitle', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.4
-        });
-
-        gsap.to(loadingSection, {
-            duration: 0.5,
-            opacity: 0,
-            delay: 1.5,
-            onComplete: () => {
-                loadingSection.style.display = 'none';
-                document.body.style.overflowY = 'auto';
-                setupScrolling();
-            }
-        });
-    } else {
-        // Reverse animation (coming back from section 2)
-        gsap.to('.header-logo', {
-            duration: 1,
-            top: '30px',
-            transform: 'translateX(-50%)',
-            scale: 0.6,
-            ease: "power2.inOut"
-        });
-
-        gsap.to(['.main-title', '.subtitle'], {
-            duration: 0.5,
-            opacity: 1,
-            y: 0
-        });
-
-        gsap.to('.section-one-tombstone', {
-            duration: 0.5,
-            opacity: 1
-        });
-
-        // Reset tombstone structures
-        gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
-            duration: 0.5,
-            opacity: 0,
-            scale: 1
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.scale, {
-                duration: 1.5,
-                x: 0,
-                y: 0,
-                z: 0,
-                ease: "power2.inOut"
+// Section transition functions
+function startSection1() {
+    if (!assetsLoaded) {
+        setTimeout(() => startSection1(), 100);
+        return;
+    }
+    
+    const loadingSection = document.querySelector('.loading-section');
+    const semicircle = document.querySelector('.semicircle');
+    
+    gsap.to(semicircle, {
+        duration: 1,
+        width: '150px',
+        height: '300px',
+        borderRadius: '75px 75px 0 0',
+        ease: "power2.inOut",
+        onComplete: () => {
+            semicircle.style.borderBottom = '1px solid #ffffff5f';
+            gsap.to('.section-one-tombstone', {
+                duration: 0.5,
+                opacity: 1
             });
         }
-    }
+    });
+    
+    gsap.to('#mask1', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1.5
+    });
+
+    gsap.to('.logo', {
+        duration: 1.2,
+        y: -window.innerHeight/2 + 60,
+        scale: 0.6,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('.header-logo', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+
+    gsap.to('.main-title', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
+
+    gsap.to('.subtitle', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.4
+    });
+
+    gsap.to(loadingSection, {
+        duration: 0.5,
+        opacity: 0,
+        delay: 1.5,
+        onComplete: () => {
+            loadingSection.style.display = 'none';
+            document.body.style.overflowY = 'auto';
+            setupScrolling();
+        }
+    });
 
     currentSection = 1;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(1);
+    }
 }
 
-function startSection2(reverse = false) {
-    if (!reverse) {
-        // Forward animation
-        gsap.to('.header-logo', {
-            duration: 1,
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            scale: 1,
-            ease: "power2.inOut"
-        });
+function startSection2() {
+    gsap.to('.header-logo', {
+        duration: 1,
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+        scale: 1,
+        ease: "power2.inOut"
+    });
 
-        gsap.to(['.main-title', '.subtitle'], {
-            duration: 0.5,
-            opacity: 0,
-            y: -100
-        });
+    gsap.to(['.main-title', '.subtitle'], {
+        duration: 0.5,
+        opacity: 0,
+        y: -100
+    });
 
-        gsap.to('.section-one-tombstone', {
-            duration: 0.5,
-            opacity: 0
-        });
+    gsap.to('.section-one-tombstone', {
+        duration: 0.5,
+        opacity: 0
+    });
 
-        // Show tombstone structure and animate scales
-        gsap.to('.tombstone-1', {
-            duration: 0.5,
-            opacity: 1,
-            scale: 2,
-            delay: 0.2
-        });
+    // Show tombstone structure and animate scales
+    gsap.to('.tombstone-1', {
+        duration: 0.5,
+        opacity: 1,
+        scale: 2,
+        delay: 0.2
+    });
 
-        gsap.to('.tombstone-2', {
-            duration: 0.8,
-            opacity: 1,
-            scale: 4,
+    gsap.to('.tombstone-2', {
+        duration: 0.8,
+        opacity: 1,
+        scale: 4,
+        ease: "back.out(1.7)",
+        delay: 0.4
+    });
+
+    gsap.to('.tombstone-3', {
+        duration: 0.8,
+        opacity: 1,
+        scale: 5,
+        ease: "back.out(1.7)",
+        delay: 0.6
+    });
+
+    gsap.to('.tombstone-4', {
+        duration: 0.8,
+        opacity: 1,
+        scale: 7,
+        ease: "back.out(1.7)",
+        delay: 0.8
+    });
+
+    if (planet3D) {
+        gsap.to(planet3D.scale, {
+            duration: 1.5,
+            x: 0.8,
+            y: 0.8,
+            z: 0.8,
             ease: "back.out(1.7)",
-            delay: 0.4
+            delay: 0.5
         });
 
-        gsap.to('.tombstone-3', {
-            duration: 0.8,
-            opacity: 1,
-            scale: 5,
-            ease: "back.out(1.7)",
-            delay: 0.6
-        });
-
-        gsap.to('.tombstone-4', {
-            duration: 0.8,
-            opacity: 1,
-            scale: 7,
-            ease: "back.out(1.7)",
-            delay: 0.8
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.scale, {
-                duration: 1.5,
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
-                ease: "back.out(1.7)",
+        if (planetBackground) {
+            gsap.to(planetBackground.material, {
+                duration: 1,
+                opacity: 0.7,
                 delay: 0.5
             });
-
-            if (planetBackground) {
-                gsap.to(planetBackground.material, {
-                    duration: 1,
-                    opacity: 0.7,
-                    delay: 0.5
-                });
-            }
         }
-    } else {
-        // Reverse animation (coming back from section 3)
-        gsap.to('#mask1', {
-            duration: 0.8,
-            opacity: 1,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask2', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask3', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                z: 0,
-                y: 0,
-                ease: "power2.inOut"
-            });
-        }
-
-        // Hide section 3 content
-        gsap.to('.section-three-content', {
-            duration: 0.5,
-            opacity: 0
-        });
-
-        gsap.to('.section-three-overlays', {
-            duration: 0.5,
-            opacity: 0
-        });
-
-        gsap.to('.nav-frame', {
-            duration: 1,
-            opacity: 0
-        });
-
-        // Show tombstones again
-        gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
-            duration: 1,
-            scale: [2, 4, 5, 7],
-            opacity: 1,
-            ease: "power2.out"
-        });
-
-        gsap.to('.header-logo', {
-            duration: 0.8,
-            opacity: 1,
-            scale: 1
-        });
     }
 
     currentSection = 2;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(2);
+    }
 }
 
-function startSection3(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        gsap.to('#mask1', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask2', {
-            duration: 0.8,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.3
-        });
-        
-        gsap.to('#mask3', {
-            duration: 0.8,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.5
-        });
-        
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                z: 11,
-                y: -2,
-                ease: "power2.inOut"
-            });
-
-            if (planetBackground) {
-                gsap.to(planetBackground.position, {
-                    duration: 1.5,
-                    z: 3,
-                    y: -2,
-                    ease: "power2.inOut"
-                });
-            }
-        }
-        
-        gsap.to('.section-three-overlays', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 2
-        });
-
-        gsap.to('.white-circle-behind', {
-            duration: 1,
-            opacity: 1,
-            delay: 2.2
-        });
-
-        gsap.to('.section-three-overlay', {
-            duration: 0.8,
-            opacity: 1,
-            stagger: 0.2,
-            delay: 2.4
-        });
-
-        // Move tombstones with the planet and fade out
-        gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
-            duration: 1,
-            scale: 10,
-            opacity: 0,
-            z: 1000,
-            ease: "power2.in"
-        });
-
-        gsap.to('.header-logo', {
-            duration: 0.8,
-            opacity: 0,
-            scale: 0,
-            delay: 0.5
-        });
-
-        gsap.to('.section-three-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1
-        });
-
-        gsap.to('.section-three-title', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.2
-        });
-
-        gsap.to('.explore-button', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.4
-        });
-
-        gsap.to('.content-image', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.6
-        });
-
-        gsap.to('.nav-frame', {
-            duration: 1,
-            opacity: 1,
-            delay: 2
-        });
-        
-        gsap.to('.connection-curves', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 2.8
-        });
-
-        // Animate curves drawing
-        gsap.to('.curve-path', {
+function startSection3() {
+    gsap.to('#mask1', {
+        duration: 0.8,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask2', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.3
+    });
+    
+    gsap.to('#mask3', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+    
+    if (planet3D) {
+        gsap.to(planet3D.position, {
             duration: 1.5,
-            strokeDashoffset: 0,
-            stagger: 0.3,
-            delay: 3,
-            ease: "power2.out"
-        });
-
-        // Animate circles bouncing in
-        gsap.to('.connection-circle', {
-            duration: 0.6,
-            opacity: 1,
-            scale: 1.2,
-            stagger: 0.2,
-            delay: 4,
-            ease: "bounce.out",
-            onComplete: () => {
-                // Add continuous pulse animation
-                gsap.to('.connection-circle', {
-                    duration: 2,
-                    scale: 1,
-                    repeat: -1,
-                    yoyo: true,
-                    ease: "power2.inOut"
-                });
-            }
-        });
-    } else {
-        // Reverse animation (coming back from section 4)
-        gsap.to('#mask3', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('.section-three-overlays', {
-            duration: 0.5,
-            opacity: 1,
-            scale: 1
-        });
-        
-        gsap.to('#mask2', {
-            duration: 1,
-            y: 0,
+            z: 11,
+            y: -2,
             ease: "power2.inOut"
         });
 
-        // Hide section 4 content
-        gsap.to('.section-four-content', {
-            duration: 0.5,
-            opacity: 0
-        });
-
-        // Show section 3 content
-        gsap.to('.section-three-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.position, {
+        if (planetBackground) {
+            gsap.to(planetBackground.position, {
                 duration: 1.5,
+                z: 3,
                 y: -2,
                 ease: "power2.inOut"
             });
-
-            if (planetBackground) {
-                gsap.to(planetBackground.material, {
-                    duration: 1,
-                    opacity: 0.7,
-                    ease: "power2.inOut"
-                });
-            }
         }
     }
+    
+    gsap.to('.section-three-overlays', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 2
+    });
+
+    gsap.to('.white-circle-behind', {
+        duration: 1,
+        opacity: 1,
+        delay: 2.2
+    });
+
+    gsap.to('.section-three-overlay', {
+        duration: 0.8,
+        opacity: 1,
+        stagger: 0.2,
+        delay: 2.4
+    });
+
+    // Move tombstones with the planet and fade out
+    gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
+        duration: 1,
+        scale: 10,
+        opacity: 0,
+        z: 1000,
+        ease: "power2.in"
+    });
+
+    gsap.to('.header-logo', {
+        duration: 0.8,
+        opacity: 0,
+        scale: 0,
+        delay: 0.5
+    });
+
+    gsap.to('.section-three-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+
+    gsap.to('.section-three-title', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
+
+    gsap.to('.explore-button', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.4
+    });
+
+    gsap.to('.content-image', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.6
+    });
+
+    gsap.to('.nav-frame', {
+        duration: 1,
+        opacity: 1,
+        delay: 2
+    });
+    
+    gsap.to('.connection-curves', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 2.8
+    });
+
+    // Animate curves drawing
+    gsap.to('.curve-path', {
+        duration: 1.5,
+        strokeDashoffset: 0,
+        stagger: 0.3,
+        delay: 3,
+        ease: "power2.out"
+    });
+
+    // Animate circles bouncing in
+    gsap.to('.connection-circle', {
+        duration: 0.6,
+        opacity: 1,
+        scale: 1.2,
+        stagger: 0.2,
+        delay: 4,
+        ease: "bounce.out",
+        onComplete: () => {
+            // Add continuous pulse animation
+            gsap.to('.connection-circle', {
+                duration: 2,
+                scale: 1,
+                repeat: -1,
+                yoyo: true,
+                ease: "power2.inOut"
+            });
+        }
+    });
 
     currentSection = 3;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(3);
+    }
 }
 
-function startSection4(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        gsap.to('#mask3', {
-            duration: 1,
-            y: window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('.section-three-overlays', {
-            duration: 0.5,
-            opacity: 0,
-            scale: 0
-        });
-        
-        gsap.to('#mask2', {
-            duration: 1,
-            y: -100,
-            ease: "power2.inOut"
-        });
-        
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                y: 3,
-                ease: "power2.inOut"
-            });
-
-            if (planetBackground) {
-                gsap.to(planetBackground.material, {
-                    duration: 1,
-                    opacity: 0,
-                    ease: "power2.inOut"
-                });
-            }
-        }
-
-        gsap.to('.section-three-content', {
-            duration: 0.5,
-            opacity: 0,
-            y: -100
-        });
-
-        gsap.to('.section-four-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.5
-        });
-
-        gsap.to('.section-four-title', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 0.8
-        });
-
-        gsap.to('.image-gallery', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1
-        });
-
-        gsap.to('.bottom-content', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.2,
-            transform: 'translateX(-50%) translateY(0)'
-        });
-    } else {
-        // Reverse animation (coming back from section 5)
-        gsap.to('#mask2', {
-            duration: 1,
-            opacity: 1,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask4', {
-            duration: 1,
-            opacity: 0,
+function startSection4() {
+    gsap.to('#mask3', {
+        duration: 1,
+        y: window.innerHeight,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('.section-three-overlays', {
+        duration: 0.5,
+        opacity: 0,
+        scale: 0
+    });
+    
+    gsap.to('#mask2', {
+        duration: 1,
+        y: -100,
+        ease: "power2.inOut"
+    });
+    
+    if (planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            y: 3,
             ease: "power2.inOut"
         });
 
-        gsap.to('.section-five-button', {
-            duration: 0.8,
-            opacity: 0
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                x: 0,
+        if (planetBackground) {
+            gsap.to(planetBackground.material, {
+                duration: 1,
+                opacity: 0,
                 ease: "power2.inOut"
             });
         }
-
-        gsap.to('.section-four-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-
-        gsap.to('.bottom-content', {
-            duration: 1,
-            top: '5%',
-            opacity: 0.3,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.bottom-description', {
-            duration: 0.5,
-            opacity: 0.3
-        });
     }
+
+    gsap.to('.section-three-content', {
+        duration: 0.5,
+        opacity: 0,
+        y: -100
+    });
+
+    gsap.to('.section-four-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.5
+    });
+
+    gsap.to('.section-four-title', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 0.8
+    });
+
+    gsap.to('.image-gallery', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1
+    });
+
+    gsap.to('.bottom-content', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2,
+        transform: 'translateX(-50%) translateY(0)'
+    });
 
     currentSection = 4;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(4);
+    }
 }
 
-function startSection5(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        gsap.to('#mask2', {
-            duration: 1,
-            opacity: 0,
+function startSection5() {
+    gsap.to('#mask2', {
+        duration: 1,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask4', {
+        duration: 1,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+    
+    gsap.to('.section-five-button', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
+    
+    if (planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            x: -6,
             ease: "power2.inOut"
         });
-        
-        gsap.to('#mask4', {
-            duration: 1,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.5
-        });
-        
-        gsap.to('.section-five-button', {
-            duration: 0.8,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.2
-        });
-        
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                x: -6,
-                ease: "power2.inOut"
-            });
-        }
-
-        gsap.to('.section-four-content', {
-            duration: 0.5,
-            opacity: 0,
-            y: -100
-        });
-
-        gsap.to('.bottom-content', {
-            duration: 1,
-            top: '50%',
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.5
-        });
-
-        gsap.to('.bottom-description', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.8
-        });
-    } else {
-        // Reverse animation (coming back from section 6)
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                x: -6,
-                y: 3,
-                ease: "power2.inOut"
-            });
-
-            gsap.to(planet3D.scale, {
-                duration: 1.5,
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
-                ease: "power2.inOut"
-            });
-        }
-
-        gsap.to('.section-six-content', {
-            duration: 0.5,
-            opacity: 0
-        });
-
-        gsap.to('.bottom-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-
-        document.querySelectorAll('.category-item').forEach((item) => {
-            gsap.to(item, {
-                duration: 0.5,
-                x: 100,
-                opacity: 0
-            });
-        });
     }
+
+    gsap.to('.section-four-content', {
+        duration: 0.5,
+        opacity: 0,
+        y: -100
+    });
+
+    gsap.to('.bottom-content', {
+        duration: 1,
+        top: '50%',
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+
+    gsap.to('.bottom-description', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.8
+    });
 
     currentSection = 5;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(5);
+    }
 }
 
-function startSection6(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                x: -10,
-                y: 8,
-                ease: "power2.inOut"
-            });
-
-            gsap.to(planet3D.scale, {
-                duration: 1.5,
-                x: 0,
-                y: 0,
-                z: 0,
-                ease: "power2.inOut"
-            });
-        }
-
-        gsap.to('.bottom-content', {
-            duration: 0.5,
-            opacity: 0,
-            y: -100
-        });
-
-        gsap.to('.section-six-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.8
-        });
-
-        document.querySelectorAll('.category-item').forEach((item, index) => {
-            gsap.to(item, {
-                duration: 0.8,
-                x: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1 + (index * 0.2)
-            });
-        });
-    } else {
-        // Reverse animation (coming back from section 7)
-        if (wheelInterval) {
-            clearInterval(wheelInterval);
-        }
-
-        gsap.to('.section-seven-content', {
-            duration: 1,
-            x: window.innerWidth,
-            opacity: 0,
+function startSection6() {
+    if (planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            x: -10,
+            y: 8,
             ease: "power2.inOut"
         });
 
-        gsap.to('.section-six-content', {
-            duration: 0.5,
-            opacity: 1
+        gsap.to(planet3D.scale, {
+            duration: 1.5,
+            x: 0,
+            y: 0,
+            z: 0,
+            ease: "power2.inOut"
         });
-
-        if (planet3D) {
-            gsap.set(planet3D.position, {
-                x: -10,
-                y: 8
-            });
-
-            gsap.to(planet3D.scale, {
-                duration: 1.5,
-                x: 0,
-                y: 0,
-                z: 0,
-                ease: "power2.inOut"
-            });
-        }
     }
+
+    gsap.to('.bottom-content', {
+        duration: 0.5,
+        opacity: 0,
+        y: -100
+    });
+
+    gsap.to('.section-six-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.8
+    });
+
+    document.querySelectorAll('.category-item').forEach((item, index) => {
+        gsap.to(item, {
+            duration: 0.8,
+            x: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1 + (index * 0.2)
+        });
+    });
 
     currentSection = 6;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(6);
+    }
 }
 
-function startSection7(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        gsap.to('.section-six-content', {
-            duration: 1,
-            x: -window.innerWidth,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
+function startSection7() {
+    gsap.to('.section-six-content', {
+        duration: 1,
+        x: -window.innerWidth,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
 
-        gsap.to('.section-seven-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.5
-        });
+    gsap.to('.section-seven-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.5
+    });
 
-        gsap.to('.cafe-content', {
-            duration: 0.8,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1
-        });
+    gsap.to('.cafe-content', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1
+    });
 
-        gsap.to('.wheel-controls', {
-            duration: 0.8,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.2
-        });
+    gsap.to('.wheel-controls', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
 
-        startWheelTimer();
-    } else {
-        // Reverse animation (coming back from section 8)
-        if (wheelInterval) {
-            clearInterval(wheelInterval);
-        }
-
-        gsap.set('#mask3', { y: 0 });
-        gsap.to('#mask3', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-eight-content', {
-            duration: 1,
-            y: window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-seven-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                y: 15,
-                ease: "power2.inOut"
-            });
-
-            gsap.to(planet3D.scale, {
-                duration: 1.5,
-                x: 0,
-                y: 0,
-                z: 0,
-                ease: "power2.inOut"
-            });
-        }
-
-        startWheelTimer();
-    }
+    startWheelTimer();
 
     currentSection = 7;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(7);
+    }
 }
 
-function startSection8(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        gsap.set('#mask3', { y: 0 });
-        gsap.to('#mask3', {
-            duration: 0.8,
-            opacity: 0.7,
-            ease: "power2.inOut",
-            delay: 1
-        });
-        
-        if (wheelInterval) {
-            clearInterval(wheelInterval);
-        }
-
-        gsap.to('.section-seven-content', {
-            duration: 1,
-            y: -window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        if (planet3D) {
-            gsap.set(planet3D.position, {
-                x: 0,
-                y: -15,
-                z: 11
-            });
-
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                y: -2,
-                ease: "power2.inOut",
-                delay: 0.5
-            });
-
-            gsap.to(planet3D.scale, {
-                duration: 1.5,
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
-                ease: "power2.inOut",
-                delay: 0.5
-            });
-
-            if (planetBackground) {
-                gsap.to(planetBackground.position, {
-                    duration: 1.5,
-                    x: 0,
-                    y: -2,
-                    z: 3,
-                    ease: "power2.inOut",
-                    delay: 0.5
-                });
-
-                gsap.to(planetBackground.material, {
-                    duration: 1,
-                    opacity: 0.7,
-                    delay: 0.5
-                });
-            }
-        }
-
-        gsap.to('.section-eight-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1
-        });
-
-        gsap.to('.ai-tool-header', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.2
-        });
-
-        gsap.to('.input-container', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.4,
-            transform: 'translate(-50%, -50%) translateY(0)'
-        });
-    } else {
-        // Reverse animation (coming back from section 9)
-        gsap.to('#mask4', {
-            duration: 0.5,
-            opacity: 1,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask3', {
-            duration: 0.5,
-            opacity: 0.7,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask5', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-nine-content', {
-            duration: 1,
-            y: window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.ai-tool-header', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.input-container', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "power2.inOut",
-            transform: 'translate(-50%, -50%) translateY(0)'
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                y: -2,
-                ease: "power2.inOut"
-            });
-
-            if (planetBackground) {
-                gsap.to(planetBackground.material, {
-                    duration: 1,
-                    opacity: 0.7
-                });
-            }
-        }
-
-        gsap.to('.section-eight-content', {
-            duration: 0.5,
-            opacity: 1
-        });
+function startSection8() {
+    gsap.set('#mask3', { y: 0 });
+    gsap.to('#mask3', {
+        duration: 0.8,
+        opacity: 0.7,
+        ease: "power2.inOut",
+        delay: 1
+    });
+    
+    if (wheelInterval) {
+        clearInterval(wheelInterval);
     }
+
+    gsap.to('.section-seven-content', {
+        duration: 1,
+        y: -window.innerHeight,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    if (planet3D) {
+        gsap.set(planet3D.position, {
+            x: 0,
+            y: -15,
+            z: 11
+        });
+
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            y: -2,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+
+        gsap.to(planet3D.scale, {
+            duration: 1.5,
+            x: 0.8,
+            y: 0.8,
+            z: 0.8,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+
+        if (planetBackground) {
+            gsap.to(planetBackground.position, {
+                duration: 1.5,
+                x: 0,
+                y: -2,
+                z: 3,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            gsap.to(planetBackground.material, {
+                duration: 1,
+                opacity: 0.7,
+                delay: 0.5
+            });
+        }
+    }
+
+    gsap.to('.section-eight-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+
+    gsap.to('.ai-tool-header', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
+
+    gsap.to('.input-container', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.4,
+        transform: 'translate(-50%, -50%) translateY(0)'
+    });
 
     currentSection = 8;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(8);
+    }
 }
 
-function startSection9(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        gsap.to('#mask4', {
-            duration: 0.5,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask3', {
-            duration: 0.5,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask5', {
-            duration: 0.8,
-            opacity: 1,
+function startSection9() {
+    gsap.to('#mask4', {
+        duration: 0.5,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask3', {
+        duration: 0.5,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask5', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+
+    gsap.to('.ai-tool-header', {
+        duration: 1,
+        y: -200,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('.input-container', {
+        duration: 1,
+        y: -200,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    if (planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            y: 3,
             ease: "power2.inOut",
-            delay: 0.5
-        });
-
-        gsap.to('.ai-tool-header', {
-            duration: 1,
-            y: -200,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.input-container', {
-            duration: 1,
-            y: -200,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                y: 3,
-                ease: "power2.inOut",
-                delay: 0.5,
-                onStart: () => {
-                    setTimeout(() => {
-                        triggerOrbitAnimations();
-                    }, 500);
-                }
-            });
-
-            if (planetBackground) {
-                gsap.to(planetBackground.material, {
-                    duration: 1,
-                    opacity: 0,
-                    delay: 0.5
-                });
+            delay: 0.5,
+            onStart: () => {
+                setTimeout(() => {
+                    triggerOrbitAnimations();
+                }, 500);
             }
-        }
-
-        gsap.to('.section-nine-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1
         });
 
-        gsap.to('.rotating-container', {
-            duration: 1,
-            opacity: 1,
-            delay: 1.2
-        });
-    } else {
-        // Reverse animation (coming back from section 10)
-        gsap.to('.section-ten-content', {
-            duration: 1,
-            y: window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.position, {
+        if (planetBackground) {
+            gsap.to(planetBackground.material, {
                 duration: 1,
-                y: 3,
-                ease: "power2.inOut"
-            });
-
-            gsap.to(planet3D.scale, {
-                duration: 1,
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
-                ease: "power2.inOut"
+                opacity: 0,
+                delay: 0.5
             });
         }
-
-        gsap.to('.section-nine-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-
-        gsap.to('.rotating-container', {
-            duration: 1,
-            opacity: 1
-        });
-
-        triggerOrbitAnimations();
     }
+
+    gsap.to('.section-nine-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+
+    gsap.to('.rotating-container', {
+        duration: 1,
+        opacity: 1,
+        delay: 1.2
+    });
 
     currentSection = 9;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(9);
+    }   
 }
 
-// Continue with the rest of the sections following the same pattern...
-function startSection10(reverse = false) {
-    if (!reverse) {
-        // Forward animation (original)
-        gsap.to('.section-nine-content', {
+function startSection10() {
+    gsap.to('.section-nine-content', {
+        duration: 1,
+        y: -window.innerHeight,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    if (planet3D) {
+        gsap.to(planet3D.position, {
             duration: 1,
-            y: -window.innerHeight,
-            opacity: 0,
+            y: 15,
             ease: "power2.inOut"
         });
 
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1,
-                y: 15,
-                ease: "power2.inOut"
-            });
-
-            gsap.to(planet3D.scale, {
-                duration: 1,
-                x: 0,
-                y: 0,
-                z: 0,
-                ease: "power2.inOut"
-            });
-        }
-
-        gsap.to('.section-ten-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.5
-        });
-
-        gsap.to('.testimonial-header', {
+        gsap.to(planet3D.scale, {
             duration: 1,
+            x: 0,
             y: 0,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 1,
-            transform: 'translateX(-50%) translateY(0)'
-        });
-
-        gsap.to('.cards-container', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 1.3,
-            transform: 'translateX(-50%) translateY(0)'
-        });
-    } else {
-        // Reverse animation (coming back from section 11)
-        gsap.to('#mask5', {
-            duration: 1,
-            opacity: 1,
+            z: 0,
             ease: "power2.inOut"
-        });
-        
-        gsap.set('#mask6', { y: 0 });
-        gsap.to('#mask6', {
-            duration: 1.5,
-            y: window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-eleven-content', {
-            duration: 1,
-            y: window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-ten-content', {
-            duration: 0.5,
-            opacity: 1
         });
     }
+
+    gsap.to('.section-ten-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.5
+    });
+
+    gsap.to('.testimonial-header', {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 1,
+        transform: 'translateX(-50%) translateY(0)'
+    });
+
+    gsap.to('.cards-container', {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 1.3,
+        transform: 'translateX(-50%) translateY(0)'
+    });
 
     currentSection = 10;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(10);
+    }
 }
 
-// Add the remaining sections with reverse animations...
-function startSection11(reverse = false) {
-    if (!reverse) {
-        gsap.to('#mask5', {
-            duration: 1,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.set('#mask6', { y: window.innerHeight });
-        gsap.to('#mask6', {
-            duration: 1.5,
-            y: 0,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.5
-        });
-        
-        gsap.to('.section-ten-content', {
-            duration: 1,
-            y: -window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
+function startSection11() {
+    gsap.to('#mask5', {
+        duration: 1,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.set('#mask6', { y: window.innerHeight });
+    gsap.to('#mask6', {
+        duration: 1.5,
+        y: 0,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+    
+    gsap.to('.section-ten-content', {
+        duration: 1,
+        y: -window.innerHeight,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
 
-        gsap.to('.section-eleven-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.5
-        });
+    gsap.to('.section-eleven-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.5
+    });
 
-        gsap.to('.section-eleven-title', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1
-        });
+    gsap.to('.section-eleven-title', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1
+    });
 
-        gsap.to('.section-eleven-description', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.2
-        });
-    } else {
-        gsap.to('#mask6', {
-            duration: 1,
-            scale: 1,
-            opacity: 1,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask5', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-twelve-content', {
-            duration: 1,
-            y: window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-eleven-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-    }
+    gsap.to('.section-eleven-description', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
 
     currentSection = 11;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(11);
+    }
 }
 
-function startSection12(reverse = false) {
-    if (!reverse) {
-        gsap.to('#mask6', {
-            duration: 1,
-            scale: 2,
-            opacity: 0,
-            ease: "power2.inOut"
+function startSection12() {
+    gsap.to('#mask6', {
+        duration: 1,
+        scale: 2,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask5', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.8
+    });
+    
+    gsap.to('.section-eleven-content', {
+        duration: 1,
+        y: -window.innerHeight,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('.section-twelve-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.5
+    });
+
+    gsap.to('.section-twelve-left', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1
+    });
+
+    gsap.to('.rolling-image', {
+        duration: 1.5,
+        x: 0,
+        rotateY: 0,
+        scale: 1,
+        opacity: 1,
+        ease: "power2.out",
+        delay: 1.5
+    });
+
+    gsap.to('.section-twelve-right', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1.8
+    });
+
+    gsap.to('.right-image', {
+        duration: 1,
+        scale: 1,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 2
+    });
+
+    currentSection = 12;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(12);
+    }
+}
+
+function startSection13() {
+    gsap.to('.section-twelve-content', {
+        duration: 1,
+        y: -window.innerHeight,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('.section-thirteen-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.5
+    });
+
+    gsap.to('.section-thirteen-header', {
+        duration: 0.8,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1
+    });
+
+    document.querySelectorAll('.grid-icon').forEach((icon, index) => {
+        gsap.to(icon, {
+            duration: 0.6,
+            y: 0,
+            opacity: 1,
+            ease: "back.out(1.7)",
+            delay: 1.5 + (index * 0.2)
+        });
+    });
+
+    currentSection = 13;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(13);
+    }
+}
+
+function startSection14() {
+    // Hide section 13 content immediately
+    gsap.to('.section-thirteen-content', {
+        duration: 0.2,
+        opacity: 0
+    });
+
+    const transition = document.querySelector('.tombstone-transition');
+    
+    // Step 1: Show transition overlay while section 13 background is still visible
+    gsap.set(transition, { 
+        opacity: 0, 
+        transform: 'scale(0)' 
+    });
+    
+    gsap.to(transition, {
+        duration: 0.8,
+        opacity: 1,
+        transform: 'scale(15)',
+        ease: "power2.out",
+        onComplete: () => {
+            // Step 2: Change background to section 14 while overlay is visible
+            gsap.to('#mask7', {
+                duration: 0.1,
+                opacity: 1
+            });
+            
+            // Step 3: Wait a moment, then zoom transition back in
+            gsap.to(transition, {
+                duration: 1,
+                transform: 'scale(0)',
+                opacity: 0,
+                ease: "power2.in",
+                delay: 1, // Wait 1 second before zooming back in
+                onComplete: () => {
+                    // Step 4: Show section 14 content
+                    gsap.to('.section-fourteen-content', {
+                        duration: 0.5,
+                        opacity: 1
+                    });
+                }
+            });
+        }
+    });
+
+    // Animate section 14 content with delay
+    gsap.to('.section-fourteen-left', {
+        duration: 0.8,
+        x: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 2.8 // After transition completes
+    });
+
+    gsap.to('.section-fourteen-right', {
+        duration: 0.8,
+        x: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 3
+    });
+
+    currentSection = 14;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(14);
+    }
+}
+
+function startSection15() {
+    gsap.to('#mask7', {
+        duration: 0.8,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    if (carouselInterval) {
+        clearInterval(carouselInterval);
+    }
+
+    gsap.to('.section-fourteen-content', {
+        duration: 1,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('.section-fifteen-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 0.5
+    });
+
+    initializeCarousel();
+
+    currentSection = 15;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(15);
+    }
+}
+
+function startSection16() {
+    if (carouselInterval) {
+        clearInterval(carouselInterval);
+    }
+    
+    gsap.to('.section-fifteen-content', {
+        duration: 1,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('.section-fifteen-background', {
+        duration: 0.8,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+    
+    gsap.to('#mask5', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+    
+    gsap.to('.section-sixteen-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+    
+    gsap.to('.section-sixteen-title', {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.2
+    });
+    
+    gsap.to('.logos-row', {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.5
+    });
+
+    currentSection = 16;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(16);
+    }
+}
+
+function startSection17() {
+    gsap.to('.section-sixteen-title', {
+        duration: 0.8,
+        y: -200,
+        opacity: 0,
+        ease: "power2.in"
+    });
+    
+    gsap.to('.logos-row', {
+        duration: 0.8,
+        y: -200,
+        opacity: 0,
+        ease: "power2.in",
+        delay: 0.1
+    });
+    
+    gsap.set('#mask3', { y: 0, opacity: 0 });
+    gsap.to('#mask3', {
+        duration: 0.8,
+        opacity: 0.7,
+        ease: "power2.inOut",
+        delay: 0.5
+    });
+    
+    if (planet3D) {
+        if (planet3D.material) {
+            gsap.to(planet3D.material.color, {
+                duration: 0.5,
+                r: 1,
+                g: 0.5,
+                b: 0
+            });
+            gsap.to(planet3D.material, {
+                duration: 0.5,
+                emissive: new THREE.Color(0x442200)
+            });
+        } else if (planet3D.traverse) {
+            planet3D.traverse(function(child) {
+                if (child instanceof THREE.Mesh && child.material) {
+                    gsap.to(child.material.color, {
+                        duration: 0.5,
+                        r: 1,
+                        g: 0.5,
+                        b: 0
+                    });
+                    gsap.to(child.material, {
+                        duration: 0.5,
+                        emissive: new THREE.Color(0x442200)
+                    });
+                }
+            });
+        }
+        
+        gsap.set(planet3D.position, {
+            x: 0,
+            y: -15,
+            z: 11
         });
         
-        gsap.to('#mask5', {
-            duration: 0.8,
-            opacity: 1,
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            y: -2,
             ease: "power2.inOut",
             delay: 0.8
         });
         
-        gsap.to('.section-eleven-content', {
-            duration: 1,
-            y: -window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-twelve-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.5
-        });
-
-        gsap.to('.section-twelve-left', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1
-        });
-
-        gsap.to('.rolling-image', {
+        gsap.to(planet3D.scale, {
             duration: 1.5,
-            x: 0,
-            rotateY: 0,
-            scale: 1,
-            opacity: 1,
-            ease: "power2.out",
-            delay: 1.5
-        });
-
-        gsap.to('.section-twelve-right', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1.8
-        });
-
-        gsap.to('.right-image', {
-            duration: 1,
-            scale: 1,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 2
-        });
-    } else {
-        gsap.to('.section-thirteen-content', {
-            duration: 1,
-            y: window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-twelve-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-    }
-
-    currentSection = 12;
-}
-
-function startSection14(reverse = false) {
-    if (!reverse) {
-        // Hide section 13 content immediately
-        gsap.to('.section-thirteen-content', {
-            duration: 0.2,
-            opacity: 0
-        });
-
-        const transition = document.querySelector('.tombstone-transition');
-        
-        // Step 1: Show transition overlay while section 13 background is still visible
-        gsap.set(transition, { 
-            opacity: 0, 
-            transform: 'scale(0)' 
-        });
-        
-        gsap.to(transition, {
-            duration: 0.8,
-            opacity: 1,
-            transform: 'scale(15)',
-            ease: "power2.out",
-            onComplete: () => {
-                // Step 2: Change background to section 14 while overlay is visible
-                gsap.to('#mask7', {
-                    duration: 0.1,
-                    opacity: 1
-                });
-                
-                // Step 3: Wait a moment, then zoom transition back in
-                gsap.to(transition, {
-                    duration: 1,
-                    transform: 'scale(0)',
-                    opacity: 0,
-                    ease: "power2.in",
-                    delay: 1, // Wait 1 second before zooming back in
-                    onComplete: () => {
-                        // Step 4: Show section 14 content
-                        gsap.to('.section-fourteen-content', {
-                            duration: 0.5,
-                            opacity: 1
-                        });
-                    }
-                });
-            }
-        });
-
-        // Animate section 14 content with delay
-        gsap.to('.section-fourteen-left', {
-            duration: 0.8,
-            x: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 2.8 // After transition completes
-        });
-
-        gsap.to('.section-fourteen-right', {
-            duration: 0.8,
-            x: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 3
-        });
-    } else {
-        // Reverse animation code remains the same
-        gsap.to('#mask7', {
-            duration: 0.8,
-            opacity: 1,
-            ease: "power2.inOut"
-        });
-
-        if (carouselInterval) {
-            clearInterval(carouselInterval);
-        }
-
-        gsap.to('.section-fifteen-content', {
-            duration: 1,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-fourteen-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-
-        currentCarouselIndex = 0;
-    }
-
-    currentSection = 14;
-}
-
-function startSection13(reverse = false) {
-    if (!reverse) {
-        // Forward transition (normal)
-        gsap.to('.section-twelve-content', {
-            duration: 1,
-            y: -window.innerHeight,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-thirteen-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.5
-        });
-
-        gsap.to('.section-thirteen-header', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1
-        });
-
-        document.querySelectorAll('.grid-icon').forEach((icon, index) => {
-            gsap.to(icon, {
-                duration: 0.6,
-                y: 0,
-                opacity: 1,
-                ease: "back.out(1.7)",
-                delay: 1.5 + (index * 0.2)
-            });
-        });
-    } else {
-        // Reverse transition (from section 14 back to 13)
-        const transition = document.querySelector('.tombstone-transition');
-        
-        // Start reverse transition - zoom out
-        gsap.set(transition, { 
-            opacity: 1, 
-            transform: 'scale(0)' 
-        });
-        
-        gsap.to(transition, {
-            duration: 0.8,
-            transform: 'scale(15)',
-            ease: "power2.out",
-            onStart: () => {
-                // Hide section 14 content and background
-                gsap.to('.section-fourteen-content', {
-                    duration: 0.2,
-                    opacity: 0
-                });
-                
-                gsap.to('#mask7', {
-                    duration: 0.1,
-                    opacity: 0,
-                    delay: 0.4
-                });
-            },
-            onComplete: () => {
-                // Show section 13 content
-                gsap.to('.section-thirteen-content', {
-                    duration: 0.3,
-                    opacity: 1
-                });
-                
-                // Zoom transition back in to hide it
-                gsap.to(transition, {
-                    duration: 0.8,
-                    transform: 'scale(0)',
-                    opacity: 0,
-                    ease: "power2.in",
-                    delay: 0.2
-                });
-            }
-        });
-    }
-
-    currentSection = 13;
-}
-
-function startSection15(reverse = false) {
-    if (!reverse) {
-        gsap.to('#mask7', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        if (carouselInterval) {
-            clearInterval(carouselInterval);
-        }
-
-        gsap.to('.section-fourteen-content', {
-            duration: 1,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-fifteen-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 0.5
-        });
-
-        initializeCarousel();
-    } else {
-        if (carouselInterval) {
-            clearInterval(carouselInterval);
-        }
-        
-        gsap.to('.section-fifteen-content', {
-            duration: 1,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('.section-fifteen-background', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask5', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('.section-sixteen-content', {
-            duration: 0.5,
-            opacity: 0
-        });
-
-        initializeCarousel();
-        gsap.to('.section-fifteen-content', {
-            duration: 0.5,
-            opacity: 1
-        });
-    }
-
-    currentSection = 15;
-}
-
-function startSection16(reverse = false) {
-    if (!reverse) {
-        if (carouselInterval) {
-            clearInterval(carouselInterval);
-        }
-        
-        gsap.to('.section-fifteen-content', {
-            duration: 1,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('.section-fifteen-background', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('#mask5', {
-            duration: 0.8,
-            opacity: 1,
+            x: 0.8,
+            y: 0.8,
+            z: 0.8,
             ease: "power2.inOut",
-            delay: 0.5
+            delay: 0.8
         });
         
-        gsap.to('.section-sixteen-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1
-        });
-        
-        gsap.to('.section-sixteen-title', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.2
-        });
-        
-        gsap.to('.logos-row', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.5
-        });
-    } else {
-        gsap.to('.section-sixteen-title', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.5
-            });
-        
-        gsap.to('.logos-row', {
-            duration: 0.8,
-            y: 0,
-            opacity: 1,
-            ease: "power2.out"
-        });
-        
-        gsap.set('#mask3', { y: 0, opacity: 0 });
-        gsap.to('#mask3', {
-            duration: 0.8,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-        
-        gsap.to('.section-seventeen-content', {
-            duration: 0.5,
-            opacity: 0
-        });
-
-        if (planet3D) {
-            gsap.to(planet3D.position, {
-                duration: 1.5,
-                y: 8,
-                ease: "power2.inOut"
-            });
-
-            gsap.to(planet3D.scale, {
+        if (planetBackground) {
+            gsap.to(planetBackground.position, {
                 duration: 1.5,
                 x: 0,
-                y: 0,
-                z: 0,
-                ease: "power2.inOut"
-            });
-        }
-    }
-
-    currentSection = 16;
-}
-
-function startSection17(reverse = false) {
-    if (!reverse) {
-        gsap.to('.section-sixteen-title', {
-            duration: 0.8,
-            y: -200,
-            opacity: 0,
-            ease: "power2.in"
-        });
-        
-        gsap.to('.logos-row', {
-            duration: 0.8,
-            y: -200,
-            opacity: 0,
-            ease: "power2.in",
-            delay: 0.1
-        });
-        
-        gsap.set('#mask3', { y: 0, opacity: 0 });
-        gsap.to('#mask3', {
-            duration: 0.8,
-            opacity: 0.7,
-            ease: "power2.inOut",
-            delay: 0.5
-        });
-        
-        if (planet3D) {
-            if (planet3D.material) {
-                gsap.to(planet3D.material.color, {
-                    duration: 0.5,
-                    r: 1,
-                    g: 0.5,
-                    b: 0
-                });
-                gsap.to(planet3D.material, {
-                    duration: 0.5,
-                    emissive: new THREE.Color(0x442200)
-                });
-            } else if (planet3D.traverse) {
-                planet3D.traverse(function(child) {
-                    if (child instanceof THREE.Mesh && child.material) {
-                        gsap.to(child.material.color, {
-                            duration: 0.5,
-                            r: 1,
-                            g: 0.5,
-                            b: 0
-                        });
-                        gsap.to(child.material, {
-                            duration: 0.5,
-                            emissive: new THREE.Color(0x442200)
-                        });
-                    }
-                });
-            }
-            
-            gsap.set(planet3D.position, {
-                x: 0,
-                y: -15,
-                z: 11
-            });
-            
-            gsap.to(planet3D.position, {
-                duration: 1.5,
                 y: -2,
+                z: 3,
                 ease: "power2.inOut",
                 delay: 0.8
             });
             
-            gsap.to(planet3D.scale, {
-                duration: 1.5,
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
-                ease: "power2.inOut",
-                delay: 0.8
-            });
-            
-            if (planetBackground) {
-                gsap.to(planetBackground.position, {
-                    duration: 1.5,
-                    x: 0,
-                    y: -2,
-                    z: 3,
-                    ease: "power2.inOut",
-                    delay: 0.8
-                });
-                
-                gsap.to(planetBackground.material, {
-                    duration: 1,
-                    opacity: 0.7,
-                    delay: 0.8
-                });
-            }
-        }
-        
-        gsap.to('.section-seventeen-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1
-        });
-        
-        gsap.to('.section-seventeen-main', {
-            duration: 1.2,
-            y: 0,
-            opacity: 1,
-            ease: "back.out(1.7)",
-            delay: 1.5
-        });
-    } else {
-        // Reverse from footer
-        gsap.to('.footer-container', {
-            duration: 1,
-            y: '100%',
-            opacity: 0,
-            ease: "power2.in"
-        });
-        
-        gsap.to('.section-seventeen-main', {
-            duration: 1,
-            y: 0,
-            ease: "power2.inOut",
-            delay: 0.3
-        });
-        
-        if (planet3D) {
-            gsap.to(planet3D.position, {
+            gsap.to(planetBackground.material, {
                 duration: 1,
-                y: -2,
-                ease: "power2.inOut",
-                delay: 0.3
+                opacity: 0.7,
+                delay: 0.8
             });
         }
     }
+    
+    gsap.to('.section-seventeen-content', {
+        duration: 0.5,
+        opacity: 1,
+        delay: 1
+    });
+    
+    gsap.to('.section-seventeen-main', {
+        duration: 1.2,
+        y: 0,
+        opacity: 1,
+        ease: "back.out(1.7)",
+        delay: 1.5
+    });
 
     currentSection = 17;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(17);
+    }
 }
 
 function showFooter() {
@@ -2485,6 +1876,9 @@ function showFooter() {
     });
     
     currentSection = 18;
+    if (window.reverseScrollHandler) {
+        window.reverseScrollHandler.setCurrentSection(18);
+    }
 }
 
 // Add this new function to trigger orbit animations
@@ -2644,134 +2038,11 @@ function updateCardSlider() {
     slider.style.transform = `translateX(${translateX}px)`;
 }
 
-// Mobile touch support
-// let touchStartY = 0;
-// let touchStartX = 0;
-// let lastTouchTime = 0;
-const touchThreshold = 50; // Minimum swipe distance
-const timeThreshold = 300; // Maximum time for swipe
-
-function handleTouchStart(e) {
-    touchStartY = e.touches[0].clientY;
-    touchStartX = e.touches[0].clientX;
-    lastTouchTime = Date.now();
-}
-
-function handleTouchEnd(e) {
-    if (!touchStartY || !touchStartX) return;
-    
-    const touchEndY = e.changedTouches[0].clientY;
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchTime = Date.now() - lastTouchTime;
-    
-    const deltaY = touchStartY - touchEndY;
-    const deltaX = Math.abs(touchStartX - touchEndX);
-    
-    // Only process vertical swipes (ignore horizontal swipes)
-    if (Math.abs(deltaY) > touchThreshold && deltaX < touchThreshold && touchTime < timeThreshold) {
-        e.preventDefault();
-        
-        // Simulate wheel event
-        const wheelEvent = {
-            deltaY: deltaY > 0 ? 100 : -100,
-            preventDefault: () => {}
-        };
-        
-        handleScroll(wheelEvent);
-    }
-    
-    touchStartY = 0;
-    touchStartX = 0;
-}
-
-// Updated scroll handling function that supports both directions and mobile
+// Updated scroll handling function - only forward scrolling
 let isScrolling = false;
-function handleScroll(e) {
-    if (isScrolling) return;
-    
-    e.preventDefault();
-    
-    let targetSection = currentSection;
-    
-    // Special handling for section 15
-    if (currentSection === 15) {
-        const handled = updateCarouselOnScroll(e.deltaY);
-        if (handled) {
-            isScrolling = true;
-            setTimeout(() => { isScrolling = false; }, 300);
-            return;
-        }
-    }
-    
-    if (e.deltaY > 0) {
-        // Scrolling down
-        if (currentSection < 17) {
-            targetSection = currentSection + 1;
-        } else if (currentSection === 17 && currentSection !== 18) {
-            showFooter();
-            isScrolling = true;
-            setTimeout(() => { isScrolling = false; }, 2000);
-            return;
-        }
-    } else if (e.deltaY < 0) {
-        // Scrolling up
-        if (currentSection === 18) {
-            // Hide footer and go back to section 17
-            startSection17(true); // Pass true for reverse
-            isScrolling = true;
-            setTimeout(() => { isScrolling = false; }, 2000);
-            return;
-        } else if (currentSection > 1) {
-            targetSection = currentSection - 1;
-        }
-    }
-    
-    if (targetSection !== currentSection) {
-        isScrolling = true;
-        
-        // Update navigation dots
-        document.querySelectorAll('.nav-dot').forEach((dot, index) => {
-            dot.classList.toggle('active', index === targetSection - 1);
-        });
 
-        // Stop timers when leaving sections
-        if (currentSection === 7 && wheelInterval) {
-            clearInterval(wheelInterval);
-        }
-        if (currentSection === 15 && carouselInterval) {
-            clearInterval(carouselInterval);
-        }
-        
-        // Call the appropriate section function with reverse flag
-        const isReverse = targetSection < currentSection;
-        
-        // switch(targetSection) {
-        //     case 1: startSection1(isReverse); break;
-        //     case 2: startSection2(isReverse); break;
-        //     case 3: startSection3(isReverse); break;
-        //     case 4: startSection4(isReverse); break;
-        //     case 5: startSection5(isReverse); break;
-        //     case 6: startSection6(isReverse); break;
-        //     case 7: startSection7(isReverse); break;
-        //     case 8: startSection8(isReverse); break;
-        //     case 9: startSection9(isReverse); break;
-        //     case 10: startSection10(isReverse); break;
-        //     case 11: startSection11(isReverse); break;
-        //     case 12: startSection12(isReverse); break;
-        //     case 13: startSection13(isReverse); break;
-        //     case 14: startSection14(isReverse); break;
-        //     case 15: startSection15(isReverse); break;
-        //     case 16: startSection16(isReverse); break;
-        //     case 17: startSection17(isReverse); break;
-        // }
-        
-        setTimeout(() => {
-            isScrolling = false;
-        }, 2000);
-    }
-}
 function handleScrollEvent(e) {
-    if (window.isScrolling) return;
+    if (isScrolling) return;
     
     e.preventDefault();
     
@@ -2781,66 +2052,43 @@ function handleScrollEvent(e) {
     if (currentSection === 15) {
         const handled = updateCarouselOnScroll(e.deltaY);
         if (handled) {
-            window.isScrolling = true;
-            setTimeout(() => { window.isScrolling = false; }, 300);
+            isScrolling = true;
+            setTimeout(() => { isScrolling = false; }, 300);
             return;
         }
     }
     
-    // Determine scroll direction and target section
+    // Handle both downward and upward scrolling
     if (e.deltaY > 0) {
-        // Scrolling down
+        // Downward scrolling (forward)
         if (currentSection < 17) {
             targetSection = currentSection + 1;
-        } else if (currentSection === 17 && currentSection !== 18) {
+        } else if (currentSection === 17) {
             showFooter();
-            window.isScrolling = true;
-            setTimeout(() => { window.isScrolling = false; }, 2000);
+            isScrolling = true;
+            setTimeout(() => { isScrolling = false; }, 2000);
             return;
         }
     } else if (e.deltaY < 0) {
-        // Scrolling up
-        if (currentSection === 18) {
-            gsap.to('.footer-container', {
-                duration: 1,
-                y: '100%',
-                opacity: 0,
-                ease: "power2.in"
-            });
-            
-            gsap.to('.section-seventeen-main', {
-                duration: 1,
-                y: 0,
-                ease: "power2.inOut",
-                delay: 0.3
-            });
-            
-            if (planet3D) {
-                gsap.to(planet3D.position, {
-                    duration: 1,
-                    y: -2,
-                    ease: "power2.inOut",
-                    delay: 0.3
-                });
+        // Upward scrolling (backward) - USE REVERSE HANDLER
+        if (currentSection > 1) {
+            const success = window.reverseScrollHandler.handleReverseScroll(currentSection - 1);
+            if (success) {
+                isScrolling = true;
+                setTimeout(() => { isScrolling = false; }, 2000);
+                return;
             }
-            
-            currentSection = 17;
-            window.isScrolling = true;
-            setTimeout(() => { window.isScrolling = false; }, 2000);
-            return;
-        } else if (currentSection > 1) {
-            targetSection = currentSection - 1;
         }
     }
     
-    // Execute section transition if target changed
-    if (targetSection !== currentSection) {
-        window.isScrolling = true;
+    // Execute forward section transition if target changed
+    if (targetSection !== currentSection && e.deltaY > 0) {
+        isScrolling = true;
         
-        // Update navigation dots (skip section 2 for dot indexing)
+        // Update navigation dots
         document.querySelectorAll('.nav-dot').forEach((dot, index) => {
             let dotSection = targetSection;
-            if (targetSection > 2) dotSection = targetSection - 1; // Adjust for skipped section 2
+            if (targetSection > 2) dotSection = targetSection - 1;
             if (targetSection === 1) dotSection = 0;
             dot.classList.toggle('active', index === dotSection);
         });
@@ -2875,7 +2123,7 @@ function handleScrollEvent(e) {
         }
         
         setTimeout(() => {
-            window.isScrolling = false;
+            isScrolling = false;
         }, 2000);
     }
 }
@@ -2883,9 +2131,6 @@ function handleScrollEvent(e) {
 function setupScrolling() {
     // Initialize touch detection
     detectTouchDevice();
-    
-    // Initialize scroll lock
-    window.isScrolling = false;
     
     // Desktop mouse wheel support
     window.addEventListener('wheel', handleScrollEvent, { 
@@ -2933,7 +2178,7 @@ function setupScrolling() {
         }, { passive: false });
     }
 
-    // Setup wheel controls (existing code)
+    // Setup wheel controls
     const prevArrow = document.getElementById('prevArrow');
     const nextArrow = document.getElementById('nextArrow');
     
@@ -2953,7 +2198,7 @@ function setupScrolling() {
         });
     }
 
-    // Setup testimonial card controls (existing code)
+    // Setup testimonial card controls
     const testPrevArrow = document.getElementById('testPrevArrow');
     const testNextArrow = document.getElementById('testNextArrow');
     
@@ -2974,8 +2219,6 @@ function setupScrolling() {
             }
         });
     }
-
-
 }
 
 // Add mobile-specific CSS to prevent default behaviors
@@ -3044,8 +2287,17 @@ window.addEventListener('resize', () => {
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     updateNavigationDots();
-    addMobileStyles()
+    addMobileStyles();
     load3DPlanet();
     animate();
     initializeAssetLoading();
 });
+window.startWheelTimer = function() {
+    if (window.wheelInterval) {
+        clearInterval(window.wheelInterval);
+    }
+    
+    window.wheelInterval = setInterval(() => {
+        nextWheelImage();
+    }, 3000);
+};
