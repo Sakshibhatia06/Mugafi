@@ -1033,9 +1033,9 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         .testimonial-header {
             position: absolute;
             top: 15%;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
+            left: 600px;
+            /* transform: translateX(-50%); */
+            /* text-align: center; */
             opacity: 0;
             transform: translateX(-50%) translateY(100px);
         }
@@ -1050,13 +1050,13 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     display: flex;
     align-items: center;
     gap: 20px;
-    justify-content: center;
+    justify-content: right;
     margin-bottom: 30px;
     position: relative;
     z-index: 600;
 }
 
-        .testimonial-arrow {
+        /* .testimonial-arrow {
     width: 40px;
     height: 40px;
     cursor: pointer;
@@ -1066,20 +1066,20 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     transform: translateY(-50%);
     z-index: 450;
     pointer-events: auto;
-}
+} */
 
 #testPrevArrow {
-    left: -260px;
+    right: -560px;
     z-index: 600;
 }
 
 #testNextArrow {
     right: -260px;
     z-index: 600;
-    transform: translateY(-50%) scaleX(-1);
+    /* transform:  scaleX(-1); */
 }
 
-.testimonial-arrow:hover {
+#testPrevArrow:hover {
     transform: scale(1.1);
 }
 #testNextArrow:hover {
