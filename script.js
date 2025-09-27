@@ -1305,7 +1305,7 @@ function startSection8() {
     }
 }
 // Update the mobile orbit animation function
-function triggerMobileOrbitAnimations() {
+window.triggerMobileOrbitAnimations = function () {
     console.log('Triggering mobile orbit animations');
     
     const orbitContainers = [
@@ -1937,7 +1937,7 @@ function showFooter() {
 }
 
 // Add this new function to trigger orbit animations
-function triggerOrbitAnimations() {
+window.triggerOrbitAnimations = function () {
     const orbitOne = document.querySelector('.orbit-container.one');
     const orbitTwo = document.querySelector('.orbit-container.two');
     const orbitThree = document.querySelector('.orbit-container.three');
@@ -2005,7 +2005,8 @@ currentCarouselIndex = 0;
 totalCarouselItems = 5;
 let section15ScrollProgress = 0;
 
-function initializeCarousel() {
+window.initializeCarousel = function () {
+    console.log('Initializing carousel');
     currentCarouselIndex = 0;
     section15ScrollProgress = 0;
 

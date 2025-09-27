@@ -318,16 +318,24 @@ class ReverseScrollHandler {
         });
 
         // Reset carousel to first item
-        window.currentCarouselIndex = 0;
         this.resetCarousel();
-        
-        // Reinitialize carousel after a delay
-        const initTimer = setTimeout(() => {
-            if (typeof window.initializeCarousel === 'function') {
-                window.initializeCarousel();
-            }
-        }, 1000);
-        this.activeTimers.push(initTimer);
+  gsap.to('.carousel-item:first-child', {
+      opacity: 1,
+      duration: 0.5,
+      delay: 1.2
+  });
+  gsap.to('.section-fifteen-background.bg-1', {
+      opacity: 1,
+      duration: 0.8,
+      delay: 1.2
+  });
+  // restart auto cycling
+  const initTimer = setTimeout(() => {
+      if (typeof window.initializeCarousel === 'function') {
+          window.initializeCarousel();
+      }
+  }, 1500);
+  this.activeTimers.push(initTimer);
     }
 
     reverseToSection14() {
@@ -647,174 +655,196 @@ class ReverseScrollHandler {
     }
 
     reverseToSection10() {
-        // Reset section 11 completely
-        this.resetElementToInitialState('.section-eleven-content', {
-            opacity: 0
-        });
-        
-        this.resetElementToInitialState('.section-eleven-title', {
-            opacity: 0,
-            transform: 'translateY(100px)'
-        });
-        
-        this.resetElementToInitialState('.section-eleven-description', {
-            opacity: 0,
-            transform: 'translateY(100px)'
-        });
+    // Reset section 11 completely
+    this.resetElementToInitialState('.section-eleven-content', {
+        opacity: 0
+    });
+    
+    this.resetElementToInitialState('.section-eleven-title', {
+        opacity: 0,
+        transform: 'translateY(100px)'
+    });
+    
+    this.resetElementToInitialState('.section-eleven-description', {
+        opacity: 0,
+        transform: 'translateY(100px)'
+    });
 
-        // Change background back to section 10
-        gsap.to('#mask6', {
+    // Change background back to section 10
+    gsap.to('#mask6', {
+        duration: 1,
+        scale: 2,
+        opacity: 0,
+        ease: "power2.inOut"
+    });
+
+    gsap.to('#mask5', {
+        duration: 0.8,
+        opacity: 1,
+        ease: "power2.inOut",
+        delay: 0.8
+    });
+
+    // Reset section 10 elements to initial state with CORRECT transform syntax
+    this.resetElementToInitialState('.testimonial-header', {
+        opacity: 0,
+        transform: 'translateY(100px)' // Fixed: removed conflicting translateX
+    });
+
+    this.resetElementToInitialState('.cards-container', {
+        opacity: 0,
+        transform: 'translateY(100px)' // Fixed: removed conflicting translateX
+    });
+
+    // Show section 10 content
+    gsap.to('.section-ten-content', {
+        duration: 0.5,
+        y: 0,
+        x: -0.3*window.innerWidth,
+        opacity: 1,
+        delay: 1
+    });
+
+    // Animate testimonial header with proper positioning
+    gsap.to('.testimonial-header', {
+        duration: 1,
+        y: 0,
+        opacity: 1,
+        ease: "power2.out",
+        delay: 1.2
+    });
+
+    // Animate cards container with proper positioning
+    gsap.to('.cards-container', {
+        duration: 1,
+        y: 0,
+        x: 0,
+        opacity: 1,
+        ease: "power2.out",
+        delay: 1.5
+    });
+
+    // Reset planet position for section 10
+    if (window.planet3D) {
+        gsap.to(window.planet3D.position, {
             duration: 1,
-            scale: 2,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('#mask5', {
-            duration: 0.8,
-            opacity: 1,
+            x: 0,
+            y: 15,
+            z: 0,
             ease: "power2.inOut",
-            delay: 0.8
-        });
-
-        // Reset section 10 elements to initial state
-        this.resetElementToInitialState('.testimonial-header', {
-            opacity: 0,
-            transform: 'translateX(-50%) translateY(100px)'
-        });
-
-        this.resetElementToInitialState('.cards-container', {
-            opacity: 0,
-            transform: 'translateX(-50%) translateY(100px)'
-        });
-
-        // Show section 10 content
-        gsap.to('.section-ten-content', {
-            duration: 0.5,
-            opacity: 1,
-            delay: 1
-        });
-
-        gsap.to('.testimonial-header', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "power2.out",
-            delay: 1.2,
-            transform: 'translateX(-50%) translateY(0)'
-        });
-
-        gsap.to('.cards-container', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "power2.out",
-            delay: 1.5,
-            transform: 'translateX(-50%) translateY(0)'
-        });
-
-        // Reset planet position for section 10
-        if (window.planet3D) {
-            gsap.to(window.planet3D.position, {
-                duration: 1,
-                x: 0,
-                y: 15,
-                z: 0,
-                ease: "power2.inOut",
-                delay: 0.5
-            });
-
-            gsap.to(window.planet3D.scale, {
-                duration: 1,
-                x: 0,
-                y: 0,
-                z: 0,
-                ease: "power2.inOut",
-                delay: 0.5
-            });
-        }
-    }
-
-    reverseToSection9() {
-        // Reset section 10 completely
-        this.resetElementToInitialState('.section-ten-content', {
-            opacity: 0
-        });
-        
-        this.resetElementToInitialState('.testimonial-header', {
-            opacity: 0,
-            transform: 'translateX(-50%) translateY(100px)'
-        });
-        
-        this.resetElementToInitialState('.cards-container', {
-            opacity: 0,
-            transform: 'translateX(-50%) translateY(100px)'
-        });
-
-        // Reset section 9 elements to initial state
-        this.resetElementToInitialState('.rotating-container', {
-            opacity: 0
-        });
-
-        // Show section 9 content
-        gsap.to('.section-nine-content', {
-            duration: 0.5,
-            opacity: 1,
             delay: 0.5
         });
 
-        gsap.to('.rotating-container', {
+        gsap.to(window.planet3D.scale, {
             duration: 1,
-            opacity: 1,
-            delay: 0.8
+            x: 0,
+            y: 0,
+            z: 0,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+    }
+}
+
+    reverseToSection9() {
+    // Reset section 10 completely
+    this.resetElementToInitialState('.section-ten-content', {
+        opacity: 0
+    });
+    
+    this.resetElementToInitialState('.testimonial-header', {
+        opacity: 0,
+        transform: 'translateX(-50%) translateY(100px)'
+    });
+    
+    this.resetElementToInitialState('.cards-container', {
+        opacity: 0,
+        transform: 'translateX(-50%) translateY(100px)'
+    });
+
+    // Reset section 9 elements to initial state AND reset animations
+    this.resetElementToInitialState('.rotating-container', {
+        opacity: 0
+    });
+
+    // Reset orbit containers to initial state
+    document.querySelectorAll('.orbit-container').forEach(orbit => {
+        gsap.set(orbit, { rotation: 0 });
+        const featureOrbit = orbit.querySelector('.feature-orbit');
+        if (featureOrbit) {
+            gsap.set(featureOrbit, { rotation: 0 });
+        }
+        // Remove any existing CSS animations
+        orbit.style.animation = 'none';
+    });
+
+    // Show section 9 content
+    gsap.to('.section-nine-content', {
+        duration: 0.5,
+        opacity: 1,
+        y: 0/5*window.innerHeight,
+        // delay: 0.5
+    });
+
+    gsap.to('.rotating-container', {
+        duration: 1,
+        opacity: 1,
+        delay: 0.8,
+        onComplete: () => {
+            // Trigger orbit animations after container is visible
+            if (typeof window.triggerOrbitAnimations === "function") {
+                console.log("Triggering orbit animations from reverseToSection9");
+                window.triggerOrbitAnimations();
+            }
+        }
+    });
+
+    // Move planet back to section 9 position
+    if (window.planet3D) {
+        gsap.to(window.planet3D.position, {
+            duration: 1,
+            x: 0,
+            y: 3,
+            z: 11,
+            ease: "power2.inOut",
+            delay: 0.5
         });
 
-        // Move planet back to section 9 position
-        if (window.planet3D) {
-            gsap.to(window.planet3D.position, {
+        gsap.to(window.planet3D.scale, {
+            duration: 1,
+            x: 0.8,
+            y: 0.8,
+            z: 0.8,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+
+        if (window.planetBackground) {
+            gsap.to(window.planetBackground.position, {
                 duration: 1,
                 x: 0,
                 y: 3,
-                z: 11,
+                z: 3,
                 ease: "power2.inOut",
                 delay: 0.5
             });
 
-            gsap.to(window.planet3D.scale, {
+            gsap.to(window.planetBackground.material, {
                 duration: 1,
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
-                ease: "power2.inOut",
+                opacity: 0,
                 delay: 0.5
             });
-
-            if (window.planetBackground) {
-                gsap.to(window.planetBackground.position, {
-                    duration: 1,
-                    x: 0,
-                    y: 3,
-                    z: 3,
-                    ease: "power2.inOut",
-                    delay: 0.5
-                });
-
-                gsap.to(window.planetBackground.material, {
-                    duration: 1,
-                    opacity: 0,
-                    delay: 0.5
-                });
-            }
         }
-
-        // Trigger orbit animations after delay
-        const orbitTimer = setTimeout(() => {
-            if (typeof window.triggerOrbitAnimations === 'function') {
-                window.triggerOrbitAnimations();
-            }
-        }, 1000);
-        this.activeTimers.push(orbitTimer);
     }
+
+    // Trigger orbit animations after a longer delay to ensure everything is ready
+    const orbitTimer = setTimeout(() => {
+        if (typeof window.triggerOrbitAnimations === 'function') {
+            window.triggerOrbitAnimations();
+        }
+    }, 1500); // Increased delay
+    this.activeTimers.push(orbitTimer);
+}
 
     reverseToSection8() {
         // Reset section 9 completely
