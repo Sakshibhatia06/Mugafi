@@ -22,44 +22,49 @@ class ReverseScrollHandler {
     }
 
     handleReverseScroll(targetSection) {
-    if (this.isAnimating) return false;
-    
-    this.isAnimating = true;
-    
-    // Special handling for section 3 going back
-    if (this.currentSection === 3 && targetSection === 1) {
-        this.reverseToSection2(1); // This will show section 2 then go to 1
+        if (this.isAnimating) return false;
+        
+        this.isAnimating = true;
+        
+        // Kill all ongoing animations immediately
+        this.killAllAnimations();
+        
+        // Update navigation dots
+        this.updateNavigationDots(targetSection);
+
+        // Stop any running timers
+        this.stopActiveTimers();
+
+        // Execute reverse animation based on current section
+        switch(this.currentSection) {
+            case 18: this.reverseFromFooter(); break;
+            case 17: this.reverseToSection16(); break;
+            case 16: this.reverseToSection15(); break;
+            case 15: this.reverseToSection14(); break;
+            case 14: this.reverseToSection13(); break;
+            case 13: this.reverseToSection12(); break;
+            case 12: this.reverseToSection11(); break;
+            case 11: this.reverseToSection10(); break;
+            case 10: this.reverseToSection9(); break;
+            case 9: this.reverseToSection8(); break;
+            case 8: this.reverseToSection7(); break;
+            case 7: this.reverseToSection6(); break;
+            case 6: this.reverseToSection5(); break;
+            case 5: this.reverseToSection4(); break;
+            case 4: this.reverseToSection3(); break;
+            case 3: this.reverseToSection2(); break;
+            case 2: this.reverseToSection1(); break;
+        }
+
+        // Update current section
+        this.currentSection = targetSection;
+        
         setTimeout(() => {
             this.isAnimating = false;
-        }, 3000); // Longer timeout since we have the 1-second transition
+        }, 2000);
+
         return true;
     }
-    
-    // Skip section 2 in normal reverse scrolling
-    if (targetSection === 2) {
-        targetSection = 1; // Jump directly to section 1
-    }
-    
-    // Rest of your existing code...
-    this.stopActiveTimers();
-    
-    switch(this.currentSection) {
-        case 18: this.reverseFromFooter(); break;
-        case 17: this.reverseToSection16(); break;
-        // ... rest of cases (skip case for section 2)
-        case 3: this.reverseToSection2(targetSection); break; // Special handling
-        // case 2: not needed since it's transitional
-    }
-    
-    this.currentSection = targetSection;
-    window.currentSection = targetSection;
-    
-    setTimeout(() => {
-        this.isAnimating = false;
-    }, 2000);
-    
-    return true;
-}
 
     killAllAnimations() {
         const allSelectors = [
@@ -1280,7 +1285,7 @@ class ReverseScrollHandler {
         this.currentSection = 2;
     window.currentSection = 2;
         setTimeout(() => {
-        if (targetSection === 1) {
+        if (targetSection === 2) {
             this.reverseToSection1();
         }
         // If you need to go to other sections, add them here
