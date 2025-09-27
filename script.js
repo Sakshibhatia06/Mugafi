@@ -16,7 +16,7 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 2);
 scene.add(ambientLight);
 
 // 3D Elements
-let planet3D = null;
+// let planet3D = null;
 let planetBackground = null;
 
 camera.position.z = 15;
@@ -572,7 +572,7 @@ function createPlaceholderPlanet() {
     sphere.scale.set(0, 0, 0);
     sphere.position.set(0, 0, 0);
     scene.add(sphere);
-    planet3D = sphere;
+    window.planet3D = sphere;
 
     // Create particle system instead of background image
     createParticleSystem();
@@ -1304,59 +1304,44 @@ function startSection8() {
         window.reverseScrollHandler.setCurrentSection(8);
     }
 }
+// Update the mobile orbit animation function
 function triggerMobileOrbitAnimations() {
+    console.log('Triggering mobile orbit animations');
+    
     const orbitContainers = [
         document.querySelector('.orbit-container.one'),
         document.querySelector('.orbit-container.two'),
         document.querySelector('.orbit-container.three')
     ];
     
-    const showRotation = 180; // All divs show at 180 degrees
-    const finalRotations = [220, 1401,180 ];
+    const rotations = [220, 180, 140];
     
     orbitContainers.forEach((orbit, index) => {
         if (orbit) {
-            // Reset animation
-            orbit.style.animation = 'none';
-            orbit.offsetHeight;
+            const featureOrbit = orbit.querySelector('.feature-orbit');
             
-            setTimeout(() => {
-                // Show div by rotating to 180 degrees
-                gsap.to(orbit, {
-                    duration: 1,
-                    rotation: showRotation,
+            // Reset first
+            gsap.set(orbit, { rotation: 0 });
+            if (featureOrbit) {
+                gsap.set(featureOrbit, { rotation: 0 });
+            }
+            
+            // Animate with staggered delays
+            gsap.to(orbit, {
+                duration: 2,
+                rotation: rotations[index],
+                ease: "power2.inOut",
+                delay: index * 0.5
+            });
+            
+            if (featureOrbit) {
+                gsap.to(featureOrbit, {
+                    duration: 2,
+                    rotation: -rotations[index],
                     ease: "power2.inOut",
-                    onComplete: () => {
-                        // Wait 3 seconds then move to final position
-                        setTimeout(() => {
-                            gsap.to(orbit, {
-                                duration: 1,
-                                rotation: finalRotations[index],
-                                ease: "power2.inOut"
-                            });
-                        }, 3000);
-                    }
+                    delay: index * 0.5
                 });
-                
-                // Counter-rotate the content
-                const featureOrbit = orbit.querySelector('.feature-orbit');
-                if (featureOrbit) {
-                    gsap.to(featureOrbit, {
-                        duration: 1,
-                        rotation: -finalRotations[index],
-                        ease: "power2.inOut",
-                        onComplete: () => {
-                            setTimeout(() => {
-                                gsap.to(featureOrbit, {
-                                    duration: 1,
-                                    rotation: -180,
-                                    ease: "power2.inOut"
-                                });
-                            }, 3000);
-                        }
-                    });
-                }
-            }, index * 4000); // 4 second gap between each div's sequence
+            }
         }
     });
 }
@@ -2038,6 +2023,7 @@ function initializeCarousel() {
     });
 }
 
+
 function updateCarouselOnScroll(direction) {
     if (direction > 0 && currentCarouselIndex < totalCarouselItems - 1) {
         nextCarouselItem();
@@ -2050,44 +2036,43 @@ function updateCarouselOnScroll(direction) {
     return false;
 }
 
+// In script.js, replace the existing nextCarouselItem and prevCarouselItem functions
+
 function nextCarouselItem() {
-    if (currentCarouselIndex >= totalCarouselItems - 1) return;
-    
-    const nextIndex = currentCarouselIndex + 1;
-    
-    updateCarouselBackground(nextIndex + 1);
-    
-    document.querySelectorAll('.carousel-item').forEach((item, index) => {
-        item.classList.toggle('active', index === nextIndex);
-    });
-    
-    const container = document.getElementById('carouselContainer');
-    if (container) {
-        const translateX = -(nextIndex * 500);
-        container.style.transform = `translateX(${translateX}px)`;
-    }
-    
-    currentCarouselIndex = nextIndex;
+	if (currentCarouselIndex >= totalCarouselItems - 1) return;
+
+	const nextIndex = currentCarouselIndex + 1;
+	updateCarouselState(nextIndex);
+	currentCarouselIndex = nextIndex;
 }
 
 function prevCarouselItem() {
-    if (currentCarouselIndex <= 0) return;
-    
-    const prevIndex = currentCarouselIndex - 1;
-    
-    updateCarouselBackground(prevIndex + 1);
-    
-    document.querySelectorAll('.carousel-item').forEach((item, index) => {
-        item.classList.toggle('active', index === prevIndex);
-    });
-    
-    const container = document.getElementById('carouselContainer');
-    if (container) {
-        const translateX = -(prevIndex * 500);
-        container.style.transform = `translateX(${translateX}px)`;
-    }
-    
-    currentCarouselIndex = prevIndex;
+	if (currentCarouselIndex <= 0) return;
+
+	const prevIndex = currentCarouselIndex - 1;
+	updateCarouselState(prevIndex);
+	currentCarouselIndex = prevIndex;
+}
+
+function updateCarouselState(newIndex) {
+	updateCarouselBackground(newIndex + 1);
+
+	document.querySelectorAll(".carousel-item").forEach((item, index) => {
+		item.classList.toggle("active", index === newIndex);
+	});
+
+	const container = document.getElementById("carouselContainer");
+	if (container) {
+		let translateX;
+		// Use different translation logic based on viewport width
+		if (window.innerWidth >= 1024) {
+			translateX = -(newIndex * 100); // 100vw per item
+			container.style.transform = `translateX(${translateX}vw)`;
+		} else {
+			translateX = -(newIndex * 500); // 500px per item on mobile
+			container.style.transform = `translateX(${translateX}px)`;
+		}
+	}
 }
 
 function updateCarouselBackground(bgNumber) {
