@@ -3,7 +3,7 @@ class ReverseScrollHandler {
     constructor() {
         this.isAnimating = false;
         this.activeTimers = [];
-        this._currentSection = 1;
+        this._currentSection = 1; // Private property to store the actual value
     }
 
     get currentSection() {
@@ -12,14 +12,14 @@ class ReverseScrollHandler {
 
     set currentSection(value) {
         this._currentSection = value;
+        // Also update the global variable to keep them in sync
         if (typeof window !== 'undefined') {
             window._currentSection = value;
         }
     }
-
     setCurrentSection(value) {
-        this.currentSection = value;
-    }
+    this.currentSection = value;
+}
 
     handleReverseScroll(targetSection) {
         if (this.isAnimating) return false;
@@ -29,7 +29,7 @@ class ReverseScrollHandler {
         // Kill all ongoing animations immediately
         this.killAllAnimations();
         
-        // Update navigation dots
+        // Update navigation dots (skip section 2 for dot indexing)
         this.updateNavigationDots(targetSection);
 
         // Stop any running timers
@@ -67,6 +67,7 @@ class ReverseScrollHandler {
     }
 
     killAllAnimations() {
+        // Kill animations for all possible elements
         const allSelectors = [
             '.footer-container', '.section-seventeen-main', '.section-seventeen-content',
             '.section-sixteen-content', '.section-sixteen-title', '.logos-row',
@@ -102,14 +103,6 @@ class ReverseScrollHandler {
                 gsap.killTweensOf(window.planet3D.material);
                 gsap.killTweensOf(window.planet3D.material.color);
             }
-            if (window.planet3D.traverse) {
-                window.planet3D.traverse(function(child) {
-                    if (child instanceof THREE.Mesh && child.material) {
-                        gsap.killTweensOf(child.material);
-                        gsap.killTweensOf(child.material.color);
-                    }
-                });
-            }
         }
 
         if (window.planetBackground) {
@@ -118,19 +111,17 @@ class ReverseScrollHandler {
         }
     }
 
-    updateNavigationDots(activeSection) {
-    document.querySelectorAll('.nav-dot').forEach((dot, index) => {
-        // Skip section 2 in dot indexing since it's transitional
-        let dotSection = activeSection;
-        if (activeSection > 2) dotSection = activeSection - 1;
-        if (activeSection === 1) dotSection = 0;
-        if (activeSection === 2) dotSection = activeSection === 2 ? (goingForward ? 1 : 0) : dotSection;
-        
-        dot.classList.toggle('active', index === dotSection);
-    });
-}
+    updateNavigationDots(targetSection) {
+        document.querySelectorAll('.nav-dot').forEach((dot, index) => {
+            let dotSection = targetSection;
+            if (targetSection > 2) dotSection = targetSection - 1;
+            if (targetSection === 1) dotSection = 0;
+            dot.classList.toggle('active', index === dotSection);
+        });
+    }
 
     stopActiveTimers() {
+        // Stop all known timers
         if (window.wheelInterval) {
             clearInterval(window.wheelInterval);
             window.wheelInterval = null;
@@ -140,10 +131,12 @@ class ReverseScrollHandler {
             window.carouselInterval = null;
         }
         
+        // Clear any stored timers
         this.activeTimers.forEach(timer => clearTimeout(timer));
         this.activeTimers = [];
     }
 
+    // Complete element reset to match initial CSS states
     resetElementToInitialState(selector, initialStyles, useSet = true) {
         const elements = document.querySelectorAll(selector);
         if (elements.length === 0) return;
@@ -157,70 +150,14 @@ class ReverseScrollHandler {
         }
     }
 
-    reset3DModelToState(position, scale, materialProps = null) {
-        if (window.planet3D) {
-            gsap.to(window.planet3D.position, {
-                duration: 1,
-                x: position.x,
-                y: position.y,
-                z: position.z,
-                ease: "power2.inOut"
-            });
-
-            gsap.to(window.planet3D.scale, {
-                duration: 1,
-                x: scale.x,
-                y: scale.y,
-                z: scale.z,
-                ease: "power2.inOut"
-            });
-
-            if (materialProps && window.planet3D.material) {
-                gsap.to(window.planet3D.material.color, {
-                    duration: 0.8,
-                    r: materialProps.color.r,
-                    g: materialProps.color.g,
-                    b: materialProps.color.b
-                });
-                gsap.to(window.planet3D.material, {
-                    duration: 0.8,
-                    emissive: materialProps.emissive
-                });
-            } else if (materialProps && window.planet3D.traverse) {
-                window.planet3D.traverse(function(child) {
-                    if (child instanceof THREE.Mesh && child.material) {
-                        gsap.to(child.material.color, {
-                            duration: 0.8,
-                            r: materialProps.color.r,
-                            g: materialProps.color.g,
-                            b: materialProps.color.b
-                        });
-                        gsap.to(child.material, {
-                            duration: 0.8,
-                            emissive: materialProps.emissive
-                        });
-                    }
-                });
-            }
-
-            if (window.planetBackground) {
-                gsap.to(window.planetBackground.position, {
-                    duration: 1,
-                    x: position.x,
-                    y: position.y,
-                    z: position.z - 8,
-                    ease: "power2.inOut"
-                });
-            }
-        }
-    }
-
     reverseFromFooter() {
+        // Reset footer to initial hidden state
         this.resetElementToInitialState('.footer-container', {
             transform: 'translateY(100%)',
             opacity: 0
         });
 
+        // Show section 17 content in its active state
         gsap.to('.section-seventeen-content', {
             duration: 0.5,
             opacity: 1,
@@ -235,23 +172,28 @@ class ReverseScrollHandler {
             delay: 0.5
         });
 
-        // Reset planet to section 17 state
-        this.reset3DModelToState(
-            { x: 0, y: -2, z: 11 },
-            { x: 0.8, y: 0.8, z: 0.8 },
-            {
-                color: { r: 1, g: 0.5, b: 0 },
-                emissive: new THREE.Color(0x442200)
-            }
-        );
+        // Reset planet position
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1,
+                y: -2,
+                ease: "power2.inOut",
+                delay: 0.3
+            });
 
-        // Ensure correct background
-        gsap.set('#mask3', { opacity: 0.7 });
-        gsap.set('#mask5', { opacity: 0 });
+            if (window.planetBackground) {
+                gsap.to(window.planetBackground.position, {
+                    duration: 1,
+                    y: -2,
+                    ease: "power2.inOut",
+                    delay: 0.3
+                });
+            }
+        }
     }
 
     reverseToSection16() {
-        // Reset section 17 completely
+        // Completely reset section 17 to initial state
         this.resetElementToInitialState('.section-seventeen-content', {
             opacity: 0
         });
@@ -261,37 +203,63 @@ class ReverseScrollHandler {
             transform: 'translateY(100px)'
         });
 
-        // Change backgrounds
+        // Fade out planet overlay
         gsap.to('#mask3', {
             duration: 0.8,
             opacity: 0,
             ease: "power2.inOut"
         });
 
+        // Reset planet to section 16 state
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: 0,
+                y: 8,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            gsap.to(window.planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            // Reset planet color to original
+            if (window.planet3D.material) {
+                gsap.to(window.planet3D.material.color, {
+                    duration: 0.8,
+                    r: 1,
+                    g: 0.27,
+                    b: 0.27
+                });
+                gsap.to(window.planet3D.material, {
+                    duration: 0.8,
+                    emissive: new THREE.Color(0x220000)
+                });
+            }
+        }
+
+        // Show section 16 background and content
         gsap.to('#mask5', {
             duration: 0.8,
             opacity: 1,
             ease: "power2.inOut",
-            delay: 0.5
+            delay: 1
         });
-
-        // Reset planet to section 16 state
-        this.reset3DModelToState(
-            { x: 0, y: 8, z: 0 },
-            { x: 0, y: 0, z: 0 },
-            {
-                color: { r: 1, g: 0.27, b: 0.27 },
-                emissive: new THREE.Color(0x220000)
-            }
-        );
 
         gsap.to('.section-sixteen-content', {
             duration: 0.5,
             opacity: 1,
-            delay: 1
+            delay: 1.2
         });
 
-        // Reset and animate section 16 elements
+        // Reset and animate section 16 elements from initial state
         this.resetElementToInitialState('.section-sixteen-title', {
             opacity: 0,
             transform: 'translateY(-100px)'
@@ -307,7 +275,7 @@ class ReverseScrollHandler {
             y: 0,
             opacity: 1,
             ease: "back.out(1.7)",
-            delay: 1.2
+            delay: 1.4
         });
 
         gsap.to('.logos-row', {
@@ -315,12 +283,12 @@ class ReverseScrollHandler {
             y: 0,
             opacity: 1,
             ease: "back.out(1.7)",
-            delay: 1.4
+            delay: 1.6
         });
     }
 
     reverseToSection15() {
-        // Reset section 16
+        // Reset section 16 completely
         this.resetElementToInitialState('.section-sixteen-content', {
             opacity: 0
         });
@@ -353,7 +321,7 @@ class ReverseScrollHandler {
         window.currentCarouselIndex = 0;
         this.resetCarousel();
         
-        // Reinitialize carousel
+        // Reinitialize carousel after a delay
         const initTimer = setTimeout(() => {
             if (typeof window.initializeCarousel === 'function') {
                 window.initializeCarousel();
@@ -363,12 +331,16 @@ class ReverseScrollHandler {
     }
 
     reverseToSection14() {
+        // Stop carousel if running
         this.stopActiveTimers();
+
+        // Reset section 15 completely
         this.resetElementToInitialState('.section-fifteen-content', {
             opacity: 0
         });
         this.resetCarouselElements();
 
+        // Use tombstone transition effect (reverse)
         const transition = document.querySelector('.tombstone-transition');
         
         this.resetElementToInitialState('.tombstone-transition', {
@@ -376,6 +348,7 @@ class ReverseScrollHandler {
             transform: 'scale(0)'
         });
 
+        // Zoom out transition
         gsap.to(transition, {
             duration: 0.8,
             opacity: 1,
@@ -383,11 +356,13 @@ class ReverseScrollHandler {
             ease: "power2.out",
             delay: 0.5,
             onComplete: () => {
+                // Show section 14 background
                 gsap.to('#mask7', {
                     duration: 0.1,
                     opacity: 1
                 });
                 
+                // Zoom back in
                 gsap.to(transition, {
                     duration: 1,
                     transform: 'scale(0)',
@@ -395,6 +370,7 @@ class ReverseScrollHandler {
                     ease: "power2.in",
                     delay: 0.5,
                     onComplete: () => {
+                        // Reset section 14 elements to initial state
                         this.resetElementToInitialState('.section-fourteen-left', {
                             opacity: 0,
                             transform: 'translateX(-100px)'
@@ -405,6 +381,7 @@ class ReverseScrollHandler {
                             transform: 'translateX(100px)'
                         });
 
+                        // Show section 14 content
                         gsap.to('.section-fourteen-content', {
                             duration: 0.5,
                             opacity: 1
@@ -432,6 +409,7 @@ class ReverseScrollHandler {
     }
 
     reverseToSection13() {
+        // Reset section 14 completely
         this.resetElementToInitialState('.section-fourteen-content', {
             opacity: 0
         });
@@ -446,6 +424,7 @@ class ReverseScrollHandler {
             transform: 'translateX(100px)'
         });
 
+        // Use tombstone transition in reverse
         const transition = document.querySelector('.tombstone-transition');
         
         this.resetElementToInitialState('.tombstone-transition', {
@@ -460,11 +439,13 @@ class ReverseScrollHandler {
             ease: "power2.out",
             delay: 0.5,
             onComplete: () => {
+                // Hide section 14 background
                 gsap.to('#mask7', {
                     duration: 0.1,
                     opacity: 0
                 });
                 
+                // Zoom back in and show section 13
                 gsap.to(transition, {
                     duration: 1,
                     transform: 'scale(0)',
@@ -472,6 +453,7 @@ class ReverseScrollHandler {
                     ease: "power2.in",
                     delay: 0.5,
                     onComplete: () => {
+                        // Reset section 13 elements to initial state
                         this.resetElementToInitialState('.section-thirteen-header', {
                             opacity: 0,
                             transform: 'translateY(100px)'
@@ -513,7 +495,7 @@ class ReverseScrollHandler {
     }
 
     reverseToSection12() {
-        // Reset section 13
+        // Reset section 13 completely
         this.resetElementToInitialState('.section-thirteen-content', {
             opacity: 0
         });
@@ -530,15 +512,7 @@ class ReverseScrollHandler {
             });
         });
 
-        // Show section 12 background
-        gsap.to('#mask5', {
-            duration: 0.8,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.3
-        });
-
-        // Reset section 12 elements
+        // Reset section 12 elements to initial state
         this.resetElementToInitialState('.section-twelve-left', {
             opacity: 0,
             transform: 'translateY(100px)'
@@ -558,6 +532,7 @@ class ReverseScrollHandler {
             transform: 'scale(0)'
         });
 
+        // Show section 12 content
         gsap.to('.section-twelve-content', {
             duration: 0.5,
             opacity: 1,
@@ -598,7 +573,7 @@ class ReverseScrollHandler {
     }
 
     reverseToSection11() {
-        // Reset section 12
+        // Reset section 12 completely
         this.resetElementToInitialState('.section-twelve-content', {
             opacity: 0
         });
@@ -622,7 +597,7 @@ class ReverseScrollHandler {
             transform: 'scale(0)'
         });
 
-        // Change background to section 11
+        // Change background
         gsap.to('#mask5', {
             duration: 0.8,
             opacity: 0,
@@ -637,7 +612,7 @@ class ReverseScrollHandler {
             delay: 0.5
         });
 
-        // Reset section 11 elements
+        // Reset section 11 elements to initial state
         this.resetElementToInitialState('.section-eleven-title', {
             opacity: 0,
             transform: 'translateY(100px)'
@@ -672,7 +647,7 @@ class ReverseScrollHandler {
     }
 
     reverseToSection10() {
-        // Reset section 11
+        // Reset section 11 completely
         this.resetElementToInitialState('.section-eleven-content', {
             opacity: 0
         });
@@ -687,7 +662,7 @@ class ReverseScrollHandler {
             transform: 'translateY(100px)'
         });
 
-        // Change background
+        // Change background back to section 10
         gsap.to('#mask6', {
             duration: 1,
             scale: 2,
@@ -702,13 +677,7 @@ class ReverseScrollHandler {
             delay: 0.8
         });
 
-        // Reset planet to section 10 state
-        this.reset3DModelToState(
-            { x: 0, y: 15, z: 0 },
-            { x: 0, y: 0, z: 0 }
-        );
-
-        // Reset section 10 elements
+        // Reset section 10 elements to initial state
         this.resetElementToInitialState('.testimonial-header', {
             opacity: 0,
             transform: 'translateX(-50%) translateY(100px)'
@@ -719,6 +688,7 @@ class ReverseScrollHandler {
             transform: 'translateX(-50%) translateY(100px)'
         });
 
+        // Show section 10 content
         gsap.to('.section-ten-content', {
             duration: 0.5,
             opacity: 1,
@@ -742,10 +712,31 @@ class ReverseScrollHandler {
             delay: 1.5,
             transform: 'translateX(-50%) translateY(0)'
         });
+
+        // Reset planet position for section 10
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1,
+                x: 0,
+                y: 15,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            gsap.to(window.planet3D.scale, {
+                duration: 1,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+        }
     }
 
     reverseToSection9() {
-        // Reset section 10
+        // Reset section 10 completely
         this.resetElementToInitialState('.section-ten-content', {
             opacity: 0
         });
@@ -760,17 +751,12 @@ class ReverseScrollHandler {
             transform: 'translateX(-50%) translateY(100px)'
         });
 
-        // Reset planet to section 9 state
-        this.reset3DModelToState(
-            { x: 0, y: 3, z: 11 },
-            { x: 0.8, y: 0.8, z: 0.8 }
-        );
-
-        // Reset section 9 elements
+        // Reset section 9 elements to initial state
         this.resetElementToInitialState('.rotating-container', {
             opacity: 0
         });
 
+        // Show section 9 content
         gsap.to('.section-nine-content', {
             duration: 0.5,
             opacity: 1,
@@ -783,7 +769,45 @@ class ReverseScrollHandler {
             delay: 0.8
         });
 
-        // Trigger orbit animations
+        // Move planet back to section 9 position
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1,
+                x: 0,
+                y: 3,
+                z: 11,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            gsap.to(window.planet3D.scale, {
+                duration: 1,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            if (window.planetBackground) {
+                gsap.to(window.planetBackground.position, {
+                    duration: 1,
+                    x: 0,
+                    y: 3,
+                    z: 3,
+                    ease: "power2.inOut",
+                    delay: 0.5
+                });
+
+                gsap.to(window.planetBackground.material, {
+                    duration: 1,
+                    opacity: 0,
+                    delay: 0.5
+                });
+            }
+        }
+
+        // Trigger orbit animations after delay
         const orbitTimer = setTimeout(() => {
             if (typeof window.triggerOrbitAnimations === 'function') {
                 window.triggerOrbitAnimations();
@@ -793,7 +817,7 @@ class ReverseScrollHandler {
     }
 
     reverseToSection8() {
-        // Reset section 9
+        // Reset section 9 completely
         this.resetElementToInitialState('.section-nine-content', {
             opacity: 0
         });
@@ -802,7 +826,18 @@ class ReverseScrollHandler {
             opacity: 0
         });
 
-        // Show section 8 backgrounds
+        // Reset section 8 elements to initial state
+        this.resetElementToInitialState('.ai-tool-header', {
+            opacity: 0,
+            transform: 'translateY(100px)'
+        });
+
+        this.resetElementToInitialState('.input-container', {
+            opacity: 0,
+            transform: 'translate(-50%, -50%) translateY(100px)'
+        });
+
+        // Show section 8 background and content
         gsap.to('#mask4', {
             duration: 0.5,
             opacity: 1,
@@ -821,23 +856,6 @@ class ReverseScrollHandler {
             duration: 0.8,
             opacity: 0,
             ease: "power2.inOut"
-        });
-
-        // Reset planet to section 8 state
-        this.reset3DModelToState(
-            { x: 0, y: -2, z: 11 },
-            { x: 0.8, y: 0.8, z: 0.8 }
-        );
-
-        // Reset section 8 elements
-        this.resetElementToInitialState('.ai-tool-header', {
-            opacity: 0,
-            transform: 'translateY(100px)'
-        });
-
-        this.resetElementToInitialState('.input-container', {
-            opacity: 0,
-            transform: 'translate(-50%, -50%) translateY(100px)'
         });
 
         gsap.to('.section-eight-content', {
@@ -862,10 +880,39 @@ class ReverseScrollHandler {
             delay: 1.2,
             transform: 'translate(-50%, -50%) translateY(0)'
         });
+
+        // Reset planet position
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: 0,
+                y: -2,
+                z: 11,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            if (window.planetBackground) {
+                gsap.to(window.planetBackground.position, {
+                    duration: 1.5,
+                    x: 0,
+                    y: -2,
+                    z: 3,
+                    ease: "power2.inOut",
+                    delay: 0.5
+                });
+
+                gsap.to(window.planetBackground.material, {
+                    duration: 1,
+                    opacity: 0.7,
+                    delay: 0.5
+                });
+            }
+        }
     }
 
     reverseToSection7() {
-        // Reset section 8
+        // Reset section 8 completely
         this.resetElementToInitialState('.section-eight-content', {
             opacity: 0
         });
@@ -880,7 +927,7 @@ class ReverseScrollHandler {
             transform: 'translate(-50%, -50%) translateY(100px)'
         });
 
-        // Hide section 8 backgrounds
+        // Hide section 8 background
         gsap.to('#mask4', {
             duration: 0.5,
             opacity: 0,
@@ -893,13 +940,7 @@ class ReverseScrollHandler {
             ease: "power2.inOut"
         });
 
-        // Reset planet to section 7 state
-        this.reset3DModelToState(
-            { x: 0, y: 15, z: 0 },
-            { x: 0, y: 0, z: 0 }
-        );
-
-        // Reset section 7 elements
+        // Reset section 7 elements to initial state
         this.resetElementToInitialState('.cafe-content', {
             opacity: 0
         });
@@ -908,6 +949,7 @@ class ReverseScrollHandler {
             opacity: 0
         });
 
+        // Show section 7 content
         gsap.to('.section-seven-content', {
             duration: 0.5,
             opacity: 1,
@@ -928,6 +970,27 @@ class ReverseScrollHandler {
             delay: 1.2
         });
 
+        // Reset planet position
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: 0,
+                y: 15,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            gsap.to(window.planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+        }
+
         // Restart wheel timer
         const wheelTimer = setTimeout(() => {
             if (typeof window.startWheelTimer === 'function') {
@@ -938,9 +1001,10 @@ class ReverseScrollHandler {
     }
 
     reverseToSection6() {
+        // Stop wheel timer
         this.stopActiveTimers();
 
-        // Reset section 7
+        // Reset section 7 completely
         this.resetElementToInitialState('.section-seven-content', {
             opacity: 0
         });
@@ -953,13 +1017,7 @@ class ReverseScrollHandler {
             opacity: 0
         });
 
-        // Reset planet to section 6 state
-        this.reset3DModelToState(
-            { x: -10, y: 8, z: 0 },
-            { x: 0, y: 0, z: 0 }
-        );
-
-        // Reset section 6 elements
+        // Reset section 6 elements to initial state
         document.querySelectorAll('.category-item').forEach((item) => {
             gsap.set(item, {
                 opacity: 0,
@@ -967,6 +1025,7 @@ class ReverseScrollHandler {
             });
         });
 
+        // Show section 6 content
         gsap.to('.section-six-content', {
             duration: 0.5,
             opacity: 1,
@@ -982,10 +1041,31 @@ class ReverseScrollHandler {
                 delay: 0.8 + (index * 0.1)
             });
         });
+
+        // Reset planet position for section 6
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: -10,
+                y: 8,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.3
+            });
+
+            gsap.to(window.planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.3
+            });
+        }
     }
 
     reverseToSection5() {
-        // Reset section 6
+        // Reset section 6 completely
         this.resetElementToInitialState('.section-six-content', {
             opacity: 0
         });
@@ -997,33 +1077,30 @@ class ReverseScrollHandler {
             });
         });
 
-        // Show section 5 background
-        gsap.to('#mask4', {
-            duration: 1,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.3
-        });
-
-        // Reset planet to section 5 state
-        this.reset3DModelToState(
-            { x: -6, y: 3, z: 11 },
-            { x: 0.8, y: 0.8, z: 0.8 }
-        );
-
         // Reset section 5 elements to their original state
         this.resetElementToInitialState('.bottom-content', {
-            opacity: 1,
-            top: '50%',
-            transform: 'translateX(-50%) translateY(0)'
-        });
-
-        this.resetElementToInitialState('.bottom-description', {
-            opacity: 1
+            opacity: 0.3,
+            transform: 'translateX(-50%) translateY(100px)'
         });
 
         this.resetElementToInitialState('.section-five-button', {
             opacity: 0
+        });
+
+        // Show section 5 content
+        gsap.to('.bottom-content', {
+            duration: 0.8,
+            top: '50%',
+            opacity: 1,
+            ease: "power2.out",
+            delay: 0.5,
+            transform: 'translateX(-50%) translateY(0)'
+        });
+
+        gsap.to('.bottom-description', {
+            duration: 0.5,
+            opacity: 1,
+            delay: 0.8
         });
 
         gsap.to('.section-five-button', {
@@ -1032,6 +1109,27 @@ class ReverseScrollHandler {
             ease: "back.out(1.7)",
             delay: 1
         });
+
+        // Reset planet position
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: -6,
+                y: 3,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.3
+            });
+
+            gsap.to(window.planet3D.scale, {
+                duration: 1.5,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                ease: "power2.inOut",
+                delay: 0.3
+            });
+        }
     }
 
     reverseToSection4() {
@@ -1040,27 +1138,7 @@ class ReverseScrollHandler {
             opacity: 0
         });
 
-        // Change backgrounds
-        gsap.to('#mask4', {
-            duration: 1,
-            opacity: 0,
-            ease: "power2.inOut"
-        });
-
-        gsap.to('#mask2', {
-            duration: 1,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.3
-        });
-
-        // Reset planet to section 4 state
-        this.reset3DModelToState(
-            { x: 0, y: 3, z: 11 },
-            { x: 0.8, y: 0.8, z: 0.8 }
-        );
-
-        // Reset section 4 elements
+        // Reset section 4 elements to their original states
         this.resetElementToInitialState('.section-four-title', {
             opacity: 0,
             transform: 'translateY(100px)'
@@ -1071,6 +1149,7 @@ class ReverseScrollHandler {
             transform: 'translateY(100px)'
         });
 
+        // Show section 4 content
         gsap.to('.section-four-content', {
             duration: 0.5,
             opacity: 1,
@@ -1098,7 +1177,8 @@ class ReverseScrollHandler {
             top: '5%',
             opacity: 0.3,
             ease: "power2.inOut",
-            delay: 0.5
+            delay: 0.5,
+            transform: 'translateX(-50%) translateY(0)'
         });
 
         gsap.to('.bottom-description', {
@@ -1106,10 +1186,44 @@ class ReverseScrollHandler {
             opacity: 0.3,
             delay: 0.8
         });
+
+        // Show section 4 background
+        gsap.to('#mask2', {
+            duration: 1,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.3
+        });
+
+        gsap.to('#mask4', {
+            duration: 1,
+            opacity: 0,
+            ease: "power2.inOut"
+        });
+
+        // Reset planet position
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: 0,
+                y: 3,
+                z: 11,
+                ease: "power2.inOut",
+                delay: 0.3
+            });
+
+            if (window.planetBackground) {
+                gsap.to(window.planetBackground.material, {
+                    duration: 1,
+                    opacity: 0,
+                    delay: 0.5
+                });
+            }
+        }
     }
 
     reverseToSection3() {
-        // Reset section 4
+        // Reset section 4 completely
         this.resetElementToInitialState('.section-four-content', {
             opacity: 0
         });
@@ -1124,29 +1238,7 @@ class ReverseScrollHandler {
             transform: 'translateY(100px)'
         });
 
-        // Change backgrounds
-        gsap.to('#mask3', {
-            duration: 1,
-            y: 0,
-            opacity: 1,
-            ease: "power2.inOut",
-            delay: 0.3
-        });
-
-        gsap.to('#mask2', {
-            duration: 1,
-            y: -100,
-            ease: "power2.inOut",
-            delay: 0.5
-        });
-
-        // Reset planet to section 3 state
-        this.reset3DModelToState(
-            { x: 0, y: -2, z: 11 },
-            { x: 0.8, y: 0.8, z: 0.8 }
-        );
-
-        // Reset section 3 elements
+        // Reset section 3 elements to initial states
         this.resetElementToInitialState('.section-three-title', {
             opacity: 0,
             transform: 'translateY(100px)'
@@ -1162,6 +1254,22 @@ class ReverseScrollHandler {
             transform: 'translateY(100px)'
         });
 
+        // Show section 3 background and overlays
+        gsap.to('#mask3', {
+            duration: 1,
+            y: 0,
+            opacity: 1,
+            ease: "power2.inOut",
+            delay: 0.3
+        });
+
+        gsap.to('#mask2', {
+            duration: 1,
+            y: -100,
+            ease: "power2.inOut",
+            delay: 0.5
+        });
+
         gsap.to('.section-three-overlays', {
             duration: 0.5,
             opacity: 1,
@@ -1169,6 +1277,7 @@ class ReverseScrollHandler {
             delay: 0.8
         });
 
+        // Show section 3 content
         gsap.to('.section-three-content', {
             duration: 0.5,
             opacity: 1,
@@ -1199,6 +1308,36 @@ class ReverseScrollHandler {
             delay: 1.6
         });
 
+        // Reset planet position
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: 0,
+                y: -2,
+                z: 11,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            if (window.planetBackground) {
+                gsap.to(window.planetBackground.position, {
+                    duration: 1.5,
+                    x: 0,
+                    y: -2,
+                    z: 3,
+                    ease: "power2.inOut",
+                    delay: 0.5
+                });
+
+                gsap.to(window.planetBackground.material, {
+                    duration: 1,
+                    opacity: 0.7,
+                    delay: 0.5
+                });
+            }
+        }
+
+        // Show navigation
         gsap.to('.nav-frame', {
             duration: 1,
             opacity: 1,
@@ -1207,7 +1346,7 @@ class ReverseScrollHandler {
     }
 
     reverseToSection2() {
-        // Reset section 3
+        // Reset section 3 completely
         this.resetElementToInitialState('.section-three-content', {
             opacity: 0
         });
@@ -1238,7 +1377,7 @@ class ReverseScrollHandler {
             ease: "power2.in"
         });
 
-        // Change backgrounds
+        // Change backgrounds back to section 2
         gsap.to('#mask1', {
             duration: 0.8,
             opacity: 1,
@@ -1258,13 +1397,7 @@ class ReverseScrollHandler {
             ease: "power2.inOut"
         });
 
-        // Reset planet to section 2 state
-        this.reset3DModelToState(
-            { x: 0, y: 0, z: 0 },
-            { x: 0.8, y: 0.8, z: 0.8 }
-        );
-
-        // Show section 2 elements
+        // Show section 2 elements (tombstones and logo)
         gsap.to('.header-logo', {
             duration: 0.8,
             top: '50%',
@@ -1282,12 +1415,30 @@ class ReverseScrollHandler {
             delay: 1
         });
 
-        this.currentSection = 2;
-    window.currentSection = 2;
-        setTimeout(() => {
-        if (targetSection === 2) {
-            this.reverseToSection1();
+        // Reset planet position for section 2
+        if (window.planet3D) {
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            gsap.to(window.planet3D.scale, {
+                duration: 1.5,
+                x: 0.8,
+                y: 0.8,
+                z: 0.8,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
         }
+        
+        setTimeout(() => {
+            
+            this.reverseToSection1();
         // If you need to go to other sections, add them here
     }, 1000);
     }
@@ -1312,7 +1463,7 @@ class ReverseScrollHandler {
             delay: 0.3
         });
 
-        // Reset section 1 elements
+        // Reset section 1 elements to proper initial state
         this.resetElementToInitialState('.main-title', {
             opacity: 0,
             transform: 'translateY(100px)'
@@ -1323,6 +1474,7 @@ class ReverseScrollHandler {
             transform: 'translateY(100px)'
         });
 
+        // Show section 1 content
         gsap.to(['.main-title', '.subtitle'], {
             duration: 0.8,
             opacity: 1,
@@ -1338,13 +1490,29 @@ class ReverseScrollHandler {
         });
 
         // Reset planet completely
-        this.reset3DModelToState(
-            { x: 0, y: 0, z: 0 },
-            { x: 0, y: 0, z: 0 }
-        );
+        if (window.planet3D) {
+            gsap.to(window.planet3D.scale, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+
+            gsap.to(window.planet3D.position, {
+                duration: 1.5,
+                x: 0,
+                y: 0,
+                z: 0,
+                ease: "power2.inOut",
+                delay: 0.5
+            });
+        }
     }
 
     resetCarousel() {
+        // Reset carousel to first item with proper states
         document.querySelectorAll('.carousel-item').forEach((item, index) => {
             item.classList.toggle('active', index === 0);
         });
@@ -1358,10 +1526,12 @@ class ReverseScrollHandler {
             container.style.transform = 'translateX(0)';
         }
 
+        // Reset carousel index
         window.currentCarouselIndex = 0;
     }
 
     resetCarouselElements() {
+        // Reset all carousel elements to hidden state
         this.resetElementToInitialState('.text-carousel', {
             opacity: 0
         });
@@ -1374,6 +1544,7 @@ class ReverseScrollHandler {
             opacity: 0
         });
         
+        // Reset active states
         document.querySelectorAll('.carousel-item').forEach(item => {
             item.classList.remove('active');
         });
@@ -1381,16 +1552,17 @@ class ReverseScrollHandler {
             bg.classList.remove('active');
         });
 
+        // Reset carousel index
         window.currentCarouselIndex = 0;
     }
 }
 
-// Initialize and export
+// Initialize and export - Use singleton pattern
 if (!window.reverseScrollHandler) {
     window.reverseScrollHandler = new ReverseScrollHandler();
 }
 
-// Update the main script's currentSection reference
+// Also update the main script's currentSection reference
 Object.defineProperty(window, 'currentSection', {
     get: function() {
         return window.reverseScrollHandler ? window.reverseScrollHandler.currentSection : window._currentSection || 1;
