@@ -816,11 +816,6 @@ function startSection3() {
             y: -2,
             ease: "power2.inOut"
         });
-        // gsap.to(planet3D.scale, {
-        //     duration: 1.5,
-        //     x:0.77,
-        //     ease: "power2.inOut"
-        // });
 
         if (planetBackground) {
             gsap.to(planetBackground.position, {
@@ -1048,6 +1043,14 @@ function startSection5() {
         gsap.to(planet3D.position, {
             duration: 1.5,
             x: -6,
+            ease: "power2.inOut"
+        });
+        
+        gsap.to(planet3D.scale, {
+            duration: 1.5,
+            x: 1,
+            y: 1,
+            z: 1,
             ease: "power2.inOut"
         });
     }
