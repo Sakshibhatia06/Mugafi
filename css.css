@@ -2250,13 +2250,14 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     
     .testimonial-controls {
         position: absolute;
-        bottom: 5%;
+        bottom: -400%;
         left: 50%;
         transform: translateX(-50%);
         justify-content: center;
     }
     
-    .cards-container {
+    .cards-container { 
+        position: absolute;
         bottom: 15%;
         width: 95vw;
     }
@@ -2270,7 +2271,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     }
     
     .rolling-image {
-        display: none; /* Hide on mobile or move to right */
+        display: inline;
+        width: 80%;
     }
     
     .section-twelve-right {
@@ -2285,12 +2287,14 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     .icons-grid {
         justify-items: center;
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
+    }
+    .icons-grid .grid-icon {
+        width: 130px;
     }
     
     /* Section 14 Mobile Adjustments */
     .section-fourteen-left {
-        top: 10%;
+        top: 20%;
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
@@ -2299,7 +2303,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     
     .section-fourteen-right {
         top: auto;
-        bottom: 10%;
+        bottom: 20%;
         right: auto;
         left: 50%;
         transform: translateX(-50%);

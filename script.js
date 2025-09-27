@@ -1311,8 +1311,8 @@ function triggerMobileOrbitAnimations() {
         document.querySelector('.orbit-container.three')
     ];
     
-    const rotations = [180, 180, 180];
-    const finalRotations = [220, 180, 140];
+    const showRotation = 180; // All divs show at 180 degrees
+    const finalRotations = [220, 1401,180 ];
     
     orbitContainers.forEach((orbit, index) => {
         if (orbit) {
@@ -1321,10 +1321,10 @@ function triggerMobileOrbitAnimations() {
             orbit.offsetHeight;
             
             setTimeout(() => {
-                // First rotation
+                // Show div by rotating to 180 degrees
                 gsap.to(orbit, {
                     duration: 1,
-                    rotation: rotations[index],
+                    rotation: showRotation,
                     ease: "power2.inOut",
                     onComplete: () => {
                         // Wait 3 seconds then move to final position
@@ -1343,20 +1343,20 @@ function triggerMobileOrbitAnimations() {
                 if (featureOrbit) {
                     gsap.to(featureOrbit, {
                         duration: 1,
-                        rotation: -rotations[index],
+                        rotation: -finalRotations[index],
                         ease: "power2.inOut",
                         onComplete: () => {
                             setTimeout(() => {
                                 gsap.to(featureOrbit, {
                                     duration: 1,
-                                    rotation: -finalRotations[index],
+                                    rotation: -180,
                                     ease: "power2.inOut"
                                 });
                             }, 3000);
                         }
                     });
                 }
-            }, index * 1000); // 1 second gap between transitions
+            }, index * 4000); // 4 second gap between each div's sequence
         }
     });
 }
