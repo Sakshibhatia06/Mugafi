@@ -544,6 +544,7 @@ class ReverseScrollHandler {
         gsap.to('.section-twelve-content', {
             duration: 0.5,
             opacity: 1,
+            y: 0,
             delay: 0.5
         });
 
@@ -634,6 +635,7 @@ class ReverseScrollHandler {
         gsap.to('.section-eleven-content', {
             duration: 0.5,
             opacity: 1,
+            y: 0,
             delay: 1
         });
 
@@ -718,7 +720,7 @@ class ReverseScrollHandler {
     gsap.to('.cards-container', {
         duration: 1,
         y: 0,
-        x: 0,
+        x: -0.1*window.innerWidth,
         opacity: 1,
         ease: "power2.out",
         delay: 1.5
@@ -983,6 +985,7 @@ class ReverseScrollHandler {
         gsap.to('.section-seven-content', {
             duration: 0.5,
             opacity: 1,
+            y: 0*window.innerHeight,
             delay: 0.8
         });
 
@@ -1058,6 +1061,7 @@ class ReverseScrollHandler {
         // Show section 6 content
         gsap.to('.section-six-content', {
             duration: 0.5,
+            x:0,
             opacity: 1,
             delay: 0.5
         });
@@ -1141,24 +1145,30 @@ class ReverseScrollHandler {
         });
 
         // Reset planet position
-        if (window.planet3D) {
-            gsap.to(window.planet3D.position, {
-                duration: 1.5,
-                x: -6,
-                y: 3,
-                z: 0,
-                ease: "power2.inOut",
-                delay: 0.3
-            });
-
-            gsap.to(window.planet3D.scale, {
-                duration: 1.5,
-                x: 0.8,
-                y: 0.8,
-                z: 0.8,
-                ease: "power2.inOut",
-                delay: 0.3
-            });
+        if (planet3D) {
+        if (isMobile() && planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            x: -3,
+            ease: "power2.inOut"
+        });
+    } else if (planet3D) {
+        gsap.to(planet3D.position, {
+            duration: 1.5,
+            x: -6,
+            y: 3,
+            z: 11,
+            ease: "power2.inOut"
+        });
+    }
+        
+        gsap.to(planet3D.scale, {
+            duration: 1.5,
+            x: 1,
+            y: 1,
+            z: 1,
+            ease: "power2.inOut"
+        });
         }
     }
 
@@ -1205,7 +1215,7 @@ class ReverseScrollHandler {
         gsap.to('.bottom-content', {
             duration: 0.8,
             top: '5%',
-            opacity: 0.3,
+            opacity: 0,
             ease: "power2.inOut",
             delay: 0.5,
             transform: 'translateX(-50%) translateY(0)'
@@ -1213,7 +1223,7 @@ class ReverseScrollHandler {
 
         gsap.to('.bottom-description', {
             duration: 0.5,
-            opacity: 0.3,
+            opacity: 0,
             delay: 0.8
         });
 
