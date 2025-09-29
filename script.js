@@ -1345,7 +1345,6 @@ window.triggerMobileOrbitAnimations = function () {
         }
     });
 }
-
 function startSection9() {
     gsap.to('#mask4', {
         duration: 0.5,

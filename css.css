@@ -3,6 +3,10 @@
             padding: 0;
             box-sizing: border-box;
         }
+        a{
+            text-decoration: none;
+            color:white;
+        }
 
         body {
             font-family: 'Arial', sans-serif;
@@ -245,7 +249,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 60px;
-    padding: 60px 80px 40px;
+    padding: 10px 40px 10px;
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -320,7 +324,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
 .footer-bottom {
     border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 30px 80px;
+    padding: 5px 80px;
 }
 
 .footer-bottom-content {
@@ -434,7 +438,6 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             left: 0;
             width: 100vw;
             height: 100vh;
-            pointer-events: none;
             z-index: 100;
         }
 
@@ -528,7 +531,6 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     );
     z-index: 1000;
     opacity: 0;
-    pointer-events: none;
     transform: scale(0);
     transform-origin: center;
     transition: none; /* We'll control this with GSAP */
@@ -606,7 +608,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         /* Section Four Elements */
         .section-four-content {
             position: absolute;
-            top: 30%;
+            top: 20%;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
@@ -646,7 +648,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
         .bottom-content {
             position: absolute;
-            bottom: 5%;
+            bottom: -5%;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
@@ -707,7 +709,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             border-left: 20px solid transparent;
             border-right: 20px solid transparent;
             border-bottom: 35px solid;
-            border-image: radial-gradient(circle, #ff0000, #000000) 1;
+            border-image: radial-gradient(circle, #ff0000, #000000);
             background: radial-gradient(circle, #ff0000, #000000);
             clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
         }
@@ -889,15 +891,15 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
         .input-container {
             position: absolute;
-            top: 50%;
+            top: 70%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 600px;
             max-width: 90vw;
-            background: #000;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: #0f0936;
+            border: 2px solid rgba(255, 189, 189, 0.3);
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 165, 0, 0.3);
+            box-shadow: 10px 10px 20px rgba(122, 25, 1, 0.7);
             padding: 20px;
             opacity: 0;
             transform: translate(-50%, -50%) translateY(100px);
@@ -945,7 +947,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             left: 0;
             border-radius: 10px;
             padding: 2px;
-            background: linear-gradient(45deg, transparent, transparent, white);
+            background: linear-gradient(-19deg, transparent, transparent, white);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: exclude;
             mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -1033,8 +1035,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
         .testimonial-header {
             position: absolute;
-            top: 15%;
-            left: 600px;
+            top: 20%;
+            left: 500px;
             /* transform: translateX(-50%); */
             /* text-align: center; */
             opacity: 0;
@@ -1053,6 +1055,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     gap: 20px;
     justify-content: right;
     margin-bottom: 30px;
+    top:-110px;
+    left:240px;
     position: relative;
     z-index: 600;
 }
@@ -1087,7 +1091,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 }
         .cards-container {
     position: absolute;
-    bottom: -40%;
+    top:40%;
     left: 50%;
     transform: translateX(-50%);
     width: 90vw;
@@ -1099,6 +1103,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 }
 
         .cards-slider {
+            padding-top:30px;
             display: flex;
             gap: 30px;
             transition: transform 0.5s ease;
@@ -1122,9 +1127,9 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     transform: translateY(-5px);
 }
 
-        .card-image {
+        .card-image img {
             width: 150px;
-            height: 80px;
+            height: 100px;
             background: #333;
             border-radius: 10px;
             margin-bottom: 15px;
@@ -1482,6 +1487,16 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         margin: 0 calc((100vw - 500px) / 2);
         position: relative;
     }
+    .carousel-item.active::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 0;
+    width: 100px;
+    height: 3px;
+    background: red;
+    opacity: 1;
+}
 
     .carousel-item::before {
         width: 200px;
@@ -1504,7 +1519,6 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     bottom: 0;
     width: 100vw;
     margin: 20px;
-    pointer-events: none;
     opacity: 0;
     z-index: 200;
     background-image: url('./assets/Rectangle 8305.png');
@@ -1549,7 +1563,6 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     right: 20px;
     bottom: 20px;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    pointer-events: none;
 }
 
 .nav-links-container {
@@ -1662,6 +1675,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
         /* Responsive */
         @media (max-width: 768px) {
+            .testimonial-title {
+    margin-top: 35px;}
             .logo { width: 60px; }
             .semicircle { width: 120px; height: 60px; border-radius: 60px 60px 0 0; }
             .header-logo { width: 40px; top: 20px; }
@@ -1674,7 +1689,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             .nav-corner { right: 240px; }
             .nav-indicators { right: 280px; }
             .input-container { width: 350px; }
-            .slider { width: 200px; height: 200px; }
+            .slider { width: 250px; height: 250px; }
             .slider span { transform: rotateY(calc(var(--i) * 72deg)) translateZ(250px); }
             .cafe-image { width: 200px; }
             .cafe-title { font-size: clamp(1.5rem, 3vw, 2rem); }
@@ -1691,6 +1706,9 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     .logo-item {
         width: 80px;
     }
+    .section-twelve-content {
+    top: -60px !important;
+}
     
     .section-seventeen-buttons {
         flex-direction: column;
@@ -1714,7 +1732,6 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    pointer-events: none;
 }
 .section-three-overlays {
     position: absolute;
@@ -1866,7 +1883,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 }
 .rotating-container {
     position: absolute;
-    top: -62%;
+    top: -88%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 1900px;
@@ -1877,15 +1894,16 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 .orbit-container {
     width: 100%;
     height: 100%;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(251, 1, 1, 1);
     border-radius: 50%;
+    top:-90px;
     position: absolute;
     transform-origin: center;
 }
 
 .feature-orbit {
     position: relative;
-    top: -50px;
+    top: -140px;
     left: 50%;
     transform: translateX(-50%);
     width: 300px;
@@ -1896,7 +1914,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 .feature-circle-orbit {
     width: 80px;
     height: 80px;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(253, 0, 0, 1);
     border: 2px solid white;
     border-radius: 50%;
     display: flex;
@@ -1928,7 +1946,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
 @keyframes rotate-orbit-one {
     from { transform: rotate(0deg); }
-    to { transform: rotate(220deg); }
+    to { transform: rotate(210deg); }
 }
 
 @keyframes rotate-orbit-two {
@@ -1938,14 +1956,14 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
 @keyframes rotate-orbit-three {
     from { transform: rotate(0deg); }
-    to { transform: rotate(140deg); }
+    to { transform: rotate(150deg); }
 }
 @keyframes counter-rotate-one {
     from { 
         transform: translateX(-50%) rotate(0deg); 
     }
     to { 
-        transform: translateX(-50%) rotate(-220deg); 
+        transform: translateX(-50%) rotate(-210deg); 
     }
 }
 
@@ -1963,7 +1981,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         transform: translateX(-50%) rotate(0deg); 
     }
     to { 
-        transform: translateX(-50%) rotate(-140deg); 
+        transform: translateX(-50%) rotate(-150deg); 
     }
 }
 
@@ -2233,6 +2251,10 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         bottom:-20%; 
     }
     
+.section-seven-content {
+    top: 89px !important;
+}
+    
     .wheel-controls {
         bottom: 2%;
         right: auto;
@@ -2251,17 +2273,20 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     
     .testimonial-controls {
         position: absolute;
-        bottom: -400%;
-        left: 50%;
+        bottom: -200%;
+        left: 70%;
         transform: translateX(-50%);
         justify-content: center;
     }
     
     .cards-container { 
         position: absolute;
-        bottom: 15%;
+        top:34%;
         width: 95vw;
     }
+    .testimonial-card {
+    min-width: 350px !important;
+}
     
     /* Section 12 Mobile Adjustments */
     .section-twelve-left {
@@ -2275,19 +2300,18 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         width: 100%;
         max-width: 100%;
         text-align: center;
-        font-size: 24px; /* Specific mobile size */
-        padding: 0 20px;
+        font-size: 28px; /* Specific mobile size */
         margin-bottom: 15px;
     }
     
     .rolling-image {
         display: inline;
-        width: 80%;
+        width: 100%;
     }
     
     .section-twelve-right {
         top: auto;
-        bottom: 10%;
+        bottom: 1%;
         right: auto;
         left: 50%;
         transform: translateX(-50%);
