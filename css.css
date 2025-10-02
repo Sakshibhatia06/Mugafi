@@ -1,53 +1,13 @@
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        a{
-            text-decoration: none;
-            color:white;
-        }
-
-        body {
-            font-family: 'Arial', sans-serif;
-            background: #000;
-            color: white;
-            overflow-x: hidden;
-            overflow-y: hidden;
-        }
-        @font-face {
-    font-family: 'slussen-trial';
-    src: url('./fonts/Slussen-Condensed-Regular-TRIAL.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'slussen-stencil-trial';
-    src: url('./fonts/Slussen-Stencil-Regular-TRIAL.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'slussen-mono-trial';
-    src: url('./fonts/Slussen-Mono-Regular.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
-}
-
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'slussen-trial', 'slussen-stencil-trial', 'slussen-mono-trial', Arial, sans-serif;
+     font-family: "Roboto", sans-serif;
 }
 
 body {
-    font-family: 'slussen-trial', 'slussen-stencil-trial', 'slussen-mono-trial', Arial, sans-serif;
+     font-family: "Roboto", sans-serif;
     background: #151515;
     color: white;
     overflow-x: hidden;
@@ -56,7 +16,7 @@ body {
 
 /* Apply to all text elements specifically */
 h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
-    font-family: 'slussen-trial', 'slussen-stencil-trial', 'slussen-mono-trial', Arial, sans-serif;
+     font-family: "Roboto", sans-serif;
 }
 
 
@@ -86,14 +46,14 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
         .logo-container {
             position: relative;
-            margin-bottom: 40px;
+            margin-bottom: 50px;
         }
+        
 
         .semicircle {
             width: 150px;
             height: 75px;
             border: 1px solid #ffffff3f;
-            border-bottom: none;
             border-radius: 75px 75px 0 0;
             position: absolute;
             top: 50%;
@@ -402,8 +362,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
         .progress-line {
             width: 150px;
-            height: 2px;
-            background: rgba(255, 255, 255, 0.2);
+            height: 1px;
+            background: rgba(104, 102, 102, 0.2);
             border-radius: 2px;
             overflow: hidden;
         }
@@ -411,8 +371,8 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         .progress-fill {
             width: 0%;
             height: 100%;
-            background: linear-gradient(90deg, #ff0080, #00ffff);
-            border-radius: 2px;
+            background: linear-gradient(90deg,rgb(155, 155, 155));
+            border-radius: 1px;
         }
 
         .loading-info {
@@ -431,7 +391,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             color: #ffffff;
         }
 
-        /* UI Overlays */
+
         .ui-overlay {
             position: fixed;
             top: 0;
@@ -440,10 +400,12 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             height: 100vh;
             z-index: 100;
         }
-
-        .ui-overlay > * {
-            pointer-events: auto;
-        }
+.ui-overlay {
+    pointer-events: none;
+}
+.ui-overlay * {
+    pointer-events: auto;  /* andar ke sab elements clickable */
+}
 
         /* Section One Elements */
         .header-logo {
@@ -2352,3 +2314,35 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         }
 
 }
+.ved-button,
+.contact-button,
+.explore-button,
+.chat-button,
+.explore-ips-button,
+.brainstorm-button {
+    position: relative !important;
+    z-index: 9999 !important;   /* sabse upar */
+    pointer-events: auto !important;
+}
+
+/* links bhi upar honi chahiye */
+a {
+    position: relative;
+    z-index: 9999;
+    pointer-events: auto !important;
+}
+.gallery-link {
+    position: relative !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    display: inline-block; /* spacing & layout ke liye */
+}
+
+/* overlays ko pass-through bana do */
+.tombstone-transition,
+.background-mask,
+.ui-overlay,
+.nav-frame {
+    pointer-events: none !important;
+}
+
