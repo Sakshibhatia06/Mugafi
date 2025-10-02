@@ -407,6 +407,416 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     pointer-events: auto;  /* andar ke sab elements clickable */
 }
 
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+     font-family: "Roboto", sans-serif;
+}
+
+body {
+     font-family: "Roboto", sans-serif;
+    background: #151515;
+    color: white;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+/* Apply to all text elements specifically */
+h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
+     font-family: "Roboto", sans-serif;
+}
+
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        /* Loading Section */
+        .loading-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #000;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 50px;
+        }
+        
+
+        .semicircle {
+            width: 150px;
+            height: 75px;
+            border: 1px solid #ffffff3f;
+            border-radius: 75px 75px 0 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 1s ease-in-out;
+        }
+
+        /* Section Sixteen Elements */
+.section-sixteen-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    opacity: 0;
+}
+
+.section-sixteen-title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    max-width: 800px;
+    line-height: 1.2;
+    opacity: 0;
+    transform: translateY(-100px);
+}
+
+.logos-row {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(-100px);
+}
+
+.logo-item {
+    width: 120px;
+    height: auto;
+    transition: transform 0.3s ease;
+}
+
+.logo-item:hover {
+    transform: scale(1.1);
+}
+
+/* Section Seventeen Elements */
+.section-seventeen-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+}
+
+.section-seventeen-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 30px;
+    max-width: 800px;
+    padding: 0 20px;
+    opacity: 0;
+    transform: translateY(100px);
+}
+
+.section-seventeen-title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: bold;
+    color: white;
+    line-height: 1.2;
+}
+
+.section-seventeen-description {
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+.section-seventeen-buttons {
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.ved-button, .contact-button {
+    padding: 15px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.ved-button {
+    background: transparent;
+    border: 2px solid #00ffff;
+    color: #ffffff;
+}
+
+.ved-button:hover {
+    background: rgba(0, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.contact-button {
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.contact-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.05);
+}
+
+/* Footer Styles */
+.footer-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    opacity: 0;
+    transform: translateY(100%);
+    z-index: 300;
+    pointer-events: auto;
+}
+
+.professional-footer {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(20, 20, 30, 0.95) 100%);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 60px;
+    padding: 10px 40px 10px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.footer-logo-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.footer-logo {
+    width: 80px;
+    height: auto;
+}
+
+.footer-tagline {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.4;
+}
+
+.footer-links-section h4,
+.social-links h4 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.footer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-nav a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer-nav a:hover {
+    color: white;
+}
+
+.social-icons {
+    display: flex;
+    gap: 16px;
+}
+
+.social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s ease;
+}
+
+.social-icons a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 5px 80px;
+}
+
+.footer-bottom-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-legal {
+    display: flex;
+    gap: 30px;
+}
+
+.footer-legal a {
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-legal a:hover {
+    color: white;
+}
+
+@media (max-width: 1024px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding: 40px 40px 30px;
+        text-align: center;
+    }
+    
+    .footer-nav {
+        align-items: center;
+    }
+    
+    .footer-bottom-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .footer-legal {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-content {
+        padding: 30px 20px;
+    }
+    
+    .footer-bottom {
+        padding: 20px;
+    }
+    
+    .footer-legal {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+        .logo {
+            width: 60px;
+            height: auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .progress-container {
+            margin-bottom: 15px;
+        }
+
+        .progress-line {
+            width: 150px;
+            height: 1px;
+            background: rgba(104, 102, 102, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg,rgb(155, 155, 155));
+            border-radius: 1px;
+        }
+
+        .loading-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+        }
+
+        .loading-text {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .loading-percentage {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+
+        .ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 100;
+        }
+.ui-overlay {
+    pointer-events: none;
+}
+.ui-overlay * {
+    pointer-events: auto;  /* andar ke sab elements clickable */
+}
+
+
         /* Section One Elements */
         .header-logo {
             position: absolute;
@@ -472,7 +882,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 150px;
+            width: 250px;
             height: auto;
             opacity: 0;
             z-index: 5;
@@ -691,7 +1101,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         /* Section Seven Elements */
         .section-seven-content {
             position: absolute;
-            top: 0;
+            top: 10%;
             left: 0;
             width: 100vw;
             height: 100vh;
@@ -699,12 +1109,13 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         }
 
         .image-wheel-container {
+            margin-top:50px;
     position: absolute;
-    top: 40%; 
+    top: 50%; 
     left: 20%;
-    transform: translate(-50%, -50%) rotateZ(20deg);
-    width: 300px;
-    height: 300px;
+    transform: translate(-50%, -50%) rotateZ(10deg);
+    width: 400px;
+    height: 400px;
     perspective: 1500px;
     overflow: visible;
     z-index: 5; 
@@ -725,16 +1136,18 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     height: 100%;
     transform-origin: center;
     transform-style: preserve-3d;
-    transform: rotateY(calc(var(--i) * 72deg)) translateZ(450px); /* Reduced from 400px */
+    transform: rotateY(calc(var(--i) * 72deg)) translateZ(350px); /* Reduced from 400px */
+    border-radius: 30px;
+     overflow: hidden;   
 }
 
         .slider span img {
             position: absolute;
             top: 0;
-            left: 0;
+            left: 0%;
             width: 100%;
             height: 100%;
-            border-radius: 30px;
+            border-radius: inherit; 
             object-fit: cover;
             transform: scale(0.8); /* Scale down non-active images */
     transition: transform 0.3s ease;
@@ -793,7 +1206,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     gap: 20px;
     opacity: 0;
     z-index: 15; /* Higher z-index */
-    pointer-events: auto; /* Ensure clickable */
+pointer-events: none; /* Ensure clickable */
 }
 
 .wheel-arrow {
@@ -801,7 +1214,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     height: 50px;
     cursor: pointer;
     transition: transform 0.3s ease;
-    pointer-events: auto; /* Ensure clickable */
+    pointer-events: none; /* Ensure clickable */
     z-index: 20;
 }
 
@@ -853,15 +1266,20 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 
         .input-container {
             position: absolute;
-            top: 70%;
+            top: 68%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 600px;
             max-width: 90vw;
-            background: #0f0936;
+            background: #000009;
             border: 2px solid rgba(255, 189, 189, 0.3);
             border-radius: 10px;
-            box-shadow: 10px 10px 20px rgba(122, 25, 1, 0.7);
+         box-shadow:
+    -2px 0 10px #C00A67,
+     0px 0 10px #DD788C,
+    -2px 0 10px #F9E3B0,
+     2px 0 10px #FE838D,
+      0 0 10px #FF5877;
             padding: 20px;
             opacity: 0;
             transform: translate(-50%, -50%) translateY(100px);
@@ -881,6 +1299,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             pointer-events: auto;
         }
 
+
         .story-input::placeholder {
             color: rgba(255, 255, 255, 0.5);
         }
@@ -897,7 +1316,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             position: relative;
             float: right;
             transition: all 0.3s ease;
-            pointer-events: auto;
+            pointer-events: none;
         }
 
         .brainstorm-button::before {
@@ -991,14 +1410,15 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             width: 100vw;
             height: 100vh;
             opacity: 0;
-            pointer-events: auto;
+            pointer-events: none;
             z-index: 300;
         }
 
         .testimonial-header {
             position: absolute;
             top: 20%;
-            left: 500px;
+            left: 550px;
+            width: 50%;
             /* transform: translateX(-50%); */
             /* text-align: center; */
             opacity: 0;
@@ -1053,7 +1473,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 }
         .cards-container {
     position: absolute;
-    top:40%;
+    top:45%;
     left: 50%;
     transform: translateX(-50%);
     width: 90vw;
@@ -1072,6 +1492,10 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         }
 
         .testimonial-card {
+            display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 400px;
     min-width: 300px;
     background: #000;
     border: 2px solid rgba(255, 165, 0, 0.3);
@@ -1127,7 +1551,10 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             font-size: 0.8rem;
         }
 
-        .chat-button {
+      .chat-button {
+    display: flex;
+    align-items: center; /* baseline → sometimes misaligns */
+    justify-content: center;
     background: transparent;
     border: 2px solid rgba(255, 255, 255, 0.3);
     color: white;
@@ -1135,18 +1562,18 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
-    pointer-events: auto;
     width: 100%;
     text-transform: uppercase;
     font-weight: bold;
 }
 
-.chat-button:hover {
-    background: rgba(255, 165, 0, 0.2);
-    border-color: rgba(255, 165, 0, 0.7);
-    color: #ff8000;
+.testimonial-card .chat-button:hover {
+    background: rgba(255, 165, 0, 0.2) !important;
+    border-color: rgba(255, 165, 0, 0.7) !important;
+    color: #ff8000 !important;
     transform: scale(1.05);
 }
+
 
         /* Section Eleven Elements */
         .section-eleven-content {
@@ -1540,7 +1967,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 .nav-links {
     display: flex;
     gap: 20px;
-    pointer-events: auto;
+    pointer-events: none;
 }
 
 .nav-links a {
@@ -1593,23 +2020,26 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     /* gap: 20px; */
 }
 .connection-curves svg {
-    /* width: 900px;
-    height: 200px; */
+    width: 900px;
+    height: 200px;
     display: block;
 }
 #curveSvg1 {
     position: absolute;
-    bottom: 400px;
+    right:48px;
+    bottom: 520px;
 }
 
 #curveSvg2 {
     position: absolute;
-    bottom: 300px;
+    left:21%;
+    bottom: 480px;
 }
 
 #curveSvg3 {
     position: absolute;
-    bottom: 350px;
+    left:-22%;
+    bottom: 450px;
 }
 
 .curve-path {
@@ -1627,7 +2057,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     border-radius: 50%;
     position: absolute;
     opacity: 0;
-    box-shadow: 0 0 15px white;
+    box-shadow: 0 0 35px white;
 }
 
         @keyframes gradientShift {
@@ -1692,7 +2122,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     z-index: 0;
     opacity: 0;
     background-size: cover;
-    background-position: center;
+    background-position: top;
     background-repeat: no-repeat;
 }
 .section-three-overlays {
@@ -1845,11 +2275,13 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 }
 .rotating-container {
     position: absolute;
-    top: -88%;
+    top: -50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 1900px;
-    height: 1900px;
+    width: 250vw;   
+    height: 250vw;  
+    max-width: 1900px; 
+    max-height: 1900px;
     opacity: 0;
 }
 
@@ -1858,14 +2290,14 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     height: 100%;
     border: 1px solid rgba(251, 1, 1, 1);
     border-radius: 50%;
-    top:-90px;
+    top:-130px;
     position: absolute;
     transform-origin: center;
 }
 
 .feature-orbit {
     position: relative;
-    top: -140px;
+    top:-140px;
     left: 50%;
     transform: translateX(-50%);
     width: 300px;
@@ -1948,15 +2380,15 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 }
 
 .orbit-container.one .feature-orbit {
-    animation: counter-rotate-one 3s ease-in-out 0s forwards;
+    animation: counter-rotate-one 2s ease-in-out 0s forwards;
 }
 
 .orbit-container.two .feature-orbit {
-    animation: counter-rotate-two 3s ease-in-out 1s forwards;
+    animation: counter-rotate-two 2s ease-in-out 1s forwards;
 }
 
 .orbit-container.three .feature-orbit {
-    animation: counter-rotate-three 3s ease-in-out 2s forwards;
+    animation: counter-rotate-three 2s ease-in-out 2s forwards;
 }
 
 @keyframes bounceInCircle1 {
@@ -2033,6 +2465,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         transform: translateY(0);
     }
 }
+
 
 .overlay-1 { z-index: 3; }
 .overlay-2 { z-index: 2; }
@@ -2227,7 +2660,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     /* Section 10 Mobile Adjustments */
     .testimonial-header {
         top: 5%;
-        left: 50%;
+        left: 45%;
         transform: translateX(-50%);
         text-align: center;
         width: 90%;
@@ -2270,6 +2703,73 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
         display: inline;
         width: 100%;
     }
+    .rotating-container {
+      width: 150vw;   /* phone me chhota circle */
+      height: 150vw;
+      top: 30%;
+  }
+  .feature-orbit {
+    top: -109px;
+}
+  .feature-header {
+    font-size:0.9rem;
+  }
+  .feature-description {
+    font-size:0.6rem;
+  }
+
+  .feature-orbit {
+      width: 150px;   /* text + circle ko bhi chhota karo */
+  }
+
+  @keyframes rotate-orbit-one {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(203deg); }
+}
+
+@keyframes rotate-orbit-two {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(180deg); }
+}
+
+@keyframes rotate-orbit-three {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(158deg); }
+}
+@keyframes counter-rotate-one {
+    from { 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    to { 
+        transform: translateX(-50%) rotate(-203deg); 
+    }
+}
+
+@keyframes counter-rotate-two {
+    from { 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    to { 
+        transform: translateX(-50%) rotate(-180deg); 
+    }
+}
+
+@keyframes counter-rotate-three {
+    from { 
+        transform: translateX(-50%) rotate(0deg); 
+    }
+    to { 
+        transform: translateX(-50%) rotate(-158deg); 
+    }
+}
+  .feature-circle-orbit {
+      width: 40px;
+      height: 40px;
+  }
+
+  .feature-circle-orbit i {
+      font-size: 18px;
+  }
     
     .section-twelve-right {
         top: auto;
@@ -2313,6 +2813,38 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
             font-size: 30px;
         }
 
+}
+/* --- Force all main buttons clickable above overlays --- */
+.ved-button,
+.contact-button,
+.explore-button,
+.chat-button,
+.explore-ips-button,
+.brainstorm-button {
+    position: relative !important;
+    z-index: 9999 !important;   /* sabse upar */
+    pointer-events: auto !important;
+}
+
+/* links bhi upar honi chahiye */
+a {
+    position: relative;
+    z-index: 9999;
+    pointer-events: auto;
+}
+.gallery-link {
+    position: relative !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    display: inline-block; /* spacing & layout ke liye */
+}
+
+/* overlays ko pass-through bana do */
+.tombstone-transition,
+.background-mask,
+.ui-overlay,
+.nav-frame {
+    pointer-events: none !important;
 }
 .ved-button,
 .contact-button,
