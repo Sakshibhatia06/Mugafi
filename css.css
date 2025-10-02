@@ -1521,7 +1521,7 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
     margin: 20px;
     opacity: 0;
     z-index: 200;
-    background-image: url('./assets/Rectangle 8305.png');
+    background-image: url('./assets/Rectangle 8305.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -2076,19 +2076,19 @@ h1, h2, h3, h4, h5, h6, p, span, a, button, input, textarea, div {
 .overlay-2 { z-index: 2; }
 .overlay-3 { z-index: 1; }
 
-.mask-1 { background-image: url('./assets/Mask group-2.png'); }
+.mask-1 { background-image: url('./assets/Mask group-2.webp'); }
 .mask-2 { 
-    background-image: url('./assets/Group 1171275138.png'); 
+    background-image: url('./assets/Group 1171275138.webp'); 
     background-size: 100% 100%; /* Force to cover entire area */
     background-repeat: no-repeat;
     height: 100vh;
     width: 100vw;
 }
-.mask-3 { background-image: url('./assets/image 269.png'); }
-.mask-4 { background-image: url('./assets/glows.png'); }
-.mask-5 { background-image: url('./assets/glows-2.png'); }
-.mask-6 { background-image: url('./assets/koncepted.ai_red_rose_color_pallete_detailed_smooth_mountains_i_81b88cf3-c6dd-4118-9c38-94b63a67f4d2-2 1.png'); }
-.mask-7 { background-image: url('./assets/image 376.png'); }
+.mask-3 { background-image: url('./assets/image 269.webp'); }
+.mask-4 { background-image: url('./assets/glows.webp'); }
+.mask-5 { background-image: url('./assets/glows-2.webp'); }
+.mask-6 { background-image: url('./assets/koncepted.ai_red_rose_color_pallete_detailed_smooth_mountains_i_81b88cf3-c6dd-4118-9c38-94b63a67f4d2-2 1.webp'); }
+.mask-7 { background-image: url('./assets/image 376.webp'); }
 
 /* Add these styles to your existing CSS */
 
