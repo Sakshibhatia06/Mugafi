@@ -28,7 +28,7 @@ let touchStartX = 0;
 let lastTouchTime = 0;
 let isTouchDevice = false;
 let touchSensitivity = 50; // Minimum swipe distance
-let touchTimeLimit = 500; // Maximum time for swipe gesture
+let touchTimeLimit = 300; // Maximum time for swipe gesture
 
 // Detect if device supports touch
 function detectTouchDevice() {
@@ -107,7 +107,7 @@ function handleTouchEnd(e) {
 
 function createModelPlane() {
     // Create particle system for X shape with concentration towards the center lines
-    const particleCount = 5000;
+    const particleCount = 4000;
     const positions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
 
@@ -204,13 +204,6 @@ function updateNavigationDots() {
         <div class="nav-dot"></div>
         <div class="nav-dot"></div>
         <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
-        <div class="nav-dot"></div>
     `;
 }
 function isMobile() {
@@ -250,45 +243,45 @@ class AssetLoader {
 
         // Add all the mask background images and other assets
         const allAssets = [
-            './assets/Group 1171275088.png',
-            './assets/Rectangle 8311-3.png',
-            './assets/Group 1171275097-1.png',
-            './assets/Frame 2147224148-8.png',
-            './assets/Frame 2147224148-6.png',
-            './assets/Frame 2147224148.png',
-            './assets/Vector 61.png',
-            './assets/Vector 61-1.png',
-            './assets/Vector 61-2.png',
-            './assets/Vector 61-3.png',
-            './assets/Vector 61-5.png',
-            './assets/Frame 2147224336.png',
-            './assets/Frame 2147224180-5.png',
-            './assets/Group 1171275118.png',
-            './assets/Frame 2147224338.png',
-            './assets/Frame 2147224338-1.png',
-            './assets/Frame 2147224339.png',
-            './assets/Frame 2147224339-2.png',
-            './assets/Frame 2147224340.png',
-            './assets/Frame 2147224341.png',
-            './assets/Mask group-8.png',
-            './assets/Frame 2147224148-4.png',
-            './assets/Frame 2147224339-1.png',
+            './assets/Group 1171275088.webp',
+            './assets/Rectangle 8311-3.webp',
+            './assets/Group 1171275097-1.webp',
+            './assets/Frame 2147224148-8.webp',
+            './assets/Frame 2147224148-6.webp',
+            './assets/Frame 2147224148.webp',
+            './assets/Vector 61.webp',
+            './assets/Vector 61-1.webp',
+            './assets/Vector 61-2.webp',
+            './assets/Vector 61-3.webp',
+            './assets/Vector 61-5.webp',
+            './assets/Frame 2147224336.webp',
+            './assets/Frame 2147224180-5.webp',
+            './assets/Group 1171275118.webp',
+            './assets/Frame 2147224338.webp',
+            './assets/Frame 2147224338-1.webp',
+            './assets/Frame 2147224339.webp',
+            './assets/Frame 2147224339-2.webp',
+            './assets/Frame 2147224340.webp',
+            './assets/Frame 2147224341.webp',
+            './assets/Mask group-8.webp',
+            './assets/Frame 2147224148-4.webp',
+            './assets/Frame 2147224339-1.webp',
             // Background masks
-            './assets/Mask group-2.png',
-            './assets/Group 1171275138.png',
-            './assets/image 269.png',
-            './assets/glows.png',
-            './assets/glows-2.png',
-            './assets/koncepted.ai_red_rose_color_pallete_detailed_smooth_mountains_i_81b88cf3-c6dd-4118-9c38-94b63a67f4d2-2 1.png',
-            './assets/image 376.png',
+            './assets/Mask group-2.webp',
+            './assets/Group 1171275138.webp',
+            './assets/image 269.webp',
+            './assets/glows.webp',
+            './assets/glows-2.webp',
+            './assets/koncepted.ai_red_rose_color_pallete_detailed_smooth_mountains_i_81b88cf3-c6dd-4118-9c38-94b63a67f4d2-2 1.webp',
+            './assets/image 376.webp',
             // Section 15 backgrounds
-            './assets/creator ownership.png',
-            './assets/koncepted.ai_A_surreal_scene_with_a_circle_of_human_silhouettes_c0d5e498-c93a-4922-b101-5c5ed5a9b2eb 1.png',
-            './assets/transparent funding.png',
-            './assets/global reach.png',
-            './assets/global reach-1.png',
+            './assets/creator ownership.webp',
+            './assets/koncepted.ai_A_surreal_scene_with_a_circle_of_human_silhouettes_c0d5e498-c93a-4922-b101-5c5ed5a9b2eb 1.webp',
+            './assets/transparent funding.webp',
+            './assets/global reach.webp',
+            './assets/global reach-1.webp',
             // Navigation
-            './assets/Rectangle 8305.png'
+            './assets/Rectangle 8305.webp'
         ];
 
         // Add all assets to sources
@@ -429,13 +422,7 @@ function updateLoadingDisplay(progress, loaded, total, currentSrc = '') {
     
     if (loadingText) {
         if (total > 0) {
-            const fileName = currentSrc ? currentSrc.split('/').pop() : '';
-            loadingText.textContent = `loading assets ... (${loaded}/${total})`;
-            
-            // Optionally show current file being loaded
-            if (fileName && loaded < total) {
-                loadingText.textContent += ` • ${fileName}`;
-            }
+            loadingText.textContent = `loading Multiverse ...`;
         } else {
             loadingText.textContent = `scanning assets ...`;
         }
@@ -443,7 +430,7 @@ function updateLoadingDisplay(progress, loaded, total, currentSrc = '') {
 }
 
 function createParticleSystem() {
-    const particleCount = 200;
+    const particleCount = 1000;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
     
@@ -451,7 +438,7 @@ function createParticleSystem() {
     for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
         const angle = Math.random() * Math.PI * 2;
-        const radius = Math.random() * 15 + 5;
+        const radius = Math.random() * 3 + 4;
         
         if (i % 2 === 0) {
             // First diagonal of X
@@ -463,7 +450,7 @@ function createParticleSystem() {
             positions[i3 + 1] = Math.sin(angle + Math.PI/2) * radius * 0.7;
         }
         
-        positions[i3 + 2] = (Math.random() - 0.5) * 20; // Spread in Z
+        positions[i3 + 2] = (Math.random() - 0.5) * 10; // Spread in Z
     }
     
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -491,8 +478,8 @@ function createModelParticleBackground() {
     // Create X-shape pattern behind the model with more visibility
     for (let i = 0; i < particleCount; i++) {
         const i3 = i * 3;
-        const t = (i / particleCount) * Math.PI * 6; // More rotations for denser pattern
-        const radius = 5 + Math.random() * 3; // Larger radius for better visibility
+        const t = (i / particleCount) * Math.PI * 3; // More rotations for denser pattern
+        const radius = 1 + Math.random() * 2; // Larger radius for better visibility
         
         if (i % 2 === 0) {
             // First diagonal of X
@@ -511,7 +498,7 @@ function createModelParticleBackground() {
     
     const material = new THREE.PointsMaterial({
         color: 0xffffff,
-        size: 0.15, // Larger size for better visibility
+        size: 0.12, // Larger size for better visibility
         transparent: true,
         opacity: 0.8, // Higher opacity
         blending: THREE.AdditiveBlending
@@ -532,13 +519,13 @@ function createPlaceholderPlanet() {
     
     // Create gradient texture for darker bottom
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
+    canvas.width = 356;
+    canvas.height = 356;
     const ctx = canvas.getContext('2d');
     
     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, '#ff4444');
-    gradient.addColorStop(0.7, '#ff4444');
+    gradient.addColorStop(0, '#980000ff');
+    gradient.addColorStop(0.7, '#970000ff');
     gradient.addColorStop(1, '#222222');
     
     ctx.fillStyle = gradient;
@@ -579,37 +566,43 @@ function createPlaceholderPlanet() {
     window.modelBackgroundParticles = createModelParticleBackground();
 }
 
-
-// Animation loop
 function animate() {
     requestAnimationFrame(animate);
-    
+
     if (planet3D) {
-        planet3D.rotation.y += 0.01;
-        
-        // Move particle system with the planet
+        planet3D.rotation.y += 0.003;
+
+        const showParticles = (currentSection === 1); 
+        // Particle System
         if (particleSystem) {
-            particleSystem.position.x = planet3D.position.x;
-            particleSystem.position.y = planet3D.position.y;
-            particleSystem.position.z = planet3D.position.z - 5;
-            particleSystem.rotation.z += 0.002;
+            particleSystem.visible = showParticles;  // visibility control
+            if (showParticles) {
+                // Static: position and rotation fixed
+                particleSystem.position.x = planet3D.position.x;
+                particleSystem.position.y = planet3D.position.y;
+                particleSystem.position.z = planet3D.position.z - 5;
+                // particleSystem.rotation.z += 0.002;  // remove this for static
+            }
         }
-        
-        // Move model background particles with the planet
+
+        // Model Background Particles
         if (window.modelBackgroundParticles) {
-            window.modelBackgroundParticles.position.x = planet3D.position.x;
-            window.modelBackgroundParticles.position.y = planet3D.position.y;
-            window.modelBackgroundParticles.position.z = planet3D.position.z - 3;
-            window.modelBackgroundParticles.rotation.z += 0.003; // Faster rotation for visibility
-            window.modelBackgroundParticles.rotation.x += 0.001;
+            window.modelBackgroundParticles.visible = showParticles;
+            if (showParticles) {
+                window.modelBackgroundParticles.position.x = planet3D.position.x;
+                window.modelBackgroundParticles.position.y = planet3D.position.y;
+                window.modelBackgroundParticles.position.z = planet3D.position.z - 3;
+                // window.modelBackgroundParticles.rotation.z += 0.003; // remove for static
+                // window.modelBackgroundParticles.rotation.x += 0.001;
+            }
         }
     }
-    
+
+    // Model plane visibility
     if (planet3D && window.modelPlane) {
         if (currentSection === 1) {
             window.modelPlane.visible = false;
         } else {
-            // Show X-plane when 3D model is visible (has scale > 0)
             const isModelVisible = planet3D.scale.x > 0 || planet3D.scale.y > 0 || planet3D.scale.z > 0;
             window.modelPlane.visible = isModelVisible;
         }
@@ -619,6 +612,7 @@ function animate() {
     renderer.clear();
     renderer.render(scene, camera);
 }
+
 
 // Animation and section management
 let loadingProgress = 0;
@@ -653,7 +647,7 @@ function startSection1() {
     
     gsap.to(semicircle, {
         duration: 1,
-        width: '150px',
+        width: '200px',
         height: '300px',
         borderRadius: '75px 75px 0 0',
         ease: "power2.inOut",
@@ -879,7 +873,7 @@ function startSection3() {
 
     // Move tombstones with the planet and fade out
     gsap.to(['.tombstone-1', '.tombstone-2', '.tombstone-3', '.tombstone-4'], {
-        duration: 1,
+        duration: 3,
         scale: 10,
         opacity: 0,
         z: 1000,
@@ -1004,6 +998,13 @@ function startSection4() {
             ease: "power2.inOut"
         });
     }
+    gsap.to(planet3D.scale, {
+        duration: 1.5,
+        x: 1.1, 
+        y: 1.1,
+        z: 1.1,
+        ease: "power2.inOut"
+    });
 
         if (planetBackground) {
             gsap.to(planetBackground.material, {
@@ -1094,9 +1095,9 @@ function startSection5() {
     }
         
         gsap.to(planet3D.scale, {
-            duration: 1.5,
-            x: 1,
-            y: 1,
+            duration: 1.2,
+            x: 1.2,
+            y: 1.6,
             z: 1,
             ease: "power2.inOut"
         });
@@ -1685,7 +1686,7 @@ function startSection14() {
         x: 0,
         opacity: 1,
         ease: "back.out(1.7)",
-        delay: 2.8 // After transition completes
+        delay: 2// After transition completes
     });
 
     gsap.to('.section-fourteen-right', {
